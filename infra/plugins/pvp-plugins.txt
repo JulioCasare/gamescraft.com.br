@@ -1,0 +1,6 @@
+# Arena/KitPvP for the beta: kits and any ranked system stay undecided until the
+# first tests. Keep the plugin URL here only after checking its licence, Paper
+# 1.21.8 support and how it behaves with Bedrock touch controls and aim.
+#
+# Anything sold for this mode must stay cosmetic: selling stronger kits turns the
+# server pay-to-win and is the fastest way to lose the competitive players.

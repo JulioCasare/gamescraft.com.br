@@ -1,0 +1,4 @@
+# Keep the Build Battle plugin URL here only after you choose a licensed plugin.
+# Build Battle is the mode most likely to break on Bedrock: check that the theme
+# voting menu, the block picker and the plot timer are readable through Geyser,
+# and that creative flight inside a plot does not trigger the anti-cheat.

@@ -1,0 +1,60 @@
+name: Relato de bug
+description: Reporte um problema encontrado no beta.
+title: "[Bug]: "
+labels: ["bug", "beta"]
+body:
+  - type: markdown
+    attributes:
+      value: "Não publique senha, token, IP privado ou dados pessoais."
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Edição usada
+      options:
+        - Java
+        - Bedrock
+        - Ambas
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versão do Minecraft e aparelho
+      placeholder: "Ex.: Java 1.21.8 no Windows 11"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área afetada
+      options:
+        - Lobby
+        - BedWars
+        - Pillars of Fortune
+        - Build Battle
+        - Capture the Flag
+        - PvP
+        - Login/conexão
+        - Loja ou cosméticos
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: O que deveria acontecer?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Prints, vídeo ou mensagem de erro
+    validations:
+      required: false

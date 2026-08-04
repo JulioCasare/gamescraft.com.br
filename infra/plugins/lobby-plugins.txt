@@ -1,0 +1,9 @@
+# Add only reviewed direct JAR URLs, one per line.
+# Do not add a plugin simply because it is popular: check Paper 1.21.8 support,
+# licence, update history, Bedrock behavior, and source/reputation first.
+#
+# Suggested categories after approval:
+# - permissions (LuckPerms)
+# - menus / lobby tools
+# - anti-cheat
+# - moderation

@@ -1,0 +1,4 @@
+# Keep the Capture the Flag plugin URL here only after reviewing its licence,
+# Paper 1.21.8 support and map requirements. Confirm that the flag carrier
+# indicator, team colours and scoreboard are visible to Bedrock players, since
+# Geyser renders some particle and glow effects differently.

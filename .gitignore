@@ -1,0 +1,25 @@
+# Runtime, worlds and databases
+infra/runtime/
+
+# Secrets and local environment
+infra/.env
+infra/*.secret
+*.key
+*.pem
+
+# Minecraft server artifacts
+*.jar
+*.zip
+*.tar.gz
+logs/
+crash-reports/
+world/
+world_nether/
+world_the_end/
+
+# IDE and operating system files
+.idea/
+.vscode/
+*.iml
+Thumbs.db
+Desktop.ini

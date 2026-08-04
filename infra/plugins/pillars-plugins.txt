@@ -1,0 +1,2 @@
+# Keep the Pillars of Fortune plugin URL here only after reviewing its licence,
+# telemetry behavior, Paper 1.21.8 support, and Bedrock playability.

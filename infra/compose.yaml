@@ -1,0 +1,241 @@
+name: game-craft-beta
+
+services:
+  proxy:
+    image: itzg/mc-proxy:java21
+    restart: unless-stopped
+    environment:
+      TYPE: VELOCITY
+      VELOCITY_VERSION: latest
+      MEMORY: "${MEMORY_PROXY:-1G}"
+      REPLACE_ENV_VARIABLES: "false"
+      PLUGINS_FILE: /extras/proxy-plugins.txt
+    ports:
+      - "${JAVA_PORT:-25565}:25565/tcp"
+      - "${BEDROCK_PORT:-19132}:19132/udp"
+    volumes:
+      - ./runtime/proxy:/server
+      - ./runtime/proxy-config:/config:ro
+      - ./plugins/proxy-plugins.txt:/extras/proxy-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      lobby:
+        condition: service_started
+
+  lobby:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_LOBBY:-1500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft Lobby"
+      MOTD: "Game Craft | Lobby beta"
+      MAX_PLAYERS: "50"
+      MODE: adventure
+      DIFFICULTY: peaceful
+      PVP: "false"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "8"
+      SIMULATION_DISTANCE: "6"
+      PLUGINS_FILE: /extras/lobby-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/lobby:/data
+      - ./plugins/lobby-plugins.txt:/extras/lobby-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
+  bedwars:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_BEDWARS:-2500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft BedWars"
+      MOTD: "Game Craft | BedWars beta"
+      MAX_PLAYERS: "32"
+      MODE: adventure
+      DIFFICULTY: normal
+      PVP: "true"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "8"
+      SIMULATION_DISTANCE: "6"
+      PLUGINS_FILE: /extras/bedwars-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/bedwars:/data
+      - ./plugins/bedwars-plugins.txt:/extras/bedwars-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
+  pillars:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_PILLARS:-1500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft Pillars"
+      MOTD: "Game Craft | Pillars of Fortune beta"
+      MAX_PLAYERS: "24"
+      MODE: adventure
+      DIFFICULTY: normal
+      PVP: "true"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "8"
+      SIMULATION_DISTANCE: "6"
+      PLUGINS_FILE: /extras/pillars-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/pillars:/data
+      - ./plugins/pillars-plugins.txt:/extras/pillars-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
+  buildbattle:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_BUILDBATTLE:-1500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft Build Battle"
+      MOTD: "Game Craft | Build Battle beta"
+      MAX_PLAYERS: "24"
+      MODE: adventure
+      DIFFICULTY: peaceful
+      PVP: "false"
+      # O plugin de Build Battle coloca o jogador em criativo dentro da parcela.
+      # Sem allow-flight o Paper expulsa quem estiver voando.
+      ALLOW_FLIGHT: "TRUE"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "6"
+      SIMULATION_DISTANCE: "4"
+      PLUGINS_FILE: /extras/buildbattle-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/buildbattle:/data
+      - ./plugins/buildbattle-plugins.txt:/extras/buildbattle-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
+  ctf:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_CTF:-1500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft Capture the Flag"
+      MOTD: "Game Craft | Capture the Flag beta"
+      MAX_PLAYERS: "24"
+      MODE: adventure
+      DIFFICULTY: normal
+      PVP: "true"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "8"
+      SIMULATION_DISTANCE: "6"
+      PLUGINS_FILE: /extras/ctf-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/ctf:/data
+      - ./plugins/ctf-plugins.txt:/extras/ctf-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
+  pvp:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_PVP:-1500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft PvP"
+      MOTD: "Game Craft | PvP beta"
+      MAX_PLAYERS: "24"
+      MODE: adventure
+      DIFFICULTY: normal
+      PVP: "true"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "6"
+      SIMULATION_DISTANCE: "4"
+      PLUGINS_FILE: /extras/pvp-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/pvp:/data
+      - ./plugins/pvp-plugins.txt:/extras/pvp-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: "${DATABASE_NAME}"
+      MARIADB_USER: "${DATABASE_USER}"
+      MARIADB_PASSWORD: "${DATABASE_PASSWORD}"
+      MARIADB_ROOT_PASSWORD: "${DATABASE_ROOT_PASSWORD}"
+    volumes:
+      - ./runtime/mariadb:/var/lib/mysql
+    networks:
+      - gamecraft
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -p\"$$MARIADB_ROOT_PASSWORD\" --silent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  gamecraft:
+    driver: bridge

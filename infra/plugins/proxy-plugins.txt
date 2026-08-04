@@ -1,0 +1,4 @@
+# Official GeyserMC builds for Java + Bedrock cross-play.
+# These URLs deliberately resolve the current production build; retest after upgrades.
+https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
+https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity

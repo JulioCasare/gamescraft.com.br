@@ -1,0 +1,3 @@
+# Keep the BedWars plugin URL here only after you choose a licensed plugin and
+# validate its compatibility with Paper 1.21.8, Geyser/Floodgate, your map, and
+# at least 16 concurrent test players.
