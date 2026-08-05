@@ -56,7 +56,37 @@ O primeiro boot cria arquivos de servidor em `infra/runtime/`; eles são intenci
 
 ## Memória
 
-Seis servidores Paper mais o proxy pedem cerca de **11,5 GB** de heap com os valores padrão de `infra/.env`, e o Docker ainda precisa de espaço para o MariaDB e para os próprios containers. Reserve **16 GB** para o Docker.
+O heap não é o consumo total: cada JVM usa de 25% a 40% a mais fora dele, em metaspace, GC e buffers de rede. Some ~500 MB de MariaDB e ~700 MB de sistema. Encostar o heap no limite da máquina faz o kernel matar um servidor no meio da partida.
+
+### Perfis prontos
+
+**8 GB de RAM — dois modos.** O limite é memória:
+
+```ini
+MEMORY_PROXY=512M
+MEMORY_LOBBY=1G
+MEMORY_BEDWARS=2G
+MEMORY_PVP=1G
+```
+
+```bash
+docker compose --env-file infra/.env -f infra/compose.yaml up -d proxy bedwars pvp
+```
+
+Nesse perfil o evento precisa ceder espaço: `./scripts/event.sh abrir --mapa NOME --liberar bedwars`.
+
+**16 GB com 4 vCPU — dois modos.** O limite passa a ser CPU: proxy, lobby, BedWars e PvP são quatro threads principais em quatro núcleos, e um terceiro modo passaria a disputar:
+
+```ini
+MEMORY_PROXY=1G
+MEMORY_LOBBY=1500M
+MEMORY_BEDWARS=3G
+MEMORY_PVP=1500M
+```
+
+Aqui o servidor de eventos sobe sem liberar nada — durante o evento os minigames ficam vazios e suas threads ociam.
+
+**Os seis modos abertos** pedem ~11,5 GB de heap com os valores padrão de `infra/.env`, ou seja 16 GB de RAM e pelo menos 6 vCPU. Antes de chegar lá, leia a parte de população no [ROADMAP](docs/ROADMAP.md): modo aberto sem gente para encher partida só mostra fila vazia.
 
 No Windows, o Docker Desktop usa o WSL 2 e por padrão pega apenas metade da RAM da máquina. Para fixar o limite, crie `C:\Users\<seu-usuario>\.wslconfig`:
 
@@ -68,15 +98,9 @@ processors=12
 
 Depois execute `wsl --shutdown` e reabra o Docker Desktop.
 
-Se preferir não subir tudo de uma vez, nomeie só os modos que vai testar — o proxy, o lobby e o banco sobem junto como dependência:
+Nomear os modos no `up -d` sobe só o que você pediu: o lobby e o banco entram junto como dependência do proxy.
 
-```powershell
-docker compose --env-file infra/.env -f infra/compose.yaml up -d proxy bedwars
-```
-
-Para ajustar o heap de um modo, mude o `MEMORY_*` correspondente em `infra/.env`. Aumente somente depois que o `spark` mostrar falta real de memória: heap grande demais deixa as pausas de coleta de lixo mais longas.
-
-O servidor `eventos` não entra nessa conta: ele sobe só no dia do evento, cedendo a memória de um modo do dia a dia. Veja [docs/EVENTS.md](docs/EVENTS.md).
+Aumente um `MEMORY_*` somente depois que o `spark` mostrar falta real de memória. Heap grande demais não é de graça: deixa as pausas de coleta de lixo mais longas, o que aparece como travadinha durante a partida.
 
 ## Antes de convidar testadores
 
