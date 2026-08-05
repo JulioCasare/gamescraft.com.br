@@ -22,4 +22,26 @@ Os arquivos `*.txt` desta pasta são listas de URLs que o container baixa no pri
 
 Prefira, quando possível, um único plugin que cubra vários modos: menos superfície para conflitos, uma licença só e um lugar só para atualizar. Se cada modo vier de um autor diferente, teste a combinação inteira antes de abrir o beta.
 
+## Critérios para o plugin de minigame
+
+Além de licença e suporte ao Paper 1.21.8, quatro coisas decidem se ele serve para um servidor pequeno:
+
+**1. Formatos de partida configuráveis.** Plugin que só faz 4×4 exige 16 jogadores para começar. Com 12 online a partida nunca sai, e quem esperou fecha o jogo. Você precisa poder rodar solo e duplas enquanto a população é pequena, e aumentar o formato conforme cresce.
+
+**2. Teto de partidas simultâneas.** Cada partida carrega uma cópia do mapa — BedWars destrói o cenário, então não dá para reaproveitar. Plugin que cria arena sob demanda sem limite estoura a memória num pico. Precisa existir um número máximo configurável.
+
+**3. Descarregar o mundo ao fim da partida.** É a falha mais comum e a mais difícil de ver: o consumo sobe a cada partida e nunca volta, derrubando o servidor depois de algumas horas. Um teste de 10 minutos não revela isso.
+
+**4. Menus utilizáveis no Bedrock.** Loja, seleção de time e placar passam pelo Geyser, que renderiza inventário e formulário de forma diferente. Teste com um aparelho Bedrock de verdade, não só no Java.
+
+### Como testar o item 3
+
+Rode 5 ou 6 partidas seguidas acompanhando a memória:
+
+```bash
+docker stats gamecraft-bedwars-1
+```
+
+Se o consumo sobe a cada partida e não retorna ao patamar anterior, o plugin está vazando mundos. Descarte-o: isso não tem contorno pela configuração.
+
 O arquivo [BETA-CHECKLIST](../../docs/BETA-CHECKLIST.md) define os testes mínimos antes de abrir o acesso.
