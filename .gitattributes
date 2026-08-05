@@ -5,3 +5,5 @@
 *.txt text eol=lf
 *.md text eol=lf
 *.ps1 text eol=crlf
+# Um .sh com CRLF quebra o shebang no Linux ("bad interpreter").
+*.sh text eol=lf
