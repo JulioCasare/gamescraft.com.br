@@ -73,6 +73,14 @@ done
 
 mkdir -p "$runtime_root/proxy" "$runtime_root/mariadb"
 
+# Icone da lista de servidores. O Velocity le server-icon.png do proprio
+# diretorio e exige exatamente 64x64; fora disso ele ignora o arquivo.
+server_icon="$infra_root/branding/server-icon.png"
+if [[ -f "$server_icon" ]]; then
+    cp -f "$server_icon" "$runtime_root/proxy/server-icon.png"
+    echo "Icone do servidor aplicado."
+fi
+
 # Mapas-modelo dos eventos. Cada evento roda sobre uma copia limpa daqui, porque
 # lava sobe, explosao e bloco quebrado destroem o mapa durante a partida.
 mkdir -p "$runtime_root/event-maps"

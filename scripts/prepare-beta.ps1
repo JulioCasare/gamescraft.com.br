@@ -86,6 +86,14 @@ foreach ($serverName in @("lobby", "bedwars", "pillars", "buildbattle", "ctf", "
 New-Item -ItemType Directory -Force -Path (Join-Path $runtimeRoot "proxy") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $runtimeRoot "mariadb") | Out-Null
 
+# Icone da lista de servidores. O Velocity le server-icon.png do proprio
+# diretorio e exige exatamente 64x64; fora disso ele ignora o arquivo.
+$serverIcon = Join-Path $infraRoot "branding\server-icon.png"
+if (Test-Path -LiteralPath $serverIcon) {
+    Copy-Item -LiteralPath $serverIcon -Destination (Join-Path $runtimeRoot "proxy\server-icon.png") -Force
+    Write-Host "Icone do servidor aplicado."
+}
+
 Write-Host ""
 Write-Host "Ambiente beta preparado." -ForegroundColor Green
 Write-Host "Host configurado: $PublicHost"
