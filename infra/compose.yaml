@@ -35,6 +35,11 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft Lobby"
       MOTD: "Game Craft | Lobby beta"
+      # Beta fechado: so entra quem esta na whitelist. Sair do beta e trocar
+      # BETA_WHITELIST para FALSE em infra/.env e reiniciar a rede.
+      # ENFORCE derruba quem ja estiver dentro e sair da lista.
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "50"
       MODE: adventure
       DIFFICULTY: peaceful
@@ -67,6 +72,8 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft BedWars"
       MOTD: "Game Craft | BedWars beta"
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "32"
       MODE: adventure
       DIFFICULTY: normal
@@ -99,6 +106,8 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft Pillars"
       MOTD: "Game Craft | Pillars of Fortune beta"
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"
       MODE: adventure
       DIFFICULTY: normal
@@ -131,6 +140,8 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft Build Battle"
       MOTD: "Game Craft | Build Battle beta"
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"
       MODE: adventure
       DIFFICULTY: peaceful
@@ -166,6 +177,8 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft Capture the Flag"
       MOTD: "Game Craft | Capture the Flag beta"
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"
       MODE: adventure
       DIFFICULTY: normal
@@ -198,6 +211,8 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft PvP"
       MOTD: "Game Craft | PvP beta"
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"
       MODE: adventure
       DIFFICULTY: normal
@@ -232,6 +247,8 @@ services:
       ENABLE_RCON: "FALSE"
       SERVER_NAME: "Game Craft Eventos"
       MOTD: "Game Craft | Evento"
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "60"
       # Survival para o jogador poder ser afetado pelo evento: queimar, cair,
       # levar dano. Em adventure ele nao quebra bloco e a lava nao o mata igual.

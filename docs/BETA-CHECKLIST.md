@@ -1,5 +1,27 @@
 # Checklist para beta fechado
 
+## Quem entra: whitelist, não limite de jogadores
+
+O `MAX_PLAYERS` de cada servidor é rede de proteção, não controle de acesso. Com 50 convidados você terá de 10 a 20 simultâneos nos melhores horários — o teto de 50 nunca vai ser atingido.
+
+Quem fecha o beta é a **whitelist**, ligada por `BETA_WHITELIST=TRUE` em `infra/.env`. Sem ela, qualquer um que descubra o IP entra.
+
+Para liberar um testador, em cada servidor que ele vai usar:
+
+```bash
+docker compose --env-file infra/.env -f infra/compose.yaml exec lobby rcon-cli whitelist add Fulano
+```
+
+Sem RCON habilitado, edite `infra/runtime/<servidor>/whitelist.json` e recarregue.
+
+**Jogador Bedrock entra com prefixo.** O Floodgate acrescenta um caractere ao nome (por padrão `.`), então o nome na whitelist precisa desse prefixo. Descubra o nome exato deixando a pessoa tentar entrar uma vez e lendo o log:
+
+```bash
+docker compose --env-file infra/.env -f infra/compose.yaml logs lobby | grep -i "not white-listed"
+```
+
+Convide em ondas — 10, depois 25, depois 50 — usando a whitelist como controle. Assim um bug atinge 10 pessoas, não 50.
+
 ## Infraestrutura
 
 - [ ] Docker e todos os oito serviços iniciam sem erro: proxy, lobby, bedwars, pillars, buildbattle, ctf, pvp e database.
@@ -39,3 +61,34 @@
 - [ ] 25 jogadores simultâneos: TPS e MSPT anotados.
 - [ ] 50 jogadores simultâneos: gargalos registrados e corrigidos.
 - [ ] Reinício controlado de cada minigame sem derrubar o proxy.
+
+## Como saber que o beta acabou
+
+Beta não termina por data nem por número de jogadores. Termina quando **o servidor funciona sozinho** — quando você consegue ser jogador em vez de plantão.
+
+O sinal mais confiável é este: **você passou três noites cheias seguidas sem precisar intervir.** Sem reiniciar nada, sem corrigir configuração, sem pedir desculpa a ninguém. Se ainda está apagando incêndio, ainda é beta, mesmo que a checklist esteja toda marcada.
+
+Os critérios objetivos:
+
+- [ ] **Duas semanas sem queda não planejada** de qualquer servidor.
+- [ ] **Nenhum bug grave aberto**: partida que não termina, item perdido, jogador preso, jogador que não consegue entrar.
+- [ ] A curva de bugs novos por sessão **parou de cair** — os relatos viraram sugestão de melhoria em vez de defeito.
+- [ ] Um jogador **Bedrock** e um **Java** completam o ciclo inteiro sem ajuda: entrar, jogar uma partida do início ao fim, voltar ao lobby, trocar de modo.
+- [ ] Testadores **voltam sem serem chamados**. Se só aparece gente quando você avisa no Discord, o servidor ainda não segura ninguém.
+- [ ] Três eventos seguidos rodaram do início ao fim sem intervenção.
+- [ ] Backup restaurado e verificado com dados reais.
+- [ ] Moderação, regras e canal de bug funcionando com gente de verdade usando.
+
+### O que "sair do beta" significa na prática
+
+É trocar uma linha em `infra/.env`:
+
+```ini
+BETA_WHITELIST=FALSE
+```
+
+E reiniciar a rede. A partir daí qualquer pessoa entra.
+
+Antes de fazer isso, complete a **Fase 9** do [passo a passo](PASSO-A-PASSO.md). Dois itens não são opcionais: **proteção DDoS** — servidor público de PvP é alvo, e o primeiro banido com raiva testa isso — e as **obrigações legais** da [monetização](MONETIZACAO.md), se você já tiver loja.
+
+Abrir ao público é reversível: basta voltar a variável para `TRUE`. Mas a primeira impressão de quem entrou e achou ruim não é.
