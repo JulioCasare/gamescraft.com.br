@@ -8,7 +8,8 @@ Cliente Java ─────── TCP 25565 ─┐                ┌─ Lobby
 Cliente Bedrock ─ UDP 19132 ────┘   Geyser       ├─ Pillars of Fortune
                                     Floodgate    ├─ Build Battle
                                                  ├─ Capture the Flag
-                                                 └─ PvP
+                                                 ├─ PvP
+                                                 └─ Eventos (so no dia)
                                                         |
                                                      MariaDB
 ```
@@ -20,6 +21,7 @@ O proxy autentica jogadores Java, recebe jogadores Bedrock através do Geyser e 
 - Um travamento ou reinício de BedWars não tira todo o lobby do ar.
 - Cada modo ganha memória e configuração próprias (`MEMORY_*` em `infra/.env`).
 - Modos com regras opostas convivem sem gambiarra: Build Battle roda em paz, sem PvP e com voo liberado, enquanto CTF e PvP ficam em dificuldade normal com PvP ativo.
+- O servidor `eventos` fica isolado porque suas regras estragariam qualquer minigame: `survival`, PvP ativo, voo liberado e mapa que é destruído a cada evento. Ele não sobe com a rede — veja [EVENTS.md](EVENTS.md).
 - Somente duas portas são públicas: 25565/TCP e 19132/UDP.
 - O banco não é acessível pela internet.
 - Velocity modern forwarding preserva UUID, IP e skins corretamente e protege contra conexões diretas aos backends quando o segredo é mantido privado.

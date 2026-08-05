@@ -76,6 +76,8 @@ docker compose --env-file infra/.env -f infra/compose.yaml up -d proxy bedwars
 
 Para ajustar o heap de um modo, mude o `MEMORY_*` correspondente em `infra/.env`. Aumente somente depois que o `spark` mostrar falta real de memória: heap grande demais deixa as pausas de coleta de lixo mais longas.
 
+O servidor `eventos` não entra nessa conta: ele sobe só no dia do evento, cedendo a memória de um modo do dia a dia. Veja [docs/EVENTS.md](docs/EVENTS.md).
+
 ## Antes de convidar testadores
 
 Leia e conclua [a checklist do beta](docs/BETA-CHECKLIST.md). Em especial, escolha plugins compatíveis, instale mapas licenciados, configure moderação e teste Java e Bedrock.

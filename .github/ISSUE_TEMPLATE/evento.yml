@@ -8,17 +8,19 @@ body:
       value: |
         Preencha o planejamento antes do evento e volte para completar o resultado depois.
         O histórico destas issues é o que decide qual modo vira permanente.
-  - type: dropdown
-    id: mode
+  - type: input
+    id: kind
     attributes:
-      label: Modo do evento
-      options:
-        - Build Battle
-        - Capture the Flag
-        - Pillars of Fortune
-        - BedWars
-        - PvP
-        - Outro
+      label: Tipo de evento
+      placeholder: "Ex.: A lava sobe"
+    validations:
+      required: true
+  - type: input
+    id: map
+    attributes:
+      label: Mapa usado
+      description: "Nome da pasta em infra/runtime/event-maps/"
+      placeholder: "Ex.: lava-sobe"
     validations:
       required: true
   - type: input
@@ -31,17 +33,27 @@ body:
   - type: input
     id: released
     attributes:
-      label: Modo pausado para liberar RAM
-      placeholder: "Ex.: pvp"
+      label: Modos pausados para liberar RAM
+      placeholder: "Ex.: bedwars, pvp"
     validations:
       required: false
+  - type: textarea
+    id: rules
+    attributes:
+      label: Regras do evento
+      placeholder: "Como vence, o que é proibido, o que acontece com quem for eliminado..."
+    validations:
+      required: true
   - type: checkboxes
     id: preflight
     attributes:
       label: Antes de anunciar
       options:
-        - label: Testei o modo do começo ao fim
-        - label: Um jogador Java e um Bedrock jogaram uma partida completa
+        - label: Rodei o evento inteiro sozinho antes de convidar alguém
+        - label: A cópia limpa do mapa foi testada
+        - label: O mecanismo do evento roda sozinho, sem eu digitar comando
+        - label: Eliminado vira espectador ou volta ao lobby
+        - label: O anti-cheat tem exceção para a minha conta em criativo
         - label: As regras estão escritas no Discord
         - label: O backup de ontem existe e está fora do servidor
   - type: markdown

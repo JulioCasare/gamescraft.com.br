@@ -218,6 +218,47 @@ services:
       database:
         condition: service_healthy
 
+  # Servidor dos eventos que voce mesmo conduz: lava sobe, corrida, quiz.
+  # Nao sobe junto com a rede; use scripts/event.sh no dia do evento.
+  eventos:
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      MEMORY: "${MEMORY_EVENTOS:-2G}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      SERVER_NAME: "Game Craft Eventos"
+      MOTD: "Game Craft | Evento"
+      MAX_PLAYERS: "60"
+      # Survival para o jogador poder ser afetado pelo evento: queimar, cair,
+      # levar dano. Em adventure ele nao quebra bloco e a lava nao o mata igual.
+      MODE: survival
+      DIFFICULTY: normal
+      PVP: "true"
+      # Voce precisa de voo para montar e acompanhar o evento de cima.
+      ALLOW_FLIGHT: "TRUE"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "10"
+      SIMULATION_DISTANCE: "6"
+      # O mapa e trocado por scripts/event.sh, nao gerado pelo servidor.
+      LEVEL_TYPE: FLAT
+      GENERATE_STRUCTURES: "false"
+      PLUGINS_FILE: /extras/eventos-plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - ./runtime/eventos:/data
+      - ./plugins/eventos-plugins.txt:/extras/eventos-plugins.txt:ro
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
   database:
     image: mariadb:11
     restart: unless-stopped

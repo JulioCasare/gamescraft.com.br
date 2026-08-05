@@ -64,7 +64,7 @@ sed "s|__VELOCITY_SECRET__|${velocity_secret}|" \
 printf '%s' "$velocity_secret" > "$proxy_config/forwarding.secret"
 chmod 600 "$proxy_config/forwarding.secret"
 
-for server_name in lobby bedwars pillars buildbattle ctf pvp; do
+for server_name in lobby bedwars pillars buildbattle ctf pvp eventos; do
     mkdir -p "$runtime_root/$server_name/config"
     sed "s|__VELOCITY_SECRET__|${velocity_secret}|" \
         "$infra_root/config/paper/paper-global.yml.template" \
@@ -73,10 +73,14 @@ done
 
 mkdir -p "$runtime_root/proxy" "$runtime_root/mariadb"
 
+# Mapas-modelo dos eventos. Cada evento roda sobre uma copia limpa daqui, porque
+# lava sobe, explosao e bloco quebrado destroem o mapa durante a partida.
+mkdir -p "$runtime_root/event-maps"
+
 # As imagens itzg rodam como UID 1000. Se as pastas ficarem de outro dono, o
 # container sobe e falha ao escrever no mundo. Ignora o erro quando o usuario
 # atual ja e o dono correto e nao tem permissao para chown.
-for directory in proxy proxy-config lobby bedwars pillars buildbattle ctf pvp; do
+for directory in proxy proxy-config lobby bedwars pillars buildbattle ctf pvp eventos event-maps; do
     chown -R 1000:1000 "$runtime_root/$directory" 2>/dev/null || true
 done
 

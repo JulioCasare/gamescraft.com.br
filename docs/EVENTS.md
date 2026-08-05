@@ -1,77 +1,105 @@
 # Eventos semanais
 
-Um evento semanal resolve o problema central de servidor novo: você quer oferecer variedade, mas dividir 20 jogadores em 6 modos deixa todos vazios. O evento junta a população inteira em um modo, num horário marcado, sem fragmentar o dia a dia.
+Evento aqui é o que **você conduz ao vivo**: a lava sobe, corrida de obstáculos, quiz, esconde-esconde. Não é abrir um dos minigames — é um servidor separado onde você monta a arena, controla o ritmo e decide o que acontece.
 
-Também é a forma mais barata de descobrir qual modo merece virar permanente — em vez de adivinhar, você mede.
+Por isso ele tem um servidor próprio, o `eventos`, que só sobe no dia.
 
-## Por que não deixar o modo sempre ligado
+## Por que um servidor separado
 
-Um modo permanente precisa de população constante para as partidas encherem. [O ROADMAP](ROADMAP.md) traz os números: BedWars precisa de 16–20 simultâneos *no modo* para funcionar, CTF idem. Enquanto você não tiver isso, o modo aberto 24h só mostra uma fila que nunca completa — e jogador que espera cinco minutos desconecta.
+**O mapa é destruído.** Lava subindo, explosão, bloco quebrado — no fim do evento a arena virou ruína. Se isso acontecesse dentro do BedWars ou do lobby, você levaria dano permanente em um modo que precisa funcionar todo dia.
 
-No evento acontece o oposto: todo mundo chega junto, a partida enche na hora e o modo aparenta ser popular. É a mesma quantidade de gente, distribuída melhor.
+**As regras são outras.** O servidor de eventos roda em `survival` com PvP e voo liberado, porque o jogador precisa poder queimar, cair e morrer — e você precisa voar para montar e acompanhar de cima. Essas configurações estragariam qualquer minigame.
 
-## A semana
+**Você fica em criativo.** Com op e voo, você mexe no mundo durante a partida. Isolar isso em um servidor que ninguém usa no dia a dia evita acidente no que está em produção.
 
-**Segunda ou terça — anuncie.** Diga o modo, o dia e a hora exata. Antecedência de 3 a 4 dias é o que faz alguém reservar o horário.
+## Preparar o mapa uma vez
 
-**Uma hora antes — lembre no Discord.** Sem isso metade esquece. É o passo com maior impacto e o que mais se esquece de fazer.
+Os mapas-modelo ficam em `infra/runtime/event-maps/`, uma pasta por evento:
 
-**15 minutos antes — abra o modo:**
+```text
+infra/runtime/event-maps/
+├── lava-sobe/          <- pasta do mundo: level.dat, region/, ...
+├── corrida/
+└── esconde-esconde/
+```
+
+Monte a arena, feche o servidor, e copie a pasta `world` pronta para lá com o nome do evento. **Esse modelo nunca é tocado depois** — toda semana o evento roda sobre uma cópia dele.
+
+Para conferir o que você tem:
+
+```bash
+./scripts/event.sh mapas
+```
+
+Esses mapas ficam fora do Git de propósito: são pesados e o `.gitignore` já bloqueia `infra/runtime/`. Inclua a pasta no backup.
+
+## No dia do evento
+
+**15 minutos antes**, com cópia limpa do mapa:
 
 ```bash
 cd ~/gamescraft.com.br
-./scripts/event.sh abrir buildbattle --liberar pvp
+./scripts/event.sh abrir --mapa lava-sobe --liberar bedwars --liberar pvp
 ```
 
-O `--liberar` para um modo do dia a dia para dar RAM ao evento. Em 8 GB isso não é opcional: sem liberar espaço, o sistema mata um servidor no meio da partida. Acompanhe o boot até aparecer `Done` antes de chamar o pessoal.
+O `--mapa` apaga o mundo do evento anterior e restaura o modelo do zero. O `--liberar` para modos do dia a dia para ceder RAM — em 8 GB isso não é opcional: subir o servidor de eventos sem liberar espaço faz o kernel matar um servidor com a sala cheia.
 
-**Durante — fique no servidor.** Você está ali para ver o que quebra, não para jogar. Anote tudo: erro, confusão de regra, jogador Bedrock que não conseguiu usar um menu.
+Como todo mundo vai estar no evento, liberar dois modos é normal. O lobby continua no ar, é por onde os jogadores chegam.
 
-**No fim — feche e devolva a RAM:**
+Espere aparecer `Done` no log antes de chamar o pessoal. Depois mande todos para o servidor `eventos` pelo lobby.
+
+**No fim:**
 
 ```bash
-./scripts/event.sh fechar buildbattle --liberar pvp
+./scripts/event.sh fechar --liberar bedwars --liberar pvp
 ```
 
-O mundo e as estatísticas continuam salvos em `infra/runtime/buildbattle`. Na semana seguinte tudo volta como estava.
+Para o servidor de eventos e devolve os modos normais. Na semana seguinte você roda `abrir --mapa` de novo e o mapa volta intacto.
 
-**Depois — registre.** Abra a issue de evento no GitHub com o que aconteceu. Esse registro é o que vai decidir o 4º modo permanente.
+## Conduzir
+
+O que decide se o evento funciona não é o mapa, é o ritmo.
+
+**Prenda todo mundo até começar.** Jogador que chega e sai andando pela arena descobre o atalho, cai na lava antes da hora ou quebra o cenário. Congele no spawn e libere junto.
+
+**Automatize a lava.** Subir a lava na mão, digitando comando com 40 pessoas esperando, é onde o evento trava. Um agendador de comandos executando o WorldEdit em intervalo fixo resolve — configure e teste antes, não durante.
+
+**Decida o que fazer com o eliminado.** Ele precisa virar espectador ou voltar ao lobby. Eliminado vagando pela arena atrapalha quem ainda está jogando e some com o clima da disputa.
+
+**Anuncie o tempo.** "Lava sobe em 30 segundos" muda completamente a tensão. Silêncio faz parecer que o evento travou.
+
+## A semana
+
+**Segunda ou terça — anuncie** o tipo de evento, o dia e a hora exata. Antecedência de 3 a 4 dias é o que faz alguém reservar o horário.
+
+**Uma hora antes — lembre no Discord.** É o passo de maior impacto e o mais esquecido. Sem ele, metade não aparece.
+
+**Depois — registre** na issue de evento do GitHub. Esse histórico é o que mostra qual formato funciona.
 
 ## O que medir
 
-Três números, sempre os mesmos, para poder comparar semanas:
+Três números, sempre os mesmos, para comparar semanas:
 
-- **Pico de simultâneos durante o evento**, comparado com o pico de um dia normal.
-- **Quantos ficaram até o fim** — evento que perde metade no meio tem problema de ritmo ou de bug.
-- **Quantos voltaram no dia seguinte.** Este é o que importa de verdade: evento que não traz ninguém de volta é entretenimento pontual, não crescimento.
+- **Pico de simultâneos durante o evento**, contra o pico de um dia normal.
+- **Quantos ficaram até o fim.** Perder metade no meio é ritmo ruim ou bug.
+- **Quantos voltaram no dia seguinte.** Este é o único que mede crescimento — evento que não traz ninguém de volta é diversão pontual.
 
-Um modo que enche fácil e segura o pessoal por três semanas seguidas ganhou o direito de virar permanente — e aí vale a troca para 16 GB.
-
-## Escolhendo o modo da semana
-
-Alterne. Repetir o mesmo modo toda semana desgasta rápido, e o objetivo é justamente comparar.
-
-| Modo | Bom para | Cuidado |
-|---|---|---|
-| Build Battle | Público misto, criativo, funciona com pouca gente | Menus e seletor de blocos podem falhar no Bedrock |
-| Capture the Flag | Grupo grande, times organizados | Precisa de 16+ para não ficar vazio |
-| Pillars of Fortune | Sessões curtas, boa rotatividade | Valide a jogabilidade no Bedrock antes |
-| PvP | Qualquer número, sempre funciona | Melhor como modo fixo que como evento |
-
-Se o número de confirmados no Discord estiver baixo, troque para Build Battle: é o que menos depende de população.
+Evento é também a forma mais barata de testar ideia de minigame antes de comprometer RAM com um modo permanente. Se um formato seu encher três semanas seguidas, ele merece virar servidor próprio.
 
 ## Monetização
 
 Evento é bom momento para **revelar cosmético**, dar título de participação ou entregar recompensa de temporada. Não é momento para vender vantagem.
 
-A regra do [ROADMAP](ROADMAP.md) continua valendo: nada que altere a competição. Um título de "Campeão do Build Battle #3" tem valor porque foi conquistado — vender o mesmo título esvazia os dois.
+Um título de "Sobrevivente da Lava #3" vale porque foi conquistado. Vender o mesmo título esvazia os dois.
 
 ## Antes do primeiro evento
 
-- [ ] O modo foi testado do começo ao fim, por você, antes de convidar alguém.
-- [ ] Um jogador Bedrock e um Java entraram e jogaram uma partida completa.
-- [ ] As regras do modo estão escritas no Discord.
-- [ ] Você sabe como reiniciar só esse modo sem derrubar a rede.
-- [ ] O backup do dia anterior existe e foi copiado para fora do servidor.
+- [ ] Rodei o evento inteiro sozinho, do início ao fim, antes de convidar alguém.
+- [ ] O mapa-modelo está em `event-maps/` e a cópia limpa foi testada.
+- [ ] A lava (ou o mecanismo do evento) sobe sozinha, sem eu digitar comando.
+- [ ] Eliminado vira espectador ou volta ao lobby.
+- [ ] O anti-cheat tem exceção para a minha conta em criativo com voo.
+- [ ] As regras estão escritas no Discord.
+- [ ] O backup de ontem existe e está fora do servidor.
 
-Evento com bug em modo nunca testado gasta a boa vontade dos testadores — que é o recurso mais escasso que você tem agora.
+Evento com bug e sala cheia gasta a boa vontade dos testadores, que é o recurso mais escasso que você tem agora.

@@ -1,0 +1,13 @@
+# Servidor dos eventos conduzidos por voce (lava sobe, corrida, quiz).
+# Aqui nao existe plugin de minigame: quem conduz e voce, ao vivo. O que voce
+# precisa e de ferramenta de administracao. Categorias, depois de aprovadas:
+#
+# - WorldEdit: montar a arena, encher de lava, resetar area no meio do evento
+# - Agendador de comandos: subir a lava sozinha em intervalo fixo, em vez de
+#   voce digitar comando com 40 pessoas esperando
+# - Espectador: eliminado vira espectador em vez de ficar vagando na arena
+# - Congelar/teleportar em massa: prender todo mundo no spawn ate voce comecar
+#
+# Cuidado especifico deste servidor: como voce vai ficar em modo criativo com
+# voo, o anti-cheat precisa ignorar a sua conta. Configure a excecao antes do
+# primeiro evento, nao durante.

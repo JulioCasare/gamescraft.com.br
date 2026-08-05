@@ -74,7 +74,7 @@ Copy-Template `
 Write-Utf8NoBom -Path (Join-Path $proxyConfig "forwarding.secret") -Content $velocitySecret
 
 $paperTemplate = Join-Path $infraRoot "config\paper\paper-global.yml.template"
-foreach ($serverName in @("lobby", "bedwars", "pillars", "buildbattle", "ctf", "pvp")) {
+foreach ($serverName in @("lobby", "bedwars", "pillars", "buildbattle", "ctf", "pvp", "eventos")) {
     $paperConfig = Join-Path $runtimeRoot "$serverName\config"
     New-Item -ItemType Directory -Force -Path $paperConfig | Out-Null
     Copy-Template `
