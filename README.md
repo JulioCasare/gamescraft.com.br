@@ -108,6 +108,7 @@ Aumente um `MEMORY_*` somente depois que o `spark` mostrar falta real de memóri
 
 Leia e conclua [a checklist do beta](docs/BETA-CHECKLIST.md). Em especial, escolha plugins compatíveis, instale mapas licenciados, configure moderação e teste Java e Bedrock.
 
+- [**Passo a passo, da compra ao beta**](docs/PASSO-A-PASSO.md) — comece por aqui
 - [Instalar no servidor](docs/DEPLOY.md)
 - [Eventos semanais](docs/EVENTS.md)
 - [Arquitetura](docs/ARCHITECTURE.md)
