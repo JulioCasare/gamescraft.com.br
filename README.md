@@ -81,6 +81,7 @@ Para ajustar o heap de um modo, mude o `MEMORY_*` correspondente em `infra/.env`
 Leia e conclua [a checklist do beta](docs/BETA-CHECKLIST.md). Em especial, escolha plugins compatíveis, instale mapas licenciados, configure moderação e teste Java e Bedrock.
 
 - [Instalar no servidor](docs/DEPLOY.md)
+- [Eventos semanais](docs/EVENTS.md)
 - [Arquitetura](docs/ARCHITECTURE.md)
 - [Operação e segurança](docs/OPERATIONS.md)
 - [Escolha de plugins e mapas](infra/plugins/README.md)

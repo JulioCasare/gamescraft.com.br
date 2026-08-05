@@ -1,0 +1,80 @@
+name: Evento semanal
+description: Planeje o evento da semana e registre o resultado depois.
+title: "[Evento]: "
+labels: ["evento"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Preencha o planejamento antes do evento e volte para completar o resultado depois.
+        O histórico destas issues é o que decide qual modo vira permanente.
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Modo do evento
+      options:
+        - Build Battle
+        - Capture the Flag
+        - Pillars of Fortune
+        - BedWars
+        - PvP
+        - Outro
+    validations:
+      required: true
+  - type: input
+    id: schedule
+    attributes:
+      label: Data e horário
+      placeholder: "Ex.: sexta 12/09, 20h"
+    validations:
+      required: true
+  - type: input
+    id: released
+    attributes:
+      label: Modo pausado para liberar RAM
+      placeholder: "Ex.: pvp"
+    validations:
+      required: false
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Antes de anunciar
+      options:
+        - label: Testei o modo do começo ao fim
+        - label: Um jogador Java e um Bedrock jogaram uma partida completa
+        - label: As regras estão escritas no Discord
+        - label: O backup de ontem existe e está fora do servidor
+  - type: markdown
+    attributes:
+      value: "---\n### Preencher depois do evento"
+  - type: input
+    id: peak
+    attributes:
+      label: Pico de jogadores simultâneos
+      placeholder: "Ex.: 18 (pico normal do dia: 11)"
+    validations:
+      required: false
+  - type: input
+    id: retention
+    attributes:
+      label: Quantos ficaram até o fim / voltaram no dia seguinte
+      placeholder: "Ex.: 12 até o fim, 7 voltaram"
+    validations:
+      required: false
+  - type: textarea
+    id: problems
+    attributes:
+      label: O que quebrou ou confundiu
+      placeholder: "Bugs, regras mal explicadas, problemas específicos do Bedrock..."
+    validations:
+      required: false
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Vale repetir?
+      options:
+        - "Sim, e é candidato a modo permanente"
+        - "Sim, mas precisa de ajustes"
+        - "Não"
+    validations:
+      required: false
