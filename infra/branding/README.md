@@ -2,6 +2,23 @@
 
 Coloque os arquivos da marca aqui. O `prepare-beta` leva o ícone para o lugar certo do proxy automaticamente.
 
+## O que já está aqui
+
+| Arquivo | O que é |
+|---|---|
+| `server-icon.png` | Ícone da lista de servidores, 64 × 64, pronto para uso |
+| `icon-512.png` | A mesma arte em 512 × 512, para Discord e divulgação |
+
+São uma redução do logo completo a só o escudo com as iniciais — o que sobrevive em 64 pixels. Ambos saem de [`scripts/make-icon.ps1`](../../scripts/make-icon.ps1), que desenha a arte numa grade lógica de 32 × 32 e amplia por múltiplo inteiro, mantendo a borda dura do pixel art.
+
+Para mudar cor, letra ou formato:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\make-icon.ps1 .\infra\branding
+```
+
+Substitua os arquivos à vontade se tiver uma versão feita à mão — o script é conveniência, não obrigação.
+
 ## server-icon.png — obrigatório 64×64
 
 É o ícone que aparece na lista de servidores do Minecraft Java. O protocolo aceita **exatamente 64 × 64 pixels, PNG**. Fora dessa medida o Velocity ignora o arquivo e o servidor aparece sem ícone.
