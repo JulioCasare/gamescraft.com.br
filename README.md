@@ -111,6 +111,7 @@ Leia e conclua [a checklist do beta](docs/BETA-CHECKLIST.md). Em especial, escol
 - [**Passo a passo, da compra ao beta**](docs/PASSO-A-PASSO.md) — comece por aqui
 - [Instalar no servidor](docs/DEPLOY.md)
 - [Eventos semanais](docs/EVENTS.md)
+- [Monetização](docs/MONETIZACAO.md)
 - [Arquitetura](docs/ARCHITECTURE.md)
 - [Operação e segurança](docs/OPERATIONS.md)
 - [Escolha de plugins e mapas](infra/plugins/README.md)
