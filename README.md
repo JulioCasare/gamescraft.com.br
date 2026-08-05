@@ -75,7 +75,7 @@ docker compose --env-file infra/.env -f infra/compose.yaml up -d proxy bedwars p
 
 Nesse perfil o evento precisa ceder espaço: `./scripts/event.sh abrir --mapa NOME --liberar bedwars`.
 
-**16 GB com 4 vCPU — dois modos.** O limite passa a ser CPU: proxy, lobby, BedWars e PvP são quatro threads principais em quatro núcleos, e um terceiro modo passaria a disputar:
+**16 GB com 4 vCPU — dois modos.** É o perfil da operação atual: BedWars fixo mais um slot rotativo. O limite passa a ser CPU — proxy, lobby, BedWars e o rotativo são quatro threads principais em quatro núcleos, e um terceiro modo passaria a disputar:
 
 ```ini
 MEMORY_PROXY=1G
@@ -85,6 +85,8 @@ MEMORY_PVP=1500M
 ```
 
 Aqui o servidor de eventos sobe sem liberar nada — durante o evento os minigames ficam vazios e suas threads ociam.
+
+Para trocar qual modo ocupa o slot rotativo, use `./scripts/rotate.sh <modo>`. Detalhes em [operação](docs/OPERATIONS.md).
 
 **Os seis modos abertos** pedem ~11,5 GB de heap com os valores padrão de `infra/.env`, ou seja 16 GB de RAM e pelo menos 6 vCPU. Antes de chegar lá, leia a parte de população no [ROADMAP](docs/ROADMAP.md): modo aberto sem gente para encher partida só mostra fila vazia.
 

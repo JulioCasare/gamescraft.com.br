@@ -1,5 +1,32 @@
 # Operação e segurança
 
+## Como a rede opera
+
+Três peças, e só duas ficam no ar ao mesmo tempo:
+
+| Peça | Papel |
+|---|---|
+| **BedWars** | Fixo. É a atração principal e nunca sai do ar |
+| **Slot rotativo** | Um entre PvP, Pillars, Build Battle e CTF |
+| **Eventos** | Sobe só no dia, conduzido por você |
+
+O motivo de não abrir tudo é CPU, não memória: cada servidor Paper precisa da thread principal dele rodando a cada 50 ms, e isso não paraleliza. Em 4 vCPU, proxy, lobby e dois minigames já ocupam os quatro núcleos. Um terceiro modo cheio faz o MSPT subir em *todos* eles, não só no novo.
+
+A restrição mais apertada, porém, nem é técnica: com 15–20 jogadores simultâneos, dois modos já é o máximo que consegue encher partida. Cinco modos abertos viram cinco filas vazias.
+
+### Trocar o modo rotativo
+
+```bash
+./scripts/rotate.sh              # o que está no ar agora
+./scripts/rotate.sh pillars      # troca o rotativo para Pillars
+```
+
+O script para o rotativo anterior antes de subir o novo. Mundos e estatísticas de todos os modos continuam salvos em `infra/runtime/` — trocar não apaga nada, e voltar é o mesmo comando.
+
+**Escolha o rotativo pela população esperada, não pelo seu gosto.** PvP funciona com 4 pessoas; CTF precisa de 16 para não parecer abandonado. Em semana fraca, ou quando estiver na dúvida, volte para PvP: ele é o único que nunca fica vazio.
+
+Avise a troca no Discord. Jogador que volta e não acha o modo que estava jogando some sem reclamar.
+
 ## Antes de expor o servidor
 
 1. Hospede em uma VPS ou host de jogos com proteção DDoS adequada para Minecraft.
