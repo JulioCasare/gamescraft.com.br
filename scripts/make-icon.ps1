@@ -2,23 +2,32 @@ Add-Type -AssemblyName System.Drawing
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-# Arte autorada em grade logica de 32x32 e ampliada por blocos inteiros.
+# Arte autorada em grade logica de 32x32 e ampliada por multiplo inteiro.
 # Ampliar por multiplo exato mantem a borda dura do pixel art.
 $G = 32
 
 $C = @{
-    none      = $null
     outline   = [System.Drawing.Color]::FromArgb(255, 11, 16, 32)
-    goldDark  = [System.Drawing.Color]::FromArgb(255, 168, 115, 12)
-    gold      = [System.Drawing.Color]::FromArgb(255, 232, 182, 42)
-    goldLight = [System.Drawing.Color]::FromArgb(255, 255, 217, 90)
-    blueDark  = [System.Drawing.Color]::FromArgb(255, 22, 37, 94)
-    blue      = [System.Drawing.Color]::FromArgb(255, 42, 74, 158)
-    blueLight = [System.Drawing.Color]::FromArgb(255, 62, 104, 200)
+    goldDark  = [System.Drawing.Color]::FromArgb(255, 150, 100, 10)
+    gold      = [System.Drawing.Color]::FromArgb(255, 226, 172, 36)
+    goldLight = [System.Drawing.Color]::FromArgb(255, 255, 219, 96)
+    blueDark  = [System.Drawing.Color]::FromArgb(255, 24, 42, 104)
+    blueSeam  = [System.Drawing.Color]::FromArgb(255, 34, 62, 140)
+    blue      = [System.Drawing.Color]::FromArgb(255, 42, 78, 168)
+    blueLight = [System.Drawing.Color]::FromArgb(255, 64, 108, 206)
+    gemDark   = [System.Drawing.Color]::FromArgb(255, 26, 120, 152)
+    gem       = [System.Drawing.Color]::FromArgb(255, 62, 200, 224)
+    gemLight  = [System.Drawing.Color]::FromArgb(255, 156, 244, 252)
 }
 
-# Meia-largura do escudo por linha: reto em cima, afunilando ate a ponta.
-$half = @(0,0) + (@(12) * 18) + @(12,11,11,10,9,8,7,6,5,4,2) + @(0,0)
+# Escudo tipo heater: ombros retos no topo e afunilamento continuo ate a ponta,
+# como no logo original.
+$half = @(
+    0, 0,
+    11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+    12, 11, 11, 10, 9, 8, 7, 6, 4, 2,
+    0, 0, 0, 0
+)
 
 $grid = New-Object 'string[,]' $G, $G
 for ($y = 0; $y -lt $G; $y++) {
@@ -31,33 +40,64 @@ for ($y = 0; $y -lt $G; $y++) {
     if ($h -le 0) { continue }
     $left = [int][Math]::Floor($cx - $h + 0.5)
     $right = [int][Math]::Floor($cx + $h - 0.5)
+    $nextH = if ($y + 1 -lt $G) { $half[$y + 1] } else { 0 }
 
     for ($x = $left; $x -le $right; $x++) {
-        # Distancia ate a borda do escudo, para separar moldura de campo interno.
-        $depthX = [Math]::Min($x - $left, $right - $x)
-        $depthY = $y - 2
-        $nextH = if ($y + 1 -lt $G) { $half[$y + 1] } else { 0 }
-        $depthBottom = if ($nextH -le 0) { 0 } else { 99 }
-        $depth = [Math]::Min($depthX, $depthY)
-        $depth = [Math]::Min($depth, $depthBottom)
+        $depth = [Math]::Min([Math]::Min($x - $left, $right - $x), $y - 2)
+        if ($nextH -le 0) { $depth = 0 }
 
         if ($depth -le 0) {
             $grid[$x, $y] = "outline"
         }
         elseif ($depth -le 2) {
-            # Luz vem de cima e da esquerda.
-            if ($y -le 4 -or ($x - $left) -le 2) { $grid[$x, $y] = "goldLight" }
-            elseif ($y -ge 22 -or ($right - $x) -le 2) { $grid[$x, $y] = "goldDark" }
-            else { $grid[$x, $y] = "gold" }
+            # Moldura dourada, com a luz vindo de cima e da esquerda.
+            $tone = if ($y -le 4 -or ($x - $left) -le 2) { "goldLight" }
+                    elseif ($y -ge 21 -or ($right - $x) -le 2) { "goldDark" }
+                    else { "gold" }
+            # Sulcos regulares: a moldura do logo e feita de blocos, nao lisa.
+            if (($x % 4 -eq 0) -or ($y % 4 -eq 0)) {
+                $tone = switch ($tone) {
+                    "goldLight" { "gold" }
+                    "gold"      { "goldDark" }
+                    default     { "goldDark" }
+                }
+            }
+            $grid[$x, $y] = $tone
         }
         else {
-            # A troca de tom so acontece dentro do afunilamento. Em linha cheia
-            # ela viraria uma emenda horizontal atravessando o escudo.
-            if ($y -lt 23) { $grid[$x, $y] = "blue" }
-            else { $grid[$x, $y] = "blueDark" }
+            # Emendas das tabuas: contraste baixo de proposito. Escuro demais
+            # em 64px vira grade vertical em vez de textura.
+            if ($y -ge 22) { $grid[$x, $y] = "blueDark" }
+            elseif ((($x - 3) % 5) -eq 0) { $grid[$x, $y] = "blueSeam" }
+            elseif ($y -le 5) { $grid[$x, $y] = "blueLight" }
+            else { $grid[$x, $y] = "blue" }
         }
     }
 }
+
+# Gema no topo da moldura, o detalhe mais reconhecivel do logo original.
+$gem = @(
+    ".##.",
+    "####",
+    ".##."
+)
+function Draw-Gem {
+    param($rows, [int]$ox, [int]$oy)
+    for ($r = 0; $r -lt $rows.Count; $r++) {
+        $line = $rows[$r]
+        for ($c = 0; $c -lt $line.Length; $c++) {
+            if ($line[$c] -ne '#') { continue }
+            $x = $ox + $c
+            $y = $oy + $r
+            if ($x -lt 0 -or $x -ge $G -or $y -lt 0 -or $y -ge $G) { continue }
+            $grid[$x, $y] = if ($r -eq 0) { "gemLight" }
+                            elseif ($r -ge 2) { "gemDark" }
+                            else { "gem" }
+        }
+    }
+}
+# Uma linha abaixo do topo: em y=2 a gema apagaria o contorno do escudo.
+Draw-Gem -rows $gem -ox 14 -oy 3
 
 $letterG = @(
     ".####.",
@@ -84,19 +124,15 @@ $letterC = @(
 
 function Draw-Letter {
     param($rows, [int]$ox, [int]$oy)
+    # Sombra dura embaixo e a direita destaca a letra do campo azul.
     for ($r = 0; $r -lt $rows.Count; $r++) {
         $line = $rows[$r]
         for ($c = 0; $c -lt $line.Length; $c++) {
             if ($line[$c] -ne '#') { continue }
-            $x = $ox + $c
-            $y = $oy + $r
-            if ($x -lt 0 -or $x -ge $G -or $y -lt 0 -or $y -ge $G) { continue }
-            # Sombra dura embaixo e a direita destaca a letra do campo azul.
-            $sx = $x + 1
-            $sy = $y + 1
-            if ($sx -lt $G -and $sy -lt $G -and $grid[$sx, $sy] -notmatch '^gold') {
-                $grid[$sx, $sy] = "outline"
-            }
+            $sx = $ox + $c + 1
+            $sy = $oy + $r + 1
+            if ($sx -ge $G -or $sy -ge $G) { continue }
+            if ($grid[$sx, $sy] -notmatch '^gold') { $grid[$sx, $sy] = "outline" }
         }
     }
     for ($r = 0; $r -lt $rows.Count; $r++) {
@@ -111,9 +147,7 @@ function Draw-Letter {
     }
 }
 
-# 6 + 3 de folga + 6 = 15 de largura, centrado no eixo do escudo (x 8..22).
-# Verticalmente um pouco acima do centro geometrico: a ponta inferior puxa
-# o olhar para baixo e compensa.
+# 6 + 3 de folga + 6 = 15 de largura, centrado no eixo do escudo.
 Draw-Letter -rows $letterG -ox 8 -oy 10
 Draw-Letter -rows $letterC -ox 17 -oy 10
 
