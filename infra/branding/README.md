@@ -7,17 +7,20 @@ Coloque os arquivos da marca aqui. O `prepare-beta` leva o ícone para o lugar c
 | Arquivo | O que é |
 |---|---|
 | `server-icon.png` | Ícone da lista de servidores, 64 × 64, pronto para uso |
-| `icon-512.png` | A mesma arte em 512 × 512, para Discord e divulgação |
+| `icon-512.png` | O mesmo escudo em 512 × 512, para Discord |
+| `logo-1024.png` | Logo completo, para site, banner e divulgação |
 
-São uma redução do logo completo a só o escudo com as iniciais — o que sobrevive em 64 pixels. Ambos saem de [`scripts/make-icon.ps1`](../../scripts/make-icon.ps1), que desenha a arte numa grade lógica de 32 × 32 e amplia por múltiplo inteiro, mantendo a borda dura do pixel art.
+O ícone é o **escudo recortado do logo original**, não um desenho novo. O entorno — espadas, portal, bandeiras e grama — foi mascarado porque em 64 pixels ele vira ruído colorido em volta do "GC" e derruba a legibilidade justamente onde ela mais importa.
 
-Para mudar cor, letra ou formato:
+O recorte é reproduzível por [`scripts/extract-shield.ps1`](../../scripts/extract-shield.ps1), que guarda as coordenadas da região do escudo e o contorno usado como máscara:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\make-icon.ps1 .\infra\branding
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\extract-shield.ps1 "caminho\do\Logo final.png" .\infra\branding
 ```
 
-Substitua os arquivos à vontade se tiver uma versão feita à mão — o script é conveniência, não obrigação.
+O arquivo original de 4096 × 4096 fica fora do Git de propósito: são 26 MB, e repositório não é lugar para guardar arquivo de arte pesado. Mantenha-o no seu backup.
+
+Existe também [`scripts/make-icon.ps1`](../../scripts/make-icon.ps1), uma versão do escudo desenhada em pixel art a partir do zero. Ficou como alternativa: rende uma borda mais dura em telas pequenas, mas não é a arte oficial da marca.
 
 ## server-icon.png — obrigatório 64×64
 
