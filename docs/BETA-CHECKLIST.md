@@ -22,6 +22,33 @@ docker compose --env-file infra/.env -f infra/compose.yaml logs lobby | grep -i 
 
 Convide em ondas — 10, depois 25, depois 50 — usando a whitelist como controle. Assim um bug atinge 10 pessoas, não 50.
 
+## Onde arrumar testadores
+
+Cinco bastam para começar. Insistir em juntar 50 antes de abrir é o que trava servidor novo.
+
+**Escolha o modo pelo número de gente presente**, não pelo seu preferido:
+
+| Presentes | O que dá para testar |
+|---|---|
+| 2 a 4 | PvP — arena funciona com dois |
+| 5 a 8 | Build Battle, BedWars solo ou duplas |
+| 12+ | BedWars 4×4, Capture the Flag |
+
+BedWars 4×4 com cinco pessoas nunca começa, e você perde a noite achando que quebrou algo.
+
+**Onde encontrar:**
+
+- Comunidades de Minecraft BR no Discord, nos canais de divulgação — leia as regras antes, a maioria bane quem posta fora do lugar.
+- `r/admincraft`: donos de servidor acham bug que jogador comum não percebe.
+- TikTok e YouTube Shorts, com clipe curto de partida real.
+- Escola, trabalho, amigos de amigos — cada um traz mais um.
+
+**Ofereça um título cosmético de Fundador.** Custo zero, permitido pelas regras da Mojang, e é a única coisa que não dá para conseguir depois. É o que faz alguém aguentar o servidor caindo enquanto você aprende.
+
+**Use formulário, não convite manual.** Nick, edição e horário que costuma jogar, no Discord ou Google Forms. Você aprova no seu ritmo e controla o fluxo.
+
+E não abra a whitelist como atalho por falta de gente: quem entra num servidor cru não volta, e ainda comenta.
+
 ## Infraestrutura
 
 - [ ] Docker e todos os oito serviços iniciam sem erro: proxy, lobby, bedwars, pillars, buildbattle, ctf, pvp e database.
