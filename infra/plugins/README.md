@@ -34,6 +34,8 @@ Além de licença e suporte ao Paper 1.21.8, quatro coisas decidem se ele serve 
 
 **4. Menus utilizáveis no Bedrock.** Loja, seleção de time e placar passam pelo Geyser, que renderiza inventário e formulário de forma diferente. Teste com um aparelho Bedrock de verdade, não só no Java.
 
+**5. Mapa e geradores configuráveis.** É o que permite criar modo próprio sem programar. Um híbrido de Pillars com cama, por exemplo, é mapa de pilares mais geradores soltando blocos aleatórios — se o plugin deixar importar mapa e editar o conteúdo dos geradores, isso é configuração, não desenvolvimento. Plugin que só aceita os mapas dele te prende ao BedWars igual ao de todo mundo.
+
 ### Como testar o item 3
 
 Rode 5 ou 6 partidas seguidas acompanhando a memória:
