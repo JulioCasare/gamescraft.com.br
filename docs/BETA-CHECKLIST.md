@@ -36,12 +36,14 @@ Cinco bastam para começar. Insistir em juntar 50 antes de abrir é o que trava 
 
 BedWars 4×4 com cinco pessoas nunca começa, e você perde a noite achando que quebrou algo.
 
-**Onde encontrar:**
+**Onde encontrar — só público brasileiro.** Testador fora do Brasil pega 150 a 200 ms até São Paulo: ele vai achar o PvP horrível por causa da distância, não do seu servidor, e o relato dele não serve para nada.
 
 - Comunidades de Minecraft BR no Discord, nos canais de divulgação — leia as regras antes, a maioria bane quem posta fora do lugar.
-- `r/admincraft`: donos de servidor acham bug que jogador comum não percebe.
-- TikTok e YouTube Shorts, com clipe curto de partida real.
+- TikTok e YouTube Shorts, com clipe curto de partida real. É como servidor BR cresce hoje.
+- Grupos de WhatsApp e Telegram de Minecraft.
 - Escola, trabalho, amigos de amigos — cada um traz mais um.
+
+Para **ajuda técnica** (não para recrutar), `r/admincraft` no Reddit reúne donos de servidor e é bom lugar para perguntas como compatibilidade de plugin com Paper e Geyser. É em inglês, e a maioria das comunidades técnicas proíbe divulgar servidor — leia as regras antes de postar.
 
 **Ofereça um título cosmético de Fundador.** Custo zero, permitido pelas regras da Mojang, e é a única coisa que não dá para conseguir depois. É o que faz alguém aguentar o servidor caindo enquanto você aprende.
 
