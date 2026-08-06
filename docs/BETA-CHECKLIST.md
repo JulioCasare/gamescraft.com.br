@@ -91,9 +91,29 @@ E não abra a whitelist como atalho por falta de gente: quem entra num servidor 
 - [ ] 50 jogadores simultâneos: gargalos registrados e corrigidos.
 - [ ] Reinício controlado de cada minigame sem derrubar o proxy.
 
+## Se você tem poucos testadores
+
+Com cinco amigos que jogam de vez em quando, os critérios da seção seguinte são inalcançáveis — e esperar por eles é ficar preso para sempre. Separe em dois:
+
+**Beta técnico.** Prova que funciona: o servidor fica de pé, Java e Bedrock entram, uma partida começa e termina, os menus funcionam no Bedrock, o backup restaura. Cinco pessoas conseguem isso em três ou quatro sessões.
+
+**Validação de jogo.** Prova que é bom: retenção, partidas enchendo sozinhas, carga com 25 e 50. Isso exige estranhos, e nenhuma quantidade de paciência substitui.
+
+Você não sai do beta esperando; sai abrindo. Com cinco amigos a população não cresce sozinha — o gargalo é distribuição, não software.
+
+**Duas coisas que multiplicam cinco amigos:**
+
+*Marque horário.* "Terça e sexta, 20h" converte disponibilidade dispersa em quatro pessoas online ao mesmo tempo. Disponibilidade aleatória com cinco pessoas dá uma ou duas — nunca uma partida.
+
+*Dê lista de tarefas, não peça para "jogar".* Sessão com roteiro — entrar pelo Bedrock, comprar na loja, morrer e respawnar, quebrar cama — rende muito mais que jogo livre. Amigo solto acha um bug; amigo com checklist acha oito.
+
+**Ao abrir com base pequena**, duas condições: o **PvP precisa ser o modo âncora**, porque servidor com três pessoas e só BedWars está morto — a partida nunca começa; e você precisa de **clipe curto de partida real** circulando, senão aberto e fechado dão no mesmo.
+
+O risco de abrir cedo é menor do que parece: ninguém sabe que você existe, então não há reputação a queimar. O risco real é nunca abrir.
+
 ## Como saber que o beta acabou
 
-Beta não termina por data nem por número de jogadores. Termina quando **o servidor funciona sozinho** — quando você consegue ser jogador em vez de plantão.
+Vale quando você já tem fluxo de jogadores desconhecidos. Beta não termina por data nem por número de convidados. Termina quando **o servidor funciona sozinho** — quando você consegue ser jogador em vez de plantão.
 
 O sinal mais confiável é este: **você passou três noites cheias seguidas sem precisar intervir.** Sem reiniciar nada, sem corrigir configuração, sem pedir desculpa a ninguém. Se ainda está apagando incêndio, ainda é beta, mesmo que a checklist esteja toda marcada.
 
