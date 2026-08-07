@@ -6,6 +6,24 @@ O tempo estimado é de execução, não de espera: escolher plugin e construir m
 
 ---
 
+## Fase 0 — Tudo pronto no seu PC, de graça (semanas, sem pressa)
+
+O VPS só recebe coisa pronta. Todo trabalho demorado acontece aqui, onde o
+tempo não custa nada — se for feito depois da compra, ele queima o prazo de
+reembolso em tarefa que podia ser de graça.
+
+- [ ] Rede subindo no Docker local (seção "Começar localmente" do [README](../README.md))
+- [ ] Plugins escolhidos, instalados e configurados (a fase mais longa do projeto)
+- [ ] Kits e regras do PvP montados conforme [PVP.md](PVP.md)
+- [ ] Mapas instalados e testados
+- [ ] Amigos entrando pelo Java e pelo Bedrock na sua rede local
+- [ ] A [checklist do beta](BETA-CHECKLIST.md) passando em casa
+
+Só siga para a Fase 1 com **datas marcadas** com os testadores: o prazo de
+reembolso de 30 dias começa na compra, e o beta técnico precisa caber dentro
+dele. No VPS você testa apenas o que só ele pode provar: latência real, gente
+entrando de fora, backup e carga.
+
 ## Fase 1 — Contratar (30 min)
 
 - [ ] Contratar **Hostinger KVM 4**: 4 vCPU, 16 GB, 200 GB NVMe
@@ -65,7 +83,7 @@ A fase mais longa e a que realmente define o servidor. Instale na ordem: a base 
 
 **Minigames**
 
-- [ ] Plugin de **BedWars**, avaliado pelos [4 critérios](../infra/plugins/README.md)
+- [ ] Plugin de **BedWars**, avaliado pelos [5 critérios](../infra/plugins/README.md) — o escolhido é o BedWars1058 25.2; os testes abaixo confirmam a escolha
 - [ ] Plugin do modo **rotativo** (comece por PvP)
 
 **Testes obrigatórios de cada plugin**
@@ -109,6 +127,8 @@ Bug encontrado com 10 amigos custa nada. O mesmo bug com 50 testadores queima a 
 - [ ] Política de privacidade, contato do responsável e regras publicadas
 - [ ] Backup testado outra vez, agora com dados reais
 - [ ] Decidir o 3º modo com base nos dados dos eventos — não no palpite
+- [ ] **Clipes de partida real gravados e editados** (grave durante o beta com os amigos)
+- [ ] Abrir **no mesmo dia** da publicação dos clipes, com horário fixo anunciado — servidor aberto sem conteúdo circulando é indistinguível de servidor fechado
 
 Antes de abrir, releia a parte de população no [ROADMAP](ROADMAP.md): mais modos com a mesma quantidade de gente deixa todos vazios.
 
