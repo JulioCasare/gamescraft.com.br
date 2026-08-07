@@ -1,8 +1,16 @@
-# Plugin escolhido: BedWars1058 25.2 (oficial, andrei1058), que suporta ate o
-# Paper 1.21.4 — por isso este backend fica na 1.21.4. Baixe somente do GitHub
-# oficial ou do SpigotMC e adicione a URL aqui junto com o ViaVersion (Hangar ou
-# Modrinth), que permite clientes mais novos e o Geyser entrarem neste backend.
-# Antes de fixar as URLs, valide os criterios 3 e 4 de infra/plugins/README.md:
-# memoria estavel apos 5-6 partidas e loja utilizavel num aparelho Bedrock real.
-# Plano B se a 25.2 falhar nos testes: fork BedWars2023 (tomkeuper) ou o fork do
-# MelonOof no Modrinth.
+# Plugin escolhido: BedWars1058 25.3-SNAPSHOT (Modrinth oficial do andrei1058),
+# a build da familia que suporta Paper 1.21.4 — a release estavel 25.2 vai so
+# ate 1.20.4. Se os testes dos criterios 3 e 4 (infra/plugins/README.md)
+# reprovarem a 25.3, o plano B e descer este backend para 1.20.4 com a 25.2
+# estavel; planos C: fork BedWars2023 (tomkeuper) ou fork do MelonOof.
+#
+# Instalados (fontes oficiais, 2026-08-07):
+# LuckPerms 5.5.71 (Modrinth oficial) - permissoes
+https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar
+# spark 1.10.175 (Jenkins oficial do lucko) - medicao de TPS/MSPT
+https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/libs/spark-1.10.175-bukkit.jar
+# ViaVersion 5.11.0 (Modrinth oficial) - deixa clientes novos (e o Geyser, que
+# emula cliente 26.2) entrarem neste backend 1.21.4
+https://cdn.modrinth.com/data/P1OZGk5p/versions/ZH8459B6/ViaVersion-5.11.0.jar
+# BedWars1058 25.3-SNAPSHOT (Modrinth oficial) - o minigame
+https://cdn.modrinth.com/data/VBj24lEa/versions/Qbl5eUlv/bedwars-plugin-25.3-SNAPSHOT.jar

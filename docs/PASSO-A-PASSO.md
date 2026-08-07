@@ -83,7 +83,7 @@ A fase mais longa e a que realmente define o servidor. Instale na ordem: a base 
 
 **Minigames**
 
-- [ ] Plugin de **BedWars**, avaliado pelos [5 critérios](../infra/plugins/README.md) — o escolhido é o BedWars1058 25.2; os testes abaixo confirmam a escolha
+- [ ] Plugin de **BedWars**, avaliado pelos [5 critérios](../infra/plugins/README.md) — o escolhido é o BedWars1058 25.3-SNAPSHOT (a 25.2 estável só vai até 1.20.4); os testes abaixo confirmam a escolha
 - [ ] Plugin do modo **rotativo** (comece por PvP)
 
 **Testes obrigatórios de cada plugin**

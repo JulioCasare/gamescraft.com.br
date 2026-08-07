@@ -5,5 +5,11 @@
 # Paper 26.2 (este backend usa a lanca) e o comportamento com controle de toque
 # e mira do Bedrock antes de fixar a URL aqui.
 #
+# Base instalada (fontes oficiais, testadas em 2026-08-07):
+# LuckPerms 5.5.71 (Modrinth oficial) - permissoes
+https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar
+# spark 1.10.175 (Jenkins oficial do lucko) - medicao de TPS/MSPT
+https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/libs/spark-1.10.175-bukkit.jar
+#
 # Anything sold for this mode must stay cosmetic: selling stronger kits turns the
 # server pay-to-win and is the fastest way to lose the competitive players.

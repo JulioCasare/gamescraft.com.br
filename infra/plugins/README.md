@@ -18,11 +18,13 @@ Os arquivos `*.txt` desta pasta são listas de URLs que o container baixa no pri
   ViaVersion instalado; os demais modos rodam **26.2**, para a lança (1.21.9+)
   existir no PvP e nos eventos. Dentro do BedWars não há lança — o item não
   existe na 1.21.4.
-- **BedWars: BedWars1058 25.2 oficial** (andrei1058, open source), sujeito aos
-  testes dos critérios 3 e 4 abaixo. Planos B na mesma família, com a mesma
-  base de configuração: fork BedWars2023 (tomkeuper) e fork do MelonOof no
-  Modrinth (este lista suporte a 1.21.11 — candidato futuro se quisermos lança
-  também no BedWars).
+- **BedWars: BedWars1058 25.3-SNAPSHOT** (Modrinth oficial do andrei1058, open
+  source) — é a build da família que suporta 1.21.4; a release estável 25.2 vai
+  só até o 1.20.4. Sujeito aos testes dos critérios 3 e 4 abaixo. Plano B:
+  descer o backend para Paper 1.20.4 e usar a 25.2 estável. Planos C na mesma
+  família: fork BedWars2023 (tomkeuper) e fork do MelonOof no Modrinth (este
+  lista suporte a 1.21.11 — candidato futuro se quisermos lança também no
+  BedWars).
 - **PvP: KitPvP de kit aleatório**, sem menu de seleção. O desenho completo,
   incluindo zona segura, combat tag de 15 s e o balanceamento do sorteio, está
   em [docs/PVP.md](../../docs/PVP.md).

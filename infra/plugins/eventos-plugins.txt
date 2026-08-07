@@ -11,3 +11,9 @@
 # Cuidado especifico deste servidor: como voce vai ficar em modo criativo com
 # voo, o anti-cheat precisa ignorar a sua conta. Configure a excecao antes do
 # primeiro evento, nao durante.
+#
+# Base instalada (fontes oficiais, testadas em 2026-08-07):
+# LuckPerms 5.5.71 (Modrinth oficial) - permissoes
+https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar
+# spark 1.10.175 (Jenkins oficial do lucko) - medicao de TPS/MSPT
+https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/libs/spark-1.10.175-bukkit.jar
