@@ -7,7 +7,7 @@ Base de infraestrutura do servidor **Game Craft**: uma rede de minigames para jo
 ## Beta inicial
 
 - Capacidade planejada: até 50 jogadores simultâneos.
-- Edição Java: Paper 1.21.8, mantida fixa durante o beta para preservar a compatibilidade dos plugins.
+- Edição Java: Paper, com a versão presa por modo à compatibilidade dos plugins — 26.2 nos modos gerais (para a lança existir no PvP e nos eventos) e 1.21.4 no BedWars (versão máxima do BedWars1058 25.2, com ViaVersion para os clientes novos entrarem).
 - Edição Bedrock: Geyser + Floodgate no proxy Velocity.
 - Minigames do primeiro marco: BedWars, Pillars of Fortune, Build Battle, Capture the Flag e PvP, mais o Lobby.
 - Banco de dados: MariaDB, para permissões, estatísticas, moedas e punições quando os plugins forem escolhidos.
@@ -110,6 +110,7 @@ Leia e conclua [a checklist do beta](docs/BETA-CHECKLIST.md). Em especial, escol
 
 - [**Passo a passo, da compra ao beta**](docs/PASSO-A-PASSO.md) — comece por aqui
 - [Instalar no servidor](docs/DEPLOY.md)
+- [PvP: desenho do modo](docs/PVP.md)
 - [Eventos semanais](docs/EVENTS.md)
 - [Monetização](docs/MONETIZACAO.md)
 - [Arquitetura](docs/ARCHITECTURE.md)

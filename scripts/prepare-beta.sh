@@ -10,7 +10,7 @@ infra_root="$repository_root/infra"
 runtime_root="$infra_root/runtime"
 
 public_host="localhost"
-minecraft_version="1.21.8"
+minecraft_version="26.2"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -49,7 +49,7 @@ else
     database_root_password="$(new_secret)"
     sed \
         -e "s|^PUBLIC_HOST=localhost|PUBLIC_HOST=${public_host}|" \
-        -e "s|^MINECRAFT_VERSION=1.21.8|MINECRAFT_VERSION=${minecraft_version}|" \
+        -e "s|^MINECRAFT_VERSION=26.2|MINECRAFT_VERSION=${minecraft_version}|" \
         -e "s|^VELOCITY_SECRET=REPLACE_ME|VELOCITY_SECRET=${velocity_secret}|" \
         -e "s|^DATABASE_PASSWORD=REPLACE_ME|DATABASE_PASSWORD=${database_password}|" \
         -e "s|^DATABASE_ROOT_PASSWORD=REPLACE_ME|DATABASE_ROOT_PASSWORD=${database_root_password}|" \

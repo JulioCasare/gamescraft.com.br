@@ -20,7 +20,7 @@ body:
     id: version
     attributes:
       label: Versão do Minecraft e aparelho
-      placeholder: "Ex.: Java 1.21.8 no Windows 11"
+      placeholder: "Ex.: Java 26.2 no Windows 11"
     validations:
       required: true
   - type: dropdown

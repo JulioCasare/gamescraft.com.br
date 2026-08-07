@@ -24,12 +24,12 @@ services:
         condition: service_started
 
   lobby:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
       MEMORY: "${MEMORY_LOBBY:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
@@ -61,12 +61,16 @@ services:
         condition: service_healthy
 
   bedwars:
+    # Java 21 basta aqui: so o Paper 26.x exige Java 25, e este backend e 1.21.4.
     image: itzg/minecraft-server:java21
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      # O BedWars fica numa versao propria: o BedWars1058 usa NMS e so roda
+      # nas versoes que suporta. O ViaVersion neste backend deixa os clientes
+      # mais novos (e o Geyser) entrarem mesmo assim.
+      VERSION: "${MINECRAFT_VERSION_BEDWARS:-1.21.4}"
       MEMORY: "${MEMORY_BEDWARS:-2500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
@@ -95,12 +99,12 @@ services:
         condition: service_healthy
 
   pillars:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
       MEMORY: "${MEMORY_PILLARS:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
@@ -129,12 +133,12 @@ services:
         condition: service_healthy
 
   buildbattle:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
       MEMORY: "${MEMORY_BUILDBATTLE:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
@@ -166,12 +170,12 @@ services:
         condition: service_healthy
 
   ctf:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
       MEMORY: "${MEMORY_CTF:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
@@ -200,12 +204,12 @@ services:
         condition: service_healthy
 
   pvp:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
       MEMORY: "${MEMORY_PVP:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
@@ -236,12 +240,12 @@ services:
   # Servidor dos eventos que voce mesmo conduz: lava sobe, corrida, quiz.
   # Nao sobe junto com a rede; use scripts/event.sh no dia do evento.
   eventos:
-    image: itzg/minecraft-server:java21
+    image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-1.21.8}"
+      VERSION: "${MINECRAFT_VERSION:-26.2}"
       MEMORY: "${MEMORY_EVENTOS:-2G}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"

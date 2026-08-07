@@ -1,3 +1,8 @@
-# Keep the BedWars plugin URL here only after you choose a licensed plugin and
-# validate its compatibility with Paper 1.21.8, Geyser/Floodgate, your map, and
-# at least 16 concurrent test players.
+# Plugin escolhido: BedWars1058 25.2 (oficial, andrei1058), que suporta ate o
+# Paper 1.21.4 — por isso este backend fica na 1.21.4. Baixe somente do GitHub
+# oficial ou do SpigotMC e adicione a URL aqui junto com o ViaVersion (Hangar ou
+# Modrinth), que permite clientes mais novos e o Geyser entrarem neste backend.
+# Antes de fixar as URLs, valide os criterios 3 e 4 de infra/plugins/README.md:
+# memoria estavel apos 5-6 partidas e loja utilizavel num aparelho Bedrock real.
+# Plano B se a 25.2 falhar nos testes: fork BedWars2023 (tomkeuper) ou o fork do
+# MelonOof no Modrinth.

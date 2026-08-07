@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$PublicHost = "localhost",
-    [string]$MinecraftVersion = "1.21.8"
+    [string]$MinecraftVersion = "26.2"
 )
 
 Set-StrictMode -Version Latest
@@ -58,7 +58,7 @@ else {
     $databaseRootPassword = New-RandomSecret
     $environmentText = [System.IO.File]::ReadAllText((Join-Path $infraRoot ".env.example"))
     $environmentText = $environmentText.Replace("PUBLIC_HOST=localhost", "PUBLIC_HOST=$PublicHost")
-    $environmentText = $environmentText.Replace("MINECRAFT_VERSION=1.21.8", "MINECRAFT_VERSION=$MinecraftVersion")
+    $environmentText = $environmentText.Replace("MINECRAFT_VERSION=26.2", "MINECRAFT_VERSION=$MinecraftVersion")
     $environmentText = $environmentText.Replace("VELOCITY_SECRET=REPLACE_ME", "VELOCITY_SECRET=$velocitySecret")
     $environmentText = $environmentText.Replace("DATABASE_PASSWORD=REPLACE_ME", "DATABASE_PASSWORD=$databasePassword")
     $environmentText = $environmentText.Replace("DATABASE_ROOT_PASSWORD=REPLACE_ME", "DATABASE_ROOT_PASSWORD=$databaseRootPassword")

@@ -28,7 +28,12 @@ O proxy autentica jogadores Java, recebe jogadores Bedrock através do Geyser e 
 
 ## Versão do jogo
 
-O repositório fixa o beta em **Paper 1.21.8**. O objetivo é ter uma base madura para plugins de minigame. Não atualize para uma versão nova apenas porque ela foi lançada: primeiro replique o ambiente, valide BedWars, Pillars, Geyser, anti-cheat e mapas.
+A versão é fixada **por modo**, presa à compatibilidade dos plugins de cada um — os backends não precisam estar todos na mesma versão, porque o Velocity roteia entre eles:
+
+- **Modos gerais (lobby, PvP, eventos, Pillars, Build Battle, CTF): Paper 26.2.** O motivo é a lança, adicionada na 1.21.9: ela precisa existir no PvP e nos eventos.
+- **BedWars: Paper 1.21.4**, a versão máxima do BedWars1058 25.2 (plugins de BedWars usam NMS e só rodam nas versões que suportam). O **ViaVersion instalado nesse backend** traduz o protocolo dos clientes mais novos — incluindo o Geyser, que emula um cliente Java 26.2 — para que todos entrem normalmente. Efeito colateral aceito: dentro do BedWars não existe lança.
+
+Não atualize um backend para uma versão nova apenas porque ela foi lançada: primeiro replique o ambiente, valide os plugins do modo, o Geyser, o anti-cheat e os mapas.
 
 ## O que não entra no Git
 

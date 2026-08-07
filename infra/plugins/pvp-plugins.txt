@@ -1,6 +1,9 @@
-# Arena/KitPvP for the beta: kits and any ranked system stay undecided until the
-# first tests. Keep the plugin URL here only after checking its licence, Paper
-# 1.21.8 support and how it behaves with Bedrock touch controls and aim.
+# KitPvP com kit aleatorio no spawn: o desenho do modo esta em docs/PVP.md.
+# O plugin (ou combinacao de plugins) precisa cobrir: kit sorteado ao entrar na
+# arena, zona segura no spawn, combat tag de 15 s com morte ao deslogar marcado,
+# e perda da protecao ao atacar de dentro da zona. Cheque licenca, suporte ao
+# Paper 26.2 (este backend usa a lanca) e o comportamento com controle de toque
+# e mira do Bedrock antes de fixar a URL aqui.
 #
 # Anything sold for this mode must stay cosmetic: selling stronger kits turns the
 # server pay-to-win and is the fastest way to lose the competitive players.

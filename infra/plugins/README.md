@@ -10,13 +10,29 @@ Os arquivos `*.txt` desta pasta são listas de URLs que o container baixa no pri
 4. Não use JARs "crackeados", enviados por desconhecidos ou sem licença clara.
 5. Não publique arquivos de mapas que você não tenha direito de redistribuir.
 
+## Decisões tomadas
+
+- **Versões por modo.** Os backends não precisam estar todos na mesma versão: o
+  Velocity roteia entre eles e o ViaVersion traduz cliente novo para servidor
+  velho. O BedWars roda Paper **1.21.4** (versão máxima do plugin escolhido) com
+  ViaVersion instalado; os demais modos rodam **26.2**, para a lança (1.21.9+)
+  existir no PvP e nos eventos. Dentro do BedWars não há lança — o item não
+  existe na 1.21.4.
+- **BedWars: BedWars1058 25.2 oficial** (andrei1058, open source), sujeito aos
+  testes dos critérios 3 e 4 abaixo. Planos B na mesma família, com a mesma
+  base de configuração: fork BedWars2023 (tomkeuper) e fork do MelonOof no
+  Modrinth (este lista suporte a 1.21.11 — candidato futuro se quisermos lança
+  também no BedWars).
+- **PvP: KitPvP de kit aleatório**, sem menu de seleção. O desenho completo,
+  incluindo zona segura, combat tag de 15 s e o balanceamento do sorteio, está
+  em [docs/PVP.md](../../docs/PVP.md).
+
 ## Decisões ainda pendentes
 
-- BedWars: escolher plugin pago ou open source com suporte a Geyser/Floodgate.
 - Pillars of Fortune: validar a experiência Bedrock e possíveis dados de telemetria.
 - Build Battle: conferir se os menus de tema, o seletor de blocos e a votação funcionam pelo Geyser.
 - Capture the Flag: confirmar indicação de bandeira, cores de time e placar no Bedrock.
-- PvP: decidir se será arena livre ou KitPvP, e manter os kits fora da loja.
+- PvP: escolher o plugin (ou combinação) que implementa o desenho de docs/PVP.md.
 - Anti-cheat: escolher um que lide bem com as diferenças de movimento do Bedrock e com o voo criativo do Build Battle.
 - Permissões, punições, chat e estatísticas: escolher uma combinação compatível entre si.
 
@@ -24,7 +40,7 @@ Prefira, quando possível, um único plugin que cubra vários modos: menos super
 
 ## Critérios para o plugin de minigame
 
-Além de licença e suporte ao Paper 1.21.8, quatro coisas decidem se ele serve para um servidor pequeno:
+Além de licença e suporte à versão do Paper do modo em questão (26.2 nos modos gerais, 1.21.4 no BedWars), quatro coisas decidem se ele serve para um servidor pequeno:
 
 **1. Formatos de partida configuráveis.** Plugin que só faz 4×4 exige 16 jogadores para começar. Com 12 online a partida nunca sai, e quem esperou fecha o jogo. Você precisa poder rodar solo e duplas enquanto a população é pequena, e aumentar o formato conforme cresce.
 
