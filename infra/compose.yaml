@@ -34,6 +34,9 @@ services:
       MEMORY: "${MEMORY_LOBBY:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft Lobby"
       MOTD: "Game Craft | Lobby beta"
       # Beta fechado: so entra quem esta na whitelist. Sair do beta e trocar
@@ -75,6 +78,9 @@ services:
       MEMORY: "${MEMORY_BEDWARS:-2500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft BedWars"
       MOTD: "Game Craft | BedWars beta"
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
@@ -109,6 +115,9 @@ services:
       MEMORY: "${MEMORY_PILLARS:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft Pillars"
       MOTD: "Game Craft | Pillars of Fortune beta"
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
@@ -143,6 +152,9 @@ services:
       MEMORY: "${MEMORY_BUILDBATTLE:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft Build Battle"
       MOTD: "Game Craft | Build Battle beta"
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
@@ -180,6 +192,9 @@ services:
       MEMORY: "${MEMORY_CTF:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft Capture the Flag"
       MOTD: "Game Craft | Capture the Flag beta"
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
@@ -214,6 +229,9 @@ services:
       MEMORY: "${MEMORY_PVP:-1500M}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft PvP"
       MOTD: "Game Craft | PvP beta"
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
@@ -250,6 +268,9 @@ services:
       MEMORY: "${MEMORY_EVENTOS:-2G}"
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft Eventos"
       MOTD: "Game Craft | Evento"
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
