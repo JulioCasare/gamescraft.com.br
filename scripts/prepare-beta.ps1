@@ -42,7 +42,9 @@ function Copy-Template {
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
 
 $environmentPath = Join-Path $infraRoot ".env"
+$environmentKept = $false
 if (Test-Path -LiteralPath $environmentPath) {
+    $environmentKept = $true
     $environmentText = [System.IO.File]::ReadAllText($environmentPath)
     $existingSecret = [regex]::Match($environmentText, "(?m)^VELOCITY_SECRET=(.+)$").Groups[1].Value.Trim()
     if ([string]::IsNullOrWhiteSpace($existingSecret) -or $existingSecret -eq "REPLACE_ME") {
@@ -96,7 +98,13 @@ if (Test-Path -LiteralPath $serverIcon) {
 
 Write-Host ""
 Write-Host "Ambiente beta preparado." -ForegroundColor Green
-Write-Host "Host configurado: $PublicHost"
-Write-Host "Versao Java configurada: $MinecraftVersion"
+if ($environmentKept) {
+    Write-Host "infra/.env ja existia e foi MANTIDO: host e versao nao foram alterados." -ForegroundColor Yellow
+    Write-Host "Confira MINECRAFT_VERSION e as demais variaveis contra infra/.env.example."
+}
+else {
+    Write-Host "Host configurado: $PublicHost"
+    Write-Host "Versao Java configurada: $MinecraftVersion"
+}
 Write-Host "Segredos foram gravados apenas em infra/.env e infra/runtime/ (ignorados pelo Git)."
 Write-Host "Inicie com: docker compose --env-file infra/.env -f infra/compose.yaml up -d"

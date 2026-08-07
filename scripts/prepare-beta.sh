@@ -38,7 +38,9 @@ new_secret() {
 mkdir -p "$runtime_root"
 
 environment_path="$infra_root/.env"
+environment_kept=""
 if [[ -f "$environment_path" ]]; then
+    environment_kept="1"
     velocity_secret="$(sed -n 's/^VELOCITY_SECRET=//p' "$environment_path" | head -n 1)"
     if [[ -z "$velocity_secret" || "$velocity_secret" == "REPLACE_ME" ]]; then
         velocity_secret="$(new_secret)"
@@ -94,7 +96,12 @@ done
 
 echo
 echo "Ambiente beta preparado."
-echo "Host configurado: $public_host"
-echo "Versao Java configurada: $minecraft_version"
+if [[ -n "$environment_kept" ]]; then
+    echo "infra/.env ja existia e foi MANTIDO: host e versao nao foram alterados."
+    echo "Confira MINECRAFT_VERSION e as demais variaveis contra infra/.env.example."
+else
+    echo "Host configurado: $public_host"
+    echo "Versao Java configurada: $minecraft_version"
+fi
 echo "Segredos foram gravados apenas em infra/.env e infra/runtime/ (ignorados pelo Git)."
 echo "Inicie com: docker compose --env-file infra/.env -f infra/compose.yaml up -d"
