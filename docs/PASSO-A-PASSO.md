@@ -12,7 +12,7 @@ O VPS só recebe coisa pronta. Todo trabalho demorado acontece aqui, onde o
 tempo não custa nada — se for feito depois da compra, ele queima o prazo de
 reembolso em tarefa que podia ser de graça.
 
-- [ ] Rede subindo no Docker local (seção "Começar localmente" do [README](../README.md))
+- [ ] Rede subindo no Docker local — guia detalhado em [FASE-0-WINDOWS.md](FASE-0-WINDOWS.md)
 - [ ] Plugins escolhidos, instalados e configurados (a fase mais longa do projeto)
 - [ ] Kits e regras do PvP montados conforme [PVP.md](PVP.md)
 - [ ] Mapas instalados e testados
