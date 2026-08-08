@@ -26,12 +26,22 @@ O equilíbrio vem de um **orçamento**. Cada peça custa conforme o material —
 couro 1, ouro 2, malha 3, ferro 4, diamante 5 — e a soma das quatro (de 4 a 20)
 decide o resto do kit:
 
-| Soma da armadura | Arma | Extras |
-|---|---|---|
-| 4 a 8 (quase pelado) | Diamante com Sharpness 2 | 2 maçãs douradas e poção de velocidade |
-| 9 a 12 | Diamante simples | 1 maçã dourada |
-| 13 a 16 | Ferro | Escudo |
-| 17 a 20 (blindado) | Pedra | Escudo |
+| Soma da armadura | Arma | Machado (quando sai) | Maçãs douradas |
+|---|---|---|---|
+| 4 a 8 (quase pelado) | Diamante com Sharpness 2 | Ferro | 5, mais poção de velocidade |
+| 9 a 12 | Diamante simples | Pedra | 4 |
+| 13 a 16 | Ferro | Pedra | 3 |
+| 17 a 20 (blindado) | Pedra | Madeira | 2 |
+
+**Todo kit sai também com:** 16 carnes assadas, 32 tábuas de madeira, 32
+pedregulhos, e **escudo ou totem** — o totem em 1 de cada 4 kits, porque vale
+bem mais que o escudo.
+
+**Ferramentas extras** são sorteadas à parte da espada: 1 em 4 traz picareta,
+1 em 4 traz machado, 1 em 4 traz os dois, 1 em 4 não traz nada. A picareta é
+sempre de ferro (utilidade, dano baixo); o **machado entra um nível abaixo da
+arma principal**, porque machado bate mais que espada do mesmo material e sem
+isso o kit blindado ganharia dano de graça.
 
 Assim ninguém é sorteado para perder: quem recebeu armadura ruim ganha o poder
 de matar rápido e fugir; quem recebeu diamante inteiro aguenta muito e machuca
