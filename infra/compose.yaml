@@ -48,6 +48,10 @@ services:
       MODE: adventure
       DIFFICULTY: peaceful
       PVP: "false"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
@@ -93,6 +97,10 @@ services:
       MODE: adventure
       DIFFICULTY: normal
       PVP: "true"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
@@ -130,6 +138,10 @@ services:
       MODE: adventure
       DIFFICULTY: normal
       PVP: "true"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
@@ -170,6 +182,10 @@ services:
       # O plugin de Build Battle coloca o jogador em criativo dentro da parcela.
       # Sem allow-flight o Paper expulsa quem estiver voando.
       ALLOW_FLIGHT: "TRUE"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "6"
@@ -207,6 +223,10 @@ services:
       MODE: adventure
       DIFFICULTY: normal
       PVP: "true"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
@@ -244,6 +264,10 @@ services:
       MODE: adventure
       DIFFICULTY: normal
       PVP: "true"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "6"
@@ -287,6 +311,10 @@ services:
       PVP: "true"
       # Voce precisa de voo para montar e acompanhar o evento de cima.
       ALLOW_FLIGHT: "TRUE"
+      # Sem mob natural em servidor de minigame: monstro atrapalha partida e come
+      # CPU a toa. Nao afeta mob que plugin invoca (ex.: Dream Defender).
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
       ALLOW_NETHER: "false"
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "10"
