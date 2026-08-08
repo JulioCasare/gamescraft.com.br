@@ -18,17 +18,40 @@ tela por respawn e evita depender de menus pelo Geyser (critério 4 da
 
 ## O sorteio
 
-- **Pool pequeno e curado**: 4 a 6 kits, de couro a diamante, todos com chance
-  real de vitória. Nada de kit-piada que faça o jogador se sentir sorteado para
-  perder.
-- **Quanto pior a armadura, mais forte o resto.** O kit de couro compensa com
-  itens personalizados — lança com Lunge, poção de força, projéteis. O kit de
-  diamante vem com arma simples e sem extras. A graça do sorteio é "o que eu
-  faço com isso", não "ganhei ou perdi no sorteio".
-- **Um kit centrado na lança.** A lança (1.21.9+) é o motivo de este backend
-  rodar 26.2; o Lunge em arena é a vitrine disso.
-- Kits ficam **fora da loja** — regra já registrada em
-  [MONETIZACAO](MONETIZACAO.md). Vender kit mais forte é pay-to-win.
+Não existem kits prontos: **cada peça de armadura é sorteada sozinha**, então
+quase nunca sai um conjunto completo — o normal é capacete de diamante com
+calça de couro, e é isso que faz cada vida parecer diferente da anterior.
+
+O equilíbrio vem de um **orçamento**. Cada peça custa conforme o material —
+couro 1, ouro 2, malha 3, ferro 4, diamante 5 — e a soma das quatro (de 4 a 20)
+decide o resto do kit:
+
+| Soma da armadura | Arma | Extras |
+|---|---|---|
+| 4 a 8 (quase pelado) | Diamante com Sharpness 2 | 2 maçãs douradas e poção de velocidade |
+| 9 a 12 | Diamante simples | 1 maçã dourada |
+| 13 a 16 | Ferro | Escudo |
+| 17 a 20 (blindado) | Pedra | Escudo |
+
+Assim ninguém é sorteado para perder: quem recebeu armadura ruim ganha o poder
+de matar rápido e fugir; quem recebeu diamante inteiro aguenta muito e machuca
+pouco. A graça é "o que eu faço com isso", não "ganhei ou perdi no sorteio".
+
+**Uma em cada quatro armas vem como lança**, no lugar da espada, com Lunge
+proporcional ao nível do kit. A lança (1.21.9+) é o motivo de este backend
+rodar 26.2, e o Lunge em arena é a vitrine disso.
+
+Kits ficam **fora da loja** — regra já registrada em
+[MONETIZACAO](MONETIZACAO.md). Vender kit mais forte é pay-to-win.
+
+### Onde mexer
+
+O sistema é um datapack em `infra/datapacks/gamecraft-kits`, não um plugin —
+nenhum plugin de KitPvP suporta o Paper 26.2. Para ajustar o equilíbrio:
+`slot_*.mcfunction` muda os materiais sorteados, `arma.mcfunction` muda as
+faixas de orçamento, e os `arma_*.mcfunction` mudam armas e extras de cada
+faixa. Depois de editar, copie para `infra/runtime/pvp/world/datapacks/` e rode
+`/reload` no servidor.
 
 ## As três regras que fecham as brechas
 
@@ -55,5 +78,6 @@ assunto para depois do beta, se houver demanda.
 - Os três fechos de brecha acima, um por um, tentando burlar de propósito.
 - A lança e o Lunge num aparelho Bedrock real: golpe carregado e mira por toque
   passando pelo Geyser.
-- Cada kit do pool contra cada outro: se algum kit não ganha de ninguém ou
-  ganha de todos, ajuste os itens personalizados antes de abrir.
+- O equilíbrio do orçamento: jogue várias vidas seguidas e repare se alguma
+  faixa domina. Se quem sai quase pelado ganha sempre, a arma da faixa 4–8 está
+  forte demais; se blindado nunca morre, falta dano na faixa 17–20.

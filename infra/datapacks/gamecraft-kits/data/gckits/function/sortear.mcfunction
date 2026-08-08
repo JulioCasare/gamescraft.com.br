@@ -1,9 +1,13 @@
-# Pool pequeno e curado: cinco kits, todos com chance real de vitoria.
-# A regra de equilibrio esta em docs/PVP.md: quanto pior a armadura, mais forte
-# o resto do kit.
-execute store result score #r gc_r run random value 1..5
-execute if score #r gc_r matches 1 run function gckits:kit_lanceiro
-execute if score #r gc_r matches 2 run function gckits:kit_arqueiro
-execute if score #r gc_r matches 3 run function gckits:kit_tanque
-execute if score #r gc_r matches 4 run function gckits:kit_assassino
-execute if score #r gc_r matches 5 run function gckits:kit_guerreiro
+# Kit misturado: cada peca de armadura e sorteada por conta propria, entao
+# quase nunca sai um conjunto completo. O equilibrio vem do orcamento: cada
+# peca custa de 1 (couro) a 5 (diamante), e a arma e escolhida pelo que sobrou.
+# Armadura forte recebe arma fraca; quem sai pelado leva a arma mais perigosa.
+clear @s
+scoreboard players set @s gc_s 0
+function gckits:slot_cabeca
+function gckits:slot_peito
+function gckits:slot_pernas
+function gckits:slot_pes
+function gckits:arma
+give @s minecraft:cooked_beef 6
+function gckits:aviso
