@@ -65,7 +65,7 @@ services:
         condition: service_healthy
 
   bedwars:
-    # Java 21 basta aqui: so o Paper 26.x exige Java 25, e este backend e 1.21.4.
+    # Java 21 basta aqui: so o Paper 26.x exige Java 25, e este backend e 1.20.4.
     image: itzg/minecraft-server:java21
     restart: unless-stopped
     environment:
@@ -74,7 +74,7 @@ services:
       # O BedWars fica numa versao propria: o BedWars1058 usa NMS e so roda
       # nas versoes que suporta. O ViaVersion neste backend deixa os clientes
       # mais novos (e o Geyser) entrarem mesmo assim.
-      VERSION: "${MINECRAFT_VERSION_BEDWARS:-1.21.4}"
+      VERSION: "${MINECRAFT_VERSION_BEDWARS:-1.20.4}"
       MEMORY: "${MEMORY_BEDWARS:-2500M}"
       # Mundo void: fora do mapa de BedWars nao gera terreno nenhum — cair do
       # mapa e cair no vazio. Vale so na criacao do mundo (fica no level.dat).

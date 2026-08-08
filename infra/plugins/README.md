@@ -14,17 +14,16 @@ Os arquivos `*.txt` desta pasta são listas de URLs que o container baixa no pri
 
 - **Versões por modo.** Os backends não precisam estar todos na mesma versão: o
   Velocity roteia entre eles e o ViaVersion traduz cliente novo para servidor
-  velho. O BedWars roda Paper **1.21.4** (versão máxima do plugin escolhido) com
+  velho. O BedWars roda Paper **1.20.4** (versão máxima do plugin escolhido) com
   ViaVersion instalado; os demais modos rodam **26.2**, para a lança (1.21.9+)
   existir no PvP e nos eventos. Dentro do BedWars não há lança — o item não
-  existe na 1.21.4.
-- **BedWars: BedWars1058 25.3-SNAPSHOT** (Modrinth oficial do andrei1058, open
-  source) — é a build da família que suporta 1.21.4; a release estável 25.2 vai
-  só até o 1.20.4. Sujeito aos testes dos critérios 3 e 4 abaixo. Plano B:
-  descer o backend para Paper 1.20.4 e usar a 25.2 estável. Planos C na mesma
-  família: fork BedWars2023 (tomkeuper) e fork do MelonOof no Modrinth (este
-  lista suporte a 1.21.11 — candidato futuro se quisermos lança também no
-  BedWars).
+  existe na 1.20.4.
+- **BedWars: BedWars1058 25.2 estável, em backend Paper 1.20.4.** A 25.3-SNAPSHOT
+  em 1.20.4 foi testada e **reprovada** (2026-08-08): loja abria vazia, sem
+  nenhum item à venda, mais NPE em `PlayerDeathEvent` e no menu de espectador.
+  Snapshot não passa nos critérios abaixo. Planos B na mesma família, se a 25.2
+  também falhar: fork BedWars2023 (tomkeuper) e fork do MelonOof no Modrinth
+  (este lista 1.21.11 — candidato se um dia quisermos lança no BedWars).
 - **PvP: KitPvP de kit aleatório**, sem menu de seleção. O desenho completo,
   incluindo zona segura, combat tag de 15 s e o balanceamento do sorteio, está
   em [docs/PVP.md](../../docs/PVP.md).
@@ -42,7 +41,7 @@ Prefira, quando possível, um único plugin que cubra vários modos: menos super
 
 ## Critérios para o plugin de minigame
 
-Além de licença e suporte à versão do Paper do modo em questão (26.2 nos modos gerais, 1.21.4 no BedWars), quatro coisas decidem se ele serve para um servidor pequeno:
+Além de licença e suporte à versão do Paper do modo em questão (26.2 nos modos gerais, 1.20.4 no BedWars), quatro coisas decidem se ele serve para um servidor pequeno:
 
 **1. Formatos de partida configuráveis.** Plugin que só faz 4×4 exige 16 jogadores para começar. Com 12 online a partida nunca sai, e quem esperou fecha o jogo. Você precisa poder rodar solo e duplas enquanto a população é pequena, e aumentar o formato conforme cresce.
 

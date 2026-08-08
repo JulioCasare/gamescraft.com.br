@@ -63,7 +63,7 @@ dos logs sem derrubar a rede).
 - Teste as duas edições e a troca de modo pelo lobby.
 
 Até o ViaVersion estar na lista de plugins do BedWars, o cliente 26.2 entra no
-lobby e no PvP mas **não** no BedWars (backend 1.21.4) — esperado, não é bug.
+lobby e no PvP mas **não** no BedWars (backend 1.20.4) — esperado, não é bug.
 
 ## 7. Dia a dia
 
