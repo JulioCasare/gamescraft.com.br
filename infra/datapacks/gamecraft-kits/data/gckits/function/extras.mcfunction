@@ -19,3 +19,8 @@ execute if score #x4 gc_r matches 1 run give @s minecraft:water_bucket 1
 # passagem. Sai bem mais raro que o de agua.
 execute store result score #x5 gc_r run random value 1..6
 execute if score #x5 gc_r matches 1 run give @s minecraft:lava_bucket 1
+
+# Teia: prende quem esta perseguindo e corta queda. Como todo kit tem espada,
+# quem for preso consegue se soltar — nao trava a luta, so muda o ritmo.
+execute store result score #x6 gc_r run random value 1..3
+execute if score #x6 gc_r matches 1 run give @s minecraft:cobweb 8
