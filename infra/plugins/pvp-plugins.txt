@@ -13,3 +13,6 @@ https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/li
 #
 # Anything sold for this mode must stay cosmetic: selling stronger kits turns the
 # server pay-to-win and is the fastest way to lose the competitive players.
+# FoCombatTag 1.5 (Modrinth oficial) - marca de combate de 15 s, morte ao
+# deslogar marcado e bloqueio de zona segura (regras 1 a 3 de docs/PVP.md).
+https://cdn.modrinth.com/data/DlXXdjEQ/versions/7S0NSroY/FoCombatTag-1.5.jar
