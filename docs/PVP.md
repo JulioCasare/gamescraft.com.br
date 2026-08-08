@@ -57,6 +57,15 @@ modo, por isso sai bem mais rara.
 queda; como todo kit tem espada, quem cai na teia consegue se soltar — muda o
 ritmo da luta sem travá-la.
 
+**TNT que acende sozinha:** 4 unidades em 1 de cada 5 kits. Não precisa de
+isqueiro — colocou, conta dois segundos e explode. O truque é uma conquista
+invisível que dispara a cada bloco colocado e um raio de seis blocos na direção
+do olhar: se o bloco recém-posto for TNT, ele vira TNT acesa na hora.
+
+> A TNT **abre cratera no mapa**. Enquanto a arena de PvP for terreno gerado,
+> isso não importa; quando houver arena construída, ou se aceita as marcas de
+> guerra, ou se agenda um reset periódico da área com o WorldEdit.
+
 **Arco e flecha são sorteados separados, de propósito:** 1 chance em 3 para o
 arco, outra 1 em 3 para 16 flechas. Pode vir arco sem flecha e flecha sem arco
 — e como quem morre larga o que tinha, juntar as duas metades no chão vira uma

@@ -16,3 +16,6 @@ https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/li
 # FoCombatTag 1.5 (Modrinth oficial) - marca de combate de 15 s, morte ao
 # deslogar marcado e bloqueio de zona segura (regras 1 a 3 de docs/PVP.md).
 https://cdn.modrinth.com/data/DlXXdjEQ/versions/7S0NSroY/FoCombatTag-1.5.jar
+# WorldEdit 7.4.4 (Modrinth oficial, EngineHub) - construcao, selecao e reset
+# de area. Restrinja o uso a staff pelo LuckPerms antes de abrir o beta.
+https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.jar

@@ -1,0 +1,10 @@
+{
+  "criteria": {
+    "colocou": {
+      "trigger": "minecraft:placed_block"
+    }
+  },
+  "rewards": {
+    "function": "gckits:tnt_acende"
+  }
+}

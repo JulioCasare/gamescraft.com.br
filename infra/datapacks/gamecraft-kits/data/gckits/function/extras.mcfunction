@@ -24,3 +24,8 @@ execute if score #x5 gc_r matches 1 run give @s minecraft:lava_bucket 1
 # quem for preso consegue se soltar — nao trava a luta, so muda o ritmo.
 execute store result score #x6 gc_r run random value 1..3
 execute if score #x6 gc_r matches 1 run give @s minecraft:cobweb 8
+
+# TNT que acende sozinha ao ser colocada (ver gckits:tnt_acende). Nao precisa
+# de isqueiro: colocou, conta 2 segundos e explode.
+execute store result score #x7 gc_r run random value 1..5
+execute if score #x7 gc_r matches 1 run give @s minecraft:tnt 4

@@ -17,3 +17,6 @@ https://cdn.modrinth.com/data/VBj24lEa/versions/ejWfwIIN/bedwars-plugin-25.2.jar
 # BetterInvisibility 4.0.1 (Modrinth oficial) - invisibilidade esconde armadura,
 # item na mao e particulas, como no Hypixel. O plugin de BedWars nao faz isso.
 https://cdn.modrinth.com/data/lTZS71wY/versions/Q9oqHkjP/BetterInvisibility-4.0.1.jar
+# WorldEdit 7.3.9 (Modrinth oficial) - versao que suporta o Paper 1.20.4 deste
+# backend; os outros modos usam a 7.4.4, que exige 1.21+.
+https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar

@@ -12,3 +12,6 @@ https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/li
 # - menus / lobby tools
 # - anti-cheat
 # - moderation
+# WorldEdit 7.4.4 (Modrinth oficial, EngineHub) - construcao, selecao e reset
+# de area. Restrinja o uso a staff pelo LuckPerms antes de abrir o beta.
+https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.jar
