@@ -76,6 +76,10 @@ services:
       # mais novos (e o Geyser) entrarem mesmo assim.
       VERSION: "${MINECRAFT_VERSION_BEDWARS:-1.21.4}"
       MEMORY: "${MEMORY_BEDWARS:-2500M}"
+      # Mundo void: fora do mapa de BedWars nao gera terreno nenhum — cair do
+      # mapa e cair no vazio. Vale so na criacao do mundo (fica no level.dat).
+      LEVEL_TYPE: "minecraft:flat"
+      GENERATOR_SETTINGS: '{"biome":"minecraft:the_void","layers":[]}'
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
       # Permite mandar comandos de admin sem RCON:
