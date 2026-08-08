@@ -16,6 +16,7 @@ function gckits:ferramentas
 function gckits:arma
 function gckits:encantamentos
 function gckits:blocos
+function gckits:extras
 function gckits:consumiveis
 function gckits:pocoes
 function gckits:defesa
