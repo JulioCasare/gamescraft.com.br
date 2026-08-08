@@ -1,6 +1,9 @@
 # Quem entrou agora ainda nao tem kit.
 execute as @a[tag=!gc_kitted] run function gckits:novo
 
+# Quem voltou depois de sair do jogo tambem recomeca: spawn e kit novo.
+execute as @a[scores={gc_left=1..}] run function gckits:entrou
+
 # Morreu: guarda a pendencia. Entregar kit com o jogador morto nao funciona —
 # o inventario e limpo no respawn.
 execute as @a[scores={gc_deaths=1..}] run function gckits:marcar
