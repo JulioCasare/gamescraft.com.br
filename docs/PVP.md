@@ -46,8 +46,12 @@ a função nativa do Minecraft (`enchant_randomly`), que escolhe um encantamento
 válido para aquele item e um nível aleatório dentro do máximo dele — então sai
 de Afiação I a Afiação V, Proteção I a V, e por aí vai.
 
-**Pérolas do ender em 1 de cada 4 kits** (duas por vez), para fuga e
-reposicionamento.
+**Pérolas do ender: ou quatro, ou nenhuma.** Um kit em cada quatro leva o
+punhado inteiro — o suficiente para fugir de verdade e ainda caçar alguém.
+
+**Baldes:** água em 1 de cada 3 kits (salva de queda, apaga fogo, empurra quem
+está na beirada) e lava em 1 de cada 6 — a lava é a ferramenta mais cruel do
+modo, por isso sai bem mais rara.
 
 **Arco e flecha são sorteados separados, de propósito:** 1 chance em 3 para o
 arco, outra 1 em 3 para 16 flechas. Pode vir arco sem flecha e flecha sem arco
