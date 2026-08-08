@@ -28,7 +28,7 @@ decide o resto do kit:
 
 | Soma da armadura | Espada e lança | Machado (quando sai) | Maçãs, se saírem |
 |---|---|---|---|
-| 4 a 8 (quase pelado) | Ferro ou diamante, lança com Lunge | Pedra ou ferro | 5, mais poção de velocidade |
+| 4 a 8 (quase pelado) | Ferro ou diamante, lança com Lunge | Pedra ou ferro | 5, mais poção garantida |
 | 9 a 12 | Pedra a diamante, lança com Lunge | Madeira a ferro | 4 |
 | 13 a 16 | Pedra ou ferro | Madeira ou pedra | 3 |
 | 17 a 20 (blindado) | Madeira ou pedra | Madeira | 2 |
@@ -37,8 +37,19 @@ O material de cada arma é sorteado **dentro da faixa**, então dois kits com a
 mesma armadura ainda saem diferentes.
 
 **Todo kit sai também com:** espada e lança (sempre as duas), 32 tábuas, 32
-pedregulhos, e **escudo ou totem** — o totem em 1 de cada 4 kits, porque vale
-bem mais que o escudo.
+pedregulhos, e **escudo ou totem** — o totem em 1 de cada 8 kits, porque é uma
+vida extra e vale muito mais que o escudo.
+
+**Encantamentos aparecem em alguns kits, sorteados de verdade:** a espada tem 1
+chance em 3, a lança outra 1 em 3, e uma peça de armadura 1 em 2. O sorteio usa
+a função nativa do Minecraft (`enchant_randomly`), que escolhe um encantamento
+válido para aquele item e um nível aleatório dentro do máximo dele — então sai
+de Afiação I a Afiação V, Proteção I a V, e por aí vai.
+
+**Poções de agilidade ou força, para beber ou arremessar.** Quem sorteou
+armadura fraca (4 a 8) leva sempre uma; os outros kits têm 1 chance em 3. O
+tipo é sorteado entre as quatro combinações — a arremessável vale tanto quanto
+a bebível, porque pega quem estiver em volta.
 
 **Comida: ou maçã dourada, ou carne, nunca as duas.** No sorteio, metade dos
 kits vem com 16 carnes assadas e metade com maçãs douradas — de 5 (armadura de
