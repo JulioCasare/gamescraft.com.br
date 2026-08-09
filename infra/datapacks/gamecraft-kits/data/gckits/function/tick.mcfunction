@@ -16,8 +16,9 @@ execute as @a[scores={gc_dmg=1..}] run function gckits:marcar_combate
 execute as @a[scores={gc_hurt=1..}] run function gckits:marcar_combate
 execute as @a[scores={gc_combat=1..}] run scoreboard players remove @s gc_combat 1
 
-# Zona segura em volta do spawn.
-execute as @a run function gckits:zona
+# Zona segura em volta do spawn. Roda uma vez por tick, nao uma vez por
+# jogador: o proprio zona_check ja varre todo mundo com @a.
+function gckits:zona
 
 # Blocos e fluidos colocados por jogador: 5 minutos e somem. Fica em pausa
 # enquanto alguem estiver com o modo construcao ligado.
