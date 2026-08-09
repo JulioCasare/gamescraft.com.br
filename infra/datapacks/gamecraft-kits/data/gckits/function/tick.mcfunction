@@ -26,3 +26,9 @@ execute as @e[type=minecraft:marker,tag=gc_temp,scores={gc_timer=..0}] at @s run
 # Pavio da TNT sem dano de bloco.
 scoreboard players remove @e[type=minecraft:marker,tag=gc_boom] gc_timer 1
 execute as @e[type=minecraft:marker,tag=gc_boom,scores={gc_timer=..0}] at @s run function gckits:explodir
+
+# Gatilhos /trigger save e /trigger reset.
+function gckits:gatilhos
+
+# Conserto continuo do mapa a cada 30 segundos.
+function gckits:reparo

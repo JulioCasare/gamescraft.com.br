@@ -36,3 +36,7 @@ scoreboard objectives add gc_timer dummy
 # O clone do save/reset costuma passar do teto padrao de 32768 blocos por
 # comando; sem isso o comando falha calado numa arena de tamanho normal.
 gamerule max_block_modifications 4000000
+
+# Placares dos gatilhos: o jogador aciona com /trigger save e /trigger reset.
+scoreboard objectives add save trigger
+scoreboard objectives add reset trigger

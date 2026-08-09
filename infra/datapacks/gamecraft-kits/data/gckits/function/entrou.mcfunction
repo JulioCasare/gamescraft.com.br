@@ -3,4 +3,5 @@
 # Quem deslogou em combate e morto pelo FoCombatTag; a morte e que gera o kit
 # novo, pelo caminho normal do respawn.
 scoreboard players set @s gc_left 0
+execute if entity @s[name=JulioCasare] run tag @s add gc_admin
 function gckits:para_o_spawn
