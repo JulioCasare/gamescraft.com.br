@@ -1,9 +1,10 @@
-# Conserto do mapa. O Minecraft nao avisa quando um bloco e quebrado, mas todo
-# bloco quebrado larga um item — entao um item novo no chao serve de aviso, e o
-# conserto sai no mesmo instante, so em volta de onde caiu (gckits:item_novo).
+# Conserto do mapa. Duas redes, porque uma so nao pega tudo:
 #
-# Alem disso, um pente fino na arena inteira a cada 5 minutos, para pegar bloco
-# que sumiu sem largar item. E caro (a arena toda), por isso raro.
+# 1. Item novo no chao: e o rastro de um bloco quebrado, e conserta na hora.
+#    Nao serve sozinho — quem quebra no modo criativo nao larga item nenhum.
+# 2. Varredura de perto: a cada segundo, conserta em volta de cada jogador.
+#    Como so da para quebrar o que esta ao alcance, isso cobre qualquer quebra,
+#    em qualquer modo de jogo, sem varrer a arena inteira.
 scoreboard players add #tick gc_zone 1
 execute as @e[type=minecraft:item,tag=!gc_visto] run function gckits:item_novo
-execute if score #tick gc_zone matches 6000.. run function gckits:reparo_agora
+execute if score #tick gc_zone matches 20.. run function gckits:reparo_ciclo
