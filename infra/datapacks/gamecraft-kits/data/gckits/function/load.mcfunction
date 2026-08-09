@@ -40,3 +40,4 @@ gamerule max_block_modifications 4000000
 # Placares dos gatilhos: o jogador aciona com /trigger save e /trigger reset.
 scoreboard objectives add save trigger
 scoreboard objectives add reset trigger
+scoreboard objectives add build trigger

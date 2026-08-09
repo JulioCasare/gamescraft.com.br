@@ -1,0 +1,23 @@
+# Apelidos de comando do Bukkit. Datapack nao registra comando com barra
+# propria, mas o servidor sim: cada entrada aqui vira um comando de verdade,
+# que aparece no autocompletar e roda a funcao correspondente.
+# Todos exigem operador, porque /function exige.
+command-block-overrides: []
+ignore-vanilla-permissions: false
+aliases:
+    save:
+    - function gckits:save
+    reset:
+    - function gckits:reset
+    build:
+    - function gckits:trigger_build
+    arena1:
+    - function gckits:arena_canto1
+    arena2:
+    - function gckits:arena_canto2
+    zona1:
+    - function gckits:canto1
+    zona2:
+    - function gckits:canto2
+    zona:
+    - function gckits:zona_ver

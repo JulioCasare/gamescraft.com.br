@@ -30,5 +30,7 @@ execute as @e[type=minecraft:marker,tag=gc_boom,scores={gc_timer=..0}] at @s run
 # Gatilhos /trigger save e /trigger reset.
 function gckits:gatilhos
 
-# Conserto continuo do mapa a cada 30 segundos.
-function gckits:reparo
+# Conserto continuo do mapa: DESLIGADO. Ele devolvia os blocos do backup a
+# cada 30 segundos, o que atrapalha quem esta construindo a arena — bloco
+# removido de proposito voltava sozinho. Para religar, basta descomentar.
+# function gckits:reparo
