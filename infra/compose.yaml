@@ -10,14 +10,12 @@ services:
       VELOCITY_VERSION: latest
       MEMORY: "${MEMORY_PROXY:-1G}"
       REPLACE_ENV_VARIABLES: "false"
-      PLUGINS_FILE: /extras/proxy-plugins.txt
+      PLUGINS_FILE: /server/plugins.txt
     ports:
       - "${JAVA_PORT:-25565}:25565/tcp"
       - "${BEDROCK_PORT:-19132}:19132/udp"
     volumes:
-      - ./runtime/proxy:/server
-      - ./runtime/proxy-config:/config:ro
-      - ./plugins/proxy-plugins.txt:/extras/proxy-plugins.txt:ro
+      - gc_proxy:/server
     networks:
       - gamecraft
     depends_on:
@@ -56,12 +54,11 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
-      PLUGINS_FILE: /extras/lobby-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/lobby:/data
-      - ./plugins/lobby-plugins.txt:/extras/lobby-plugins.txt:ro
+      - gc_lobby:/data
     networks:
       - gamecraft
     depends_on:
@@ -105,12 +102,11 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
-      PLUGINS_FILE: /extras/bedwars-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/bedwars:/data
-      - ./plugins/bedwars-plugins.txt:/extras/bedwars-plugins.txt:ro
+      - gc_bedwars:/data
     networks:
       - gamecraft
     depends_on:
@@ -146,12 +142,11 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
-      PLUGINS_FILE: /extras/pillars-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/pillars:/data
-      - ./plugins/pillars-plugins.txt:/extras/pillars-plugins.txt:ro
+      - gc_pillars:/data
     networks:
       - gamecraft
     depends_on:
@@ -190,12 +185,11 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "6"
       SIMULATION_DISTANCE: "4"
-      PLUGINS_FILE: /extras/buildbattle-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/buildbattle:/data
-      - ./plugins/buildbattle-plugins.txt:/extras/buildbattle-plugins.txt:ro
+      - gc_buildbattle:/data
     networks:
       - gamecraft
     depends_on:
@@ -231,12 +225,11 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
-      PLUGINS_FILE: /extras/ctf-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/ctf:/data
-      - ./plugins/ctf-plugins.txt:/extras/ctf-plugins.txt:ro
+      - gc_ctf:/data
     networks:
       - gamecraft
     depends_on:
@@ -275,12 +268,11 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "6"
       SIMULATION_DISTANCE: "4"
-      PLUGINS_FILE: /extras/pvp-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/pvp:/data
-      - ./plugins/pvp-plugins.txt:/extras/pvp-plugins.txt:ro
+      - gc_pvp:/data
     networks:
       - gamecraft
     depends_on:
@@ -325,12 +317,11 @@ services:
       # O mapa e trocado por scripts/event.sh, nao gerado pelo servidor.
       LEVEL_TYPE: FLAT
       GENERATE_STRUCTURES: "false"
-      PLUGINS_FILE: /extras/eventos-plugins.txt
+      PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
     volumes:
-      - ./runtime/eventos:/data
-      - ./plugins/eventos-plugins.txt:/extras/eventos-plugins.txt:ro
+      - gc_eventos:/data
     networks:
       - gamecraft
     depends_on:
@@ -346,7 +337,7 @@ services:
       MARIADB_PASSWORD: "${DATABASE_PASSWORD}"
       MARIADB_ROOT_PASSWORD: "${DATABASE_ROOT_PASSWORD}"
     volumes:
-      - ./runtime/mariadb:/var/lib/mysql
+      - gc_mariadb:/var/lib/mysql
     networks:
       - gamecraft
     healthcheck:
@@ -358,3 +349,34 @@ services:
 networks:
   gamecraft:
     driver: bridge
+
+# Os dados dos servidores vivem em volumes do Docker, dentro do disco Linux do
+# WSL — nao em pasta do Windows. O compartilhamento de arquivos do Docker
+# Desktop com o disco D: colapsava depois de algumas horas de escrita e
+# derrubava a rede (arquivo corrompido, container que nao sobe, erro de
+# leitura no proprio JAR). Sem bind, esse caminho deixa de existir.
+#
+# Para mexer nos arquivos de dentro:
+#   docker exec game-craft-beta-<modo>-1 ls /data
+#   docker cp <origem> game-craft-beta-<modo>-1:/data/<destino>
+# E para copiar algo de volta para o Windows:
+#   docker cp game-craft-beta-<modo>-1:/data/<arquivo> .
+volumes:
+  gc_proxy:
+    external: true
+  gc_lobby:
+    external: true
+  gc_bedwars:
+    external: true
+  gc_pillars:
+    external: true
+  gc_buildbattle:
+    external: true
+  gc_ctf:
+    external: true
+  gc_pvp:
+    external: true
+  gc_eventos:
+    external: true
+  gc_mariadb:
+    external: true
