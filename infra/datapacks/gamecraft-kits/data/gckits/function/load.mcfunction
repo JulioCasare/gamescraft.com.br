@@ -29,3 +29,10 @@ scoreboard objectives add gc_z dummy
 # fabrica, uma caixa de 24 blocos em volta do spawn, aplicado uma unica vez.
 scoreboard objectives add gc_zone dummy
 execute unless data storage gckits:zona minx run data merge storage gckits:zona {minx:44,miny:50,minz:-29,dx:24,dy:24,dz:24}
+
+# Prazo de validade dos blocos colocados em partida, contado nos marcadores.
+scoreboard objectives add gc_timer dummy
+
+# O clone do save/reset costuma passar do teto padrao de 32768 blocos por
+# comando; sem isso o comando falha calado numa arena de tamanho normal.
+gamerule max_block_modifications 4000000

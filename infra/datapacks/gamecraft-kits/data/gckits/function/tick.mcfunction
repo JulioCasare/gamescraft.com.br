@@ -18,3 +18,11 @@ execute as @a[scores={gc_combat=1..}] run scoreboard players remove @s gc_combat
 
 # Zona segura em volta do spawn.
 execute as @a run function gckits:zona
+
+# Blocos e fluidos colocados por jogador: 5 minutos e somem.
+scoreboard players remove @e[type=minecraft:marker,tag=gc_temp] gc_timer 1
+execute as @e[type=minecraft:marker,tag=gc_temp,scores={gc_timer=..0}] at @s run function gckits:sumir
+
+# Pavio da TNT sem dano de bloco.
+scoreboard players remove @e[type=minecraft:marker,tag=gc_boom] gc_timer 1
+execute as @e[type=minecraft:marker,tag=gc_boom,scores={gc_timer=..0}] at @s run function gckits:explodir

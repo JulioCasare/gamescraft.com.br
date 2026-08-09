@@ -1,0 +1,10 @@
+{
+  "criteria": {
+    "usou": {
+      "trigger": "minecraft:item_used_on_block"
+    }
+  },
+  "rewards": {
+    "function": "gckits:usou_item"
+  }
+}
