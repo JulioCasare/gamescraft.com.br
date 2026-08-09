@@ -5,6 +5,13 @@
 command-block-overrides: []
 ignore-vanilla-permissions: false
 aliases:
+    # /modo <nome> on|off liga e desliga um servidor da rede. O Minecraft nao
+    # consegue mexer em container, entao o comando so deixa um recado no log e
+    # quem age e o vigia rodando no Windows (scripts/vigia-modos.ps1). Sem o
+    # vigia ligado, o comando responde mas nada acontece.
+    # Para trocar de modo (teleporte), use /server <nome>, que e do Velocity.
+    modo:
+    - tellraw @s {"text":"[Game Craft] Pedido enviado ao controlador da rede...","color":"gray"}
     save:
     - function gckits:save
     reset:
