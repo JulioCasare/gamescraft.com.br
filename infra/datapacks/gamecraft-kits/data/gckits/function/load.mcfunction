@@ -41,3 +41,8 @@ gamerule max_block_modifications 4000000
 scoreboard objectives add save trigger
 scoreboard objectives add reset trigger
 scoreboard objectives add build trigger
+
+# Bloco quebrado nao larga item. Sem isso, o mapa que se conserta sozinho vira
+# fabrica de itens: quebra, pega o drop, espera voltar, quebra de novo. Nao
+# afeta o que cai de jogador morto, que e outra regra.
+gamerule block_drops false
