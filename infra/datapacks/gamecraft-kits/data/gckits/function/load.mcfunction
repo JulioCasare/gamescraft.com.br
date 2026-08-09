@@ -9,3 +9,23 @@ scoreboard objectives add gc_pending dummy
 scoreboard objectives add gc_r dummy
 scoreboard objectives add gc_s dummy
 scoreboard objectives add gc_left minecraft.custom:minecraft.leave_game
+
+# Marca de combate propria do datapack: o plugin de combat tag nao expoe o
+# estado dele para comandos, entao a zona segura precisa da sua propria conta.
+# gc_dmg e gc_hurt sao contadores nativos de dano dado e recebido; qualquer
+# aumento neles reinicia gc_combat, que decai um por tick (300 = 15 segundos).
+scoreboard objectives add gc_dmg minecraft.custom:minecraft.damage_dealt
+scoreboard objectives add gc_hurt minecraft.custom:minecraft.damage_taken
+scoreboard objectives add gc_combat dummy
+
+# Ultima posicao conhecida fora da zona segura, para devolver quem tentar
+# entrar em combate.
+scoreboard objectives add gc_x dummy
+scoreboard objectives add gc_y dummy
+scoreboard objectives add gc_z dummy
+
+# Area segura: definida em jogo por /function gckits:canto1 e canto2. Fica no
+# armazenamento, entao sobrevive a reinicio. O valor abaixo e so o padrao de
+# fabrica, uma caixa de 24 blocos em volta do spawn, aplicado uma unica vez.
+scoreboard objectives add gc_zone dummy
+execute unless data storage gckits:zona minx run data merge storage gckits:zona {minx:44,miny:50,minz:-29,dx:24,dy:24,dz:24}
