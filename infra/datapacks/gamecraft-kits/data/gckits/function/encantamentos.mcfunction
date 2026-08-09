@@ -1,15 +1,46 @@
-# Encantamento sorteado de verdade: o modificador gckits:encantar usa a funcao
-# nativa enchant_randomly, que escolhe um encantamento valido para o item e um
-# nivel aleatorio dentro do maximo dele (1 a 5 nos casos comuns).
-# Nem todo kit recebe: cada peca tem a sua chance.
+# Cada encantamento e sorteado por conta propria: as vezes vem um, as vezes o
+# outro, as vezes os dois, as vezes nenhum. O nivel tambem e sorteado, de 1 ate
+# o maximo do encantamento — entao sai tanto Afiacao I quanto Afiacao V.
 #
-# A espada ocupa o primeiro espaco do inventario e a lanca o segundo, porque
-# sao os primeiros itens entregues depois do clear.
-execute store result score #e1 gc_r run random value 1..3
-execute if score #e1 gc_r matches 1 run item modify entity @s container.0 gckits:encantar
-execute store result score #e2 gc_r run random value 1..3
-execute if score #e2 gc_r matches 1 run item modify entity @s container.1 gckits:encantar
-# Uma peca de armadura tambem pode vir encantada.
-execute store result score #e3 gc_r run random value 1..4
-execute if score #e3 gc_r matches 1 run item modify entity @s armor.chest gckits:encantar
-execute if score #e3 gc_r matches 2 run item modify entity @s armor.head gckits:encantar
+# Espada e lanca tem posicao fixa (primeiros itens depois do clear). Os
+# opcionais podem cair em qualquer espaco, entao a busca varre a barra.
+
+# Espada: afiacao 1 em 2, inquebravel 1 em 2.
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s container.0 gckits:e_afiacao
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s container.0 gckits:e_inquebravel
+
+# Lanca: estocada 1 em 2, afiacao 1 em 3, inquebravel 1 em 2.
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s container.1 gckits:e_estocada
+execute store result score #q gc_r run random value 1..3
+execute if score #q gc_r matches 1 run item modify entity @s container.1 gckits:e_afiacao
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s container.1 gckits:e_inquebravel
+
+# Armadura (head): protecao 1 em 2, inquebravel 1 em 3, sorteados por peca.
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s armor.head gckits:e_protecao
+execute store result score #q gc_r run random value 1..3
+execute if score #q gc_r matches 1 run item modify entity @s armor.head gckits:e_inquebravel
+
+# Armadura (chest): protecao 1 em 2, inquebravel 1 em 3, sorteados por peca.
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s armor.chest gckits:e_protecao
+execute store result score #q gc_r run random value 1..3
+execute if score #q gc_r matches 1 run item modify entity @s armor.chest gckits:e_inquebravel
+
+# Armadura (legs): protecao 1 em 2, inquebravel 1 em 3, sorteados por peca.
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s armor.legs gckits:e_protecao
+execute store result score #q gc_r run random value 1..3
+execute if score #q gc_r matches 1 run item modify entity @s armor.legs gckits:e_inquebravel
+
+# Armadura (feet): protecao 1 em 2, inquebravel 1 em 3, sorteados por peca.
+execute store result score #q gc_r run random value 1..2
+execute if score #q gc_r matches 1 run item modify entity @s armor.feet gckits:e_protecao
+execute store result score #q gc_r run random value 1..3
+execute if score #q gc_r matches 1 run item modify entity @s armor.feet gckits:e_inquebravel
+
+function gckits:ench_opcionais

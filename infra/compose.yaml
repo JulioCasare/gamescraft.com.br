@@ -261,7 +261,10 @@ services:
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"
-      MODE: adventure
+      # Survival, nao adventure: o kit tem blocos, baldes, TNT e teia, e em
+      # adventure nada disso pode ser colocado. Quem entra na area segura vira
+      # adventure pelo datapack e volta a survival ao sair.
+      MODE: survival
       DIFFICULTY: normal
       PVP: "true"
       # Sem mob natural em servidor de minigame: monstro atrapalha partida e come

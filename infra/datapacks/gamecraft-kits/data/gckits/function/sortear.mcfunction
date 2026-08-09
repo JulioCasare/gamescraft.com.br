@@ -3,9 +3,10 @@
 # armadura custa de 1 (couro) a 5 (diamante), e a soma (4 a 20) define a faixa
 # de material das armas. Armadura pesada -> armas fracas, e vice-versa.
 #
-# A ordem importa: as armas precisam entrar logo depois do clear, para caberem
-# nos primeiros espacos do inventario — e assim gckits:encantamentos saber onde
-# encontra-las.
+# A ordem importa duas vezes: as armas entram logo depois do clear, para caberem
+# nos dois primeiros espacos (gckits:encantamentos conta com isso), e os
+# encantamentos so entram depois de todos os itens encantaveis estarem no
+# inventario.
 clear @s
 scoreboard players set @s gc_s 0
 function gckits:slot_cabeca
@@ -14,9 +15,9 @@ function gckits:slot_pernas
 function gckits:slot_pes
 function gckits:ferramentas
 function gckits:arma
+function gckits:extras
 function gckits:encantamentos
 function gckits:blocos
-function gckits:extras
 function gckits:consumiveis
 function gckits:pocoes
 function gckits:defesa

@@ -1,3 +1,11 @@
+# Projetil de vento: todo kit leva. Empurra quem chega perto e ajuda a subir —
+# e a ferramenta de reposicionamento que todo mundo tem.
+give @s minecraft:wind_charge 16
+
+# Tridente com Lealdade (volta para a mao): 1 kit em 3.
+execute store result score #x0 gc_r run random value 1..3
+execute if score #x0 gc_r matches 1 run give @s minecraft:trident 1
+
 # Perola do ender: ou vem o punhado inteiro, ou nao vem nada. 1 kit em 4 leva
 # quatro perolas — o suficiente para fugir de verdade e ainda cacar alguem.
 execute store result score #x1 gc_r run random value 1..4

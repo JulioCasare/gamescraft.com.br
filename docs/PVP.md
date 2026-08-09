@@ -16,6 +16,31 @@ Não há menu de seleção: o sorteio equipa o jogador no spawn. Isso elimina um
 tela por respawn e evita depender de menus pelo Geyser (critério 4 da
 [escolha de plugins](../infra/plugins/README.md)).
 
+## A zona segura
+
+A área é marcada em jogo — vá até um canto e rode `/function gckits:canto1`,
+depois ao canto oposto (mais alto também, para cobrir a altura) e
+`/function gckits:canto2`. Fica salva no mundo e sobrevive a reinício;
+`/function gckits:zona_ver` mostra a atual.
+
+Dentro dela, quem está em paz:
+
+- **fica imune** a qualquer dano, inclusive de quem atira de fora;
+- **não quebra nem coloca bloco**, porque o servidor troca o modo para aventura
+  na entrada e devolve sobrevivência na saída;
+- **não mexe em molduras nem quadros** — os que estão na área ficam fixos e
+  invulneráveis;
+- **não machuca ninguém**: o dano de ataque é zerado por um modificador de
+  atributo enquanto estiver dentro, valendo tanto para alvo dentro quanto fora.
+
+Quem está **em combate** não entra: ao encostar na área, é devolvido à última
+posição que ocupava fora dela. É a mesma regra que resolve o ataque de dentro —
+o golpe marca combate, e no tick seguinte o atacante é expulso.
+
+> O servidor de PvP roda em **survival**, não adventure: o kit tem blocos,
+> baldes, TNT e teia, e nada disso pode ser colocado em adventure. O modo
+> aventura existe só dentro da zona segura, aplicado e removido pelo datapack.
+
 ## O sorteio
 
 Não existem kits prontos: **cada peça de armadura é sorteada sozinha**, então
@@ -40,11 +65,25 @@ mesma armadura ainda saem diferentes.
 pedregulhos, e **escudo ou totem** — o totem em 1 de cada 8 kits, porque é uma
 vida extra e vale muito mais que o escudo.
 
-**Encantamentos aparecem em alguns kits, sorteados de verdade:** a espada tem 1
-chance em 3, a lança outra 1 em 3, e uma peça de armadura 1 em 2. O sorteio usa
-a função nativa do Minecraft (`enchant_randomly`), que escolhe um encantamento
-válido para aquele item e um nível aleatório dentro do máximo dele — então sai
-de Afiação I a Afiação V, Proteção I a V, e por aí vai.
+**Encantamentos: cada um é sorteado por conta própria**, e o nível também — de
+I até o máximo daquele encantamento. Às vezes vem um, às vezes o outro, às
+vezes os dois, às vezes nenhum:
+
+| Item | Encantamentos possíveis |
+|---|---|
+| Espada | Afiação (1 em 2), Inquebrável (1 em 2) |
+| Lança | Estocada (1 em 2), Afiação (1 em 3), Inquebrável (1 em 2) |
+| Cada peça de armadura | Proteção (1 em 2), Inquebrável (1 em 3) |
+| Arco | Força (1 em 2), Inquebrável (1 em 2) |
+| Machado | Eficiência (1 em 2), Afiação (1 em 3), Inquebrável (1 em 2) |
+| Picareta | Eficiência (1 em 2), Inquebrável (1 em 2) |
+| Tridente | Lealdade (2 em 3), Inquebrável (1 em 2) |
+
+**Projétil de vento:** 16 em todo kit — empurra quem chega perto e ajuda a
+subir. É a ferramenta de reposicionamento que todos têm.
+
+**Tridente com Lealdade em 1 de cada 3 kits:** arma de arremesso que volta
+sozinha para a mão.
 
 **Pérolas do ender: ou quatro, ou nenhuma.** Um kit em cada quatro leva o
 punhado inteiro — o suficiente para fugir de verdade e ainda caçar alguém.

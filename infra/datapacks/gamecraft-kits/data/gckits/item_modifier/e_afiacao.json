@@ -1,0 +1,7 @@
+{
+  "function": "minecraft:set_enchantments",
+  "add": true,
+  "enchantments": {
+    "minecraft:sharpness": { "type": "minecraft:uniform", "min": 1, "max": 5 }
+  }
+}
