@@ -9,3 +9,9 @@ https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/li
 # WorldEdit 7.4.4 (Modrinth oficial, EngineHub) - construcao, selecao e reset
 # de area. Restrinja o uso a staff pelo LuckPerms antes de abrir o beta.
 https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.jar
+# FortunePillars 4.2.0 (Modrinth oficial) - o minigame Pillars of Fortune.
+# Suporta ate Paper 1.21.11, por isso este backend nao acompanha a 26.2.
+https://cdn.modrinth.com/data/IMIr0vrW/versions/UzT0NFn6/FortunePillars-4.2.0.jar
+# ViaVersion 5.11.0 (Modrinth oficial) - clientes 26.2 e Geyser entram neste
+# backend 1.21.11.
+https://cdn.modrinth.com/data/P1OZGk5p/versions/ZH8459B6/ViaVersion-5.11.0.jar

@@ -114,13 +114,21 @@ services:
         condition: service_healthy
 
   pillars:
+    # Java 25 mesmo rodando 1.21.11: o WorldEdit 7.4.4 e compilado para Java 25
+    # e nao carrega em Java 21. O Paper 1.21.x roda normalmente em Java 25.
     image: itzg/minecraft-server:java25
     restart: unless-stopped
     environment:
       EULA: "TRUE"
       TYPE: PAPER
-      VERSION: "${MINECRAFT_VERSION:-26.2}"
+      # Versao propria, presa ao FortunePillars (suporta ate 1.21.11).
+      # O ViaVersion neste backend deixa clientes 26.2 e o Geyser entrarem.
+      VERSION: "${MINECRAFT_VERSION_PILLARS:-1.21.11}"
       MEMORY: "${MEMORY_PILLARS:-1500M}"
+      # Mundo void: os pilares flutuam sobre o vazio, e cair do pilar e a
+      # principal forma de morrer no modo. Vale so na criacao do mundo.
+      LEVEL_TYPE: "minecraft:flat"
+      GENERATOR_SETTINGS: '{"biome":"minecraft:the_void","layers":[]}'
       ONLINE_MODE: "FALSE"
       ENABLE_RCON: "FALSE"
       # Permite mandar comandos de admin sem RCON:
