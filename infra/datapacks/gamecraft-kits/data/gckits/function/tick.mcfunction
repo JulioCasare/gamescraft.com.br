@@ -11,6 +11,10 @@ execute as @a[scores={gc_deaths=1..}] run function gckits:marcar
 # Renasceu (ja esta vivo) com kit pendente: entrega agora.
 execute as @a[scores={gc_pending=1}] unless entity @s[nbt={Health:0.0f}] run function gckits:entregar
 
+# Quem esta na area segura e levou dano: cura antes de qualquer coisa, e o
+# golpe nao vira marca de combate.
+execute as @a[tag=gc_dentro,scores={gc_hurt=1..}] run function gckits:zona_ileso
+
 # Deu ou levou dano: entra em combate por 15 segundos.
 execute as @a[scores={gc_dmg=1..}] run function gckits:marcar_combate
 execute as @a[scores={gc_hurt=1..}] run function gckits:marcar_combate

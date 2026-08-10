@@ -336,6 +336,22 @@ services:
       database:
         condition: service_healthy
 
+  # Tunel para amigos de fora da rede de casa. O agente conversa com o playit
+  # e entrega o trafego ao proxy por dentro da rede do Docker, entao o IP da
+  # casa nunca aparece para quem entra. Sem PLAYIT_SECRET no .env ele nao sobe.
+  playit:
+    image: ghcr.io/playit-cloud/playit-agent:latest
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: "${PLAYIT_SECRET}"
+    # Compartilha a rede do proxy: assim 127.0.0.1 dentro do agente E o proxy,
+    # e os tuneis do painel funcionam com o endereco local padrao, sem precisar
+    # descobrir IP de container (que muda a cada recriacao).
+    network_mode: "service:proxy"
+    depends_on:
+      proxy:
+        condition: service_started
+
   database:
     image: mariadb:11
     restart: unless-stopped
