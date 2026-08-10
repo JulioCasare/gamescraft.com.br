@@ -5,8 +5,9 @@ $tag @a[x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=$(dz)] add gc_dentro
 $execute as @a[tag=gc_dentro] unless entity @s[x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=$(dz)] run tag @s remove gc_dentro
 
 # Guarda de onde a pessoa veio, mas so quando ela esta bem fora da area (3
-# blocos de folga). Sem essa margem, quem estava colado na borda era devolvido
-# para dentro e parecia ter entrado em combate.
+# bloco de folga). A folga existe so para o arredondamento nao devolver a
+# pessoa para dentro; maior que isso, quem lutava colado na borda nunca tinha
+# ponto de retorno guardado e conseguia entrar em combate.
 $execute as @a unless entity @s[x=$(minx2),dx=$(dx2),y=$(miny2),dy=$(dy2),z=$(minz2),dz=$(dz2)] run function gckits:guardar_pos
 
 # Protecao de quem esta dentro, seja qual for o modo de jogo: dano de ataque

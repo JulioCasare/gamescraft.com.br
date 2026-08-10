@@ -17,21 +17,23 @@ scoreboard players operation #dz gc_zone = #z1 gc_zone
 scoreboard players operation #dz gc_zone > #z2 gc_zone
 scoreboard players operation #dz gc_zone -= #minz gc_zone
 
-# Caixa folgada, 3 blocos maior de cada lado. Ela decide onde e "bem fora" da
-# area: so ali a posicao do jogador e guardada como ponto de retorno. Sem essa
-# folga, quem estava colado na borda era devolvido para dentro da propria area.
+# Caixa folgada, 1 bloco maior de cada lado. Ela decide onde e "fora" da
+# area: so ali a posicao do jogador e guardada como ponto de retorno. A folga
+# existe so para o arredondamento nao devolver a pessoa para dentro. Folga
+# maior deixava quem lutava colado na borda sem ponto de retorno — e sem ponto
+# de retorno, o datapack nao tinha como expulsar quem entrava em combate.
 scoreboard players operation #minx2 gc_zone = #minx gc_zone
-scoreboard players remove #minx2 gc_zone 3
+scoreboard players remove #minx2 gc_zone 1
 scoreboard players operation #miny2 gc_zone = #miny gc_zone
-scoreboard players remove #miny2 gc_zone 3
+scoreboard players remove #miny2 gc_zone 1
 scoreboard players operation #minz2 gc_zone = #minz gc_zone
-scoreboard players remove #minz2 gc_zone 3
+scoreboard players remove #minz2 gc_zone 1
 scoreboard players operation #dx2 gc_zone = #dx gc_zone
-scoreboard players add #dx2 gc_zone 6
+scoreboard players add #dx2 gc_zone 2
 scoreboard players operation #dy2 gc_zone = #dy gc_zone
-scoreboard players add #dy2 gc_zone 6
+scoreboard players add #dy2 gc_zone 2
 scoreboard players operation #dz2 gc_zone = #dz gc_zone
-scoreboard players add #dz2 gc_zone 6
+scoreboard players add #dz2 gc_zone 2
 
 execute store result storage gckits:zona minx int 1 run scoreboard players get #minx gc_zone
 execute store result storage gckits:zona miny int 1 run scoreboard players get #miny gc_zone

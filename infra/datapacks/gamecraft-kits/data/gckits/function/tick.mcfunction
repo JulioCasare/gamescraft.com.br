@@ -24,6 +24,10 @@ execute as @a[scores={gc_combat=1..}] run scoreboard players remove @s gc_combat
 # jogador: o proprio zona_check ja varre todo mundo com @a.
 function gckits:zona
 
+# Durabilidade de quem esta na area segura, uma vez por segundo.
+scoreboard players add #tz gc_zone 1
+execute if score #tz gc_zone matches 20.. run function gckits:zona_durabilidade
+
 # Blocos e fluidos colocados por jogador: 5 minutos e somem. Fica em pausa
 # enquanto alguem estiver com o modo construcao ligado.
 execute unless entity @a[tag=gc_build] run function gckits:decaimento
