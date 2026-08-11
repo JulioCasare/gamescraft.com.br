@@ -1,5 +1,5 @@
 # Nasce um mob por vez, perto do meio da arena. Um por ciclo mantem a pressao
-# constante sem virar horda. O ciclo em si e de 20 segundos, contado no
+# constante sem virar horda. O ciclo em si e de 15 segundos, contado no
 # cada_segundo.
 scoreboard players set #ms gc_zone 0
 
@@ -10,9 +10,14 @@ execute if entity @a[tag=gc_build] run return 0
 # area segura. Com o servidor vazio a arena fica limpa.
 execute unless entity @a[gamemode=survival,tag=!gc_dentro] run return 0
 
-# Teto de mobs vivos ao mesmo tempo.
-execute store result score #nmob gc_r if entity @e[tag=gc_mob]
-execute if score #nmob gc_r matches 10.. run return 0
+# Teto de mobs vivos ao mesmo tempo. Filhote de cubo de magma nao entra na
+# conta: um cubo grande vira quatro medios e cada medio vira mais quatro
+# pequenos, entao contar todos travaria o nascimento so porque alguem matou um
+# cubo.
+execute store result score #nmob gc_r if entity @e[tag=gc_mob,type=!minecraft:magma_cube]
+execute store result score #ncubo gc_r if entity @e[tag=gc_mob,type=minecraft:magma_cube,nbt={Size:3}]
+scoreboard players operation #nmob gc_r += #ncubo gc_r
+execute if score #nmob gc_r matches 15.. run return 0
 
 # Sorteia um ponto ate 12 blocos do centro.
 execute store result score #cx gc_r run data get storage gckits:mob cx

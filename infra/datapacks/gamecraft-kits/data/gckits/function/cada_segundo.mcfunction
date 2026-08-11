@@ -18,6 +18,6 @@ execute as @e[tag=gc_mob] at @s run function gckits:mob_zona with storage gckits
 # continuam valendo: quem esta dentro deles nao e apagado.
 execute as @e[tag=gc_mob] at @s unless block ~ ~ ~ minecraft:lava unless block ~ ~ ~ minecraft:fire run data merge entity @s {Fire:-20s}
 
-# Nascimento de mob no meio da arena, a cada 20 segundos.
+# Nascimento de mob no meio da arena, a cada 15 segundos.
 scoreboard players add #ms gc_zone 1
-execute if score #ms gc_zone matches 20.. run function gckits:mobs
+execute if score #ms gc_zone matches 15.. run function gckits:mobs
