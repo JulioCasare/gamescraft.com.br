@@ -42,6 +42,17 @@ scoreboard objectives add save trigger
 scoreboard objectives add reset trigger
 scoreboard objectives add build trigger
 
+# Vida dos outros embaixo do nome. Isso e do proprio jogo — o criterio health
+# acompanha sozinho, nao precisa de plugin nem de nada rodando a cada tick.
+# So aparece para os outros, de perto: quem esta olhando ve a vida do alvo.
+scoreboard objectives add gc_vida health
+scoreboard objectives modify gc_vida displayname {"text":"❤","color":"red"}
+scoreboard objectives setdisplay below_name gc_vida
+
+# Meio da arena, onde nascem os mobs. Valor de fabrica, calculado do centro da
+# area do /save; muda em jogo com /mobcentro.
+execute unless data storage gckits:mob cx run data merge storage gckits:mob {cx:10,cy:62,cz:-19}
+
 # Bloco quebrado nao larga item. Sem isso, o mapa que se conserta sozinho vira
 # fabrica de itens: quebra, pega o drop, espera voltar, quebra de novo. Nao
 # afeta o que cai de jogador morto, que e outra regra.

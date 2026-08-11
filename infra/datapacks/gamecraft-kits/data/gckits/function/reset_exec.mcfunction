@@ -4,5 +4,6 @@ $kill @e[type=minecraft:item,x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=
 $kill @e[type=minecraft:tnt,x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=$(dz)]
 $kill @e[type=minecraft:marker,tag=gc_temp,x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=$(dz)]
 $kill @e[type=minecraft:marker,tag=gc_boom,x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=$(dz)]
+$kill @e[tag=gc_mob,x=$(minx),dx=$(dx),y=$(miny),dy=$(dy),z=$(minz),dz=$(dz)]
 $clone from minecraft:overworld $(minx) $(bkpy) $(minz) $(maxx) $(bkpymax) $(maxz) to minecraft:overworld $(minx) $(miny) $(minz) replace force
 tellraw @a [{"text":"[Arena] Mapa restaurado ao ultimo save.","color":"aqua"}]

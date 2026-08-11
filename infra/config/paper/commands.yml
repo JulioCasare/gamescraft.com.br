@@ -28,3 +28,5 @@ aliases:
     - function gckits:canto2
     zona:
     - function gckits:zona_ver
+    mobcentro:
+    - function gckits:mob_centro
