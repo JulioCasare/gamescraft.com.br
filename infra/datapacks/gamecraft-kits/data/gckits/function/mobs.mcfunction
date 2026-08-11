@@ -1,5 +1,6 @@
 # Nasce um mob por vez, perto do meio da arena. Um por ciclo mantem a pressao
-# constante sem virar horda.
+# constante sem virar horda. O ciclo em si e de 20 segundos, contado no
+# cada_segundo.
 scoreboard players set #ms gc_zone 0
 
 # Nada nasce enquanto alguem esta com o modo construcao ligado.
