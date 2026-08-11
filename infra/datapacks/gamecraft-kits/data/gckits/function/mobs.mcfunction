@@ -17,7 +17,7 @@ execute unless entity @a[gamemode=survival,tag=!gc_dentro] run return 0
 execute store result score #nmob gc_r if entity @e[tag=gc_mob,type=!minecraft:magma_cube]
 execute store result score #ncubo gc_r if entity @e[tag=gc_mob,type=minecraft:magma_cube,nbt={Size:3}]
 scoreboard players operation #nmob gc_r += #ncubo gc_r
-execute if score #nmob gc_r matches 15.. run return 0
+execute if score #nmob gc_r matches 10.. run return 0
 
 # Sorteia um ponto ate 12 blocos do centro.
 execute store result score #cx gc_r run data get storage gckits:mob cx
