@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:notice",
+  "title": "Eventos",
+  "body": [
+    {
+      "type": "minecraft:item",
+      "item": { "id": "minecraft:ender_eye", "count": 1 },
+      "description": { "contents": "Entrar no servidor de eventos" }
+    }
+  ],
+  "action": {
+    "label": "Entrar",
+    "action": { "type": "minecraft:run_command", "command": "server eventos" }
+  }
+}

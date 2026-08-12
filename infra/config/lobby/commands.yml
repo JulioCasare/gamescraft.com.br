@@ -1,0 +1,39 @@
+# Apelidos de comando do Bukkit. Datapack nao registra comando com barra
+# propria, mas o servidor sim: cada entrada aqui vira um comando de verdade,
+# que aparece no autocompletar e roda a funcao correspondente.
+# Todos exigem operador, porque /function exige.
+command-block-overrides: []
+ignore-vanilla-permissions: false
+aliases:
+    # /modo <nome> on|off liga e desliga um servidor da rede. O Minecraft nao
+    # consegue mexer em container, entao o comando so deixa um recado no log e
+    # quem age e o vigia rodando no Windows (scripts/vigia-modos.ps1). Sem o
+    # vigia ligado, o comando responde mas nada acontece.
+    # Para trocar de modo (teleporte), use /server <nome>, que e do Velocity.
+    modo:
+    - tellraw @s {"text":"[Game Craft] Pedido enviado ao controlador da rede...","color":"gray"}
+    save:
+    - function gckits:save
+    reset:
+    - function gckits:reset
+    build:
+    - function gckits:trigger_build
+    arena1:
+    - function gckits:arena_canto1
+    arena2:
+    - function gckits:arena_canto2
+    zona1:
+    - function gckits:canto1
+    zona2:
+    - function gckits:canto2
+    zona:
+    - function gckits:zona_ver
+    # /npc <jogo> cria o boneco de entrada de um modo, no lugar onde voce esta e
+    # virado para onde voce olha. O $1 e o argumento que o jogador digitou, e e
+    # o que permite um comando so para os sete jogos.
+    # Jogos: bwsolo bwduplas pilares pvp build longos eventos
+    npc:
+    - function gcnpc:criar_$1
+    # /npcapagar tira o boneco mais proximo.
+    npcapagar:
+    - function gcnpc:apagar

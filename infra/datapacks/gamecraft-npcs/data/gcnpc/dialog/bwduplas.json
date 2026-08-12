@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:notice",
+  "title": "Bed Wars Duplas",
+  "body": [
+    {
+      "type": "minecraft:item",
+      "item": { "id": "minecraft:ender_eye", "count": 1 },
+      "description": { "contents": "Entrar numa partida em duplas" }
+    }
+  ],
+  "action": {
+    "label": "Entrar",
+    "action": { "type": "minecraft:run_command", "command": "server bedwars" }
+  }
+}

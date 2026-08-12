@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:notice",
+  "title": "PvP",
+  "body": [
+    {
+      "type": "minecraft:item",
+      "item": { "id": "minecraft:ender_eye", "count": 1 },
+      "description": { "contents": "Entrar na arena de PvP" }
+    }
+  ],
+  "action": {
+    "label": "Entrar",
+    "action": { "type": "minecraft:run_command", "command": "server pvp" }
+  }
+}
