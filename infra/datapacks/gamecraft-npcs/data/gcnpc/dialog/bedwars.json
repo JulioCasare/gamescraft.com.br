@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:multi_action",
+  "title": "Bed Wars",
+  "columns": 2,
+  "body": [
+    {
+      "type": "minecraft:item",
+      "item": { "id": "minecraft:ender_eye", "count": 1 },
+      "description": { "contents": "Escolha o modo" }
+    }
+  ],
+  "actions": [
+    {
+      "label": "Solo",
+      "tooltip": "Cada um por si",
+      "action": { "type": "minecraft:run_command", "command": "server bedwars" }
+    },
+    {
+      "label": "Duplas",
+      "tooltip": "De dois em dois",
+      "action": { "type": "minecraft:run_command", "command": "server bedwars" }
+    }
+  ]
+}
