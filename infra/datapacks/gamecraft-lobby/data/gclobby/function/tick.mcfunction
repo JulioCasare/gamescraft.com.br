@@ -9,3 +9,7 @@ execute as @a[scores={gcl_deaths=1..}] run function gclobby:morreu
 # pegar tanto quem pisou na beirada quanto quem caiu no mar.
 execute as @a at @s if block ~ ~ ~ minecraft:water run function gclobby:ao_centro
 execute as @a at @s if block ~ ~1 ~ minecraft:water run function gclobby:ao_centro
+
+# Uma vez por segundo: limpa efeito de pocao que veio de outro servidor.
+scoreboard players add #t gcl_t 1
+execute if score #t gcl_t matches 20.. run function gclobby:limpar_efeitos
