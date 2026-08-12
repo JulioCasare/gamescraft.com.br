@@ -1,0 +1,6 @@
+name: GcMenus
+version: 1.0.0
+main: br.com.gamescraft.menus.GcMenus
+api-version: '1.21'
+description: Menus de bau dos bonecos do lobby do Game Craft
+author: Game Craft
