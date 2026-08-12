@@ -96,11 +96,21 @@ while read -r minx miny minz maxx maxy maxz; do
   areas=$((areas+1))
   alt=$((maxy-miny))
   by2=$((AREA_Y+alt))
+  # A copia, e logo abaixo dela um bloco de marca. O setblock so acontece se o
+  # pedaco do mapa estiver carregado — o mesmo que vale para o clone. Entao a
+  # marca prova que a copia foi feita de verdade.
+  #
+  # Isto existe porque a versao anterior confiava num placar ligado no fim do
+  # guardar, sem checar se o clone tinha acontecido. Com o mapa descarregado o
+  # clone falhava calado, o placar ligava do mesmo jeito, e a "copia" era a
+  # pedra virgem do fundo do mundo — que foi restaurada por cima da area e a
+  # transformou num cubo macico. Nao repetir.
   echo "clone from minecraft:overworld $minx $miny $minz $maxx $maxy $maxz to minecraft:overworld $minx $AREA_Y $minz replace force" >> "$FN/guardar.mcfunction"
-  echo "execute if score #copiado gcctf matches 1 unless blocks $minx $AREA_Y $minz $maxx $by2 $maxz $minx $miny $minz all run clone from minecraft:overworld $minx $AREA_Y $minz $maxx $by2 $maxz to minecraft:overworld $minx $miny $minz replace force" >> "$FN/verificar_areas.mcfunction"
+  echo "setblock $minx $((AREA_Y-1)) $minz minecraft:bedrock replace" >> "$FN/guardar.mcfunction"
+  echo "execute if block $minx $((AREA_Y-1)) $minz minecraft:bedrock unless blocks $minx $AREA_Y $minz $maxx $by2 $maxz $minx $miny $minz all run clone from minecraft:overworld $minx $AREA_Y $minz $maxx $by2 $maxz to minecraft:overworld $minx $miny $minz replace force" >> "$FN/verificar_areas.mcfunction"
 done <<< "$AREAS"
 
-echo "scoreboard players set #copiado gcctf 1" >> "$FN/guardar.mcfunction"
+
 echo "torres protegidas uma a uma: $torres (fora, por estarem dentro das areas: $fora)"
 echo "areas protegidas inteiras: $areas"
 
