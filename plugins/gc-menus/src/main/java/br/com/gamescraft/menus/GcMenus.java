@@ -150,12 +150,13 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             }
             String servidor = leitura.readUTF();
             int quantos = leitura.readInt();
-            Integer antes = jogadores.put(servidor, quantos);
-            // Só mexe nas placas quando o número mudou de verdade: reescrever a
-            // placa manda pacote para todo mundo que está vendo ela.
-            if (antes == null || antes != quantos) {
-                atualizarPlacas(servidor, quantos);
-            }
+            jogadores.put(servidor, quantos);
+            // Escreve toda vez, e não só quando o número muda. Pular a escrita
+            // parecia economia boa até aparecer o buraco: boneco criado depois
+            // da última mudança nascia com a placa vazia e ficava assim, porque
+            // o número "não tinha mudado". São seis placas a cada cinco
+            // segundos — não é isso que pesa num servidor.
+            atualizarPlacas(servidor, quantos);
         } catch (IOException erro) {
             getLogger().warning("Resposta do proxy veio quebrada: " + erro.getMessage());
         }
