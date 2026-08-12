@@ -12,7 +12,7 @@ summon minecraft:text_display ~ ~2.5 ~ {Tags:["gcnpc","gcnpc_pvp","gcnpc_placa"]
 #    tamanho vale para a placa inteira: junto com o nome, os dois teriam de ter o
 #    mesmo tamanho. Quem escreve o numero aqui e o plugin GcMenus — o lobby nao
 #    sabe quanta gente ha no outro servidor, o proxy sabe.
-summon minecraft:text_display ~ ~2.2 ~ {Tags:["gcnpc","gcnpc_pvp","gcnpc_num"],text:{"text":"","color":"gray"},billboard:"center",see_through:0b,background:0,alignment:"center",transformation:{scale:[0.6f,0.6f,0.6f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:text_display ~ ~2.2 ~ {Tags:["gcnpc","gcnpc_pvp","gcnpc_num"],text:{"text":"","color":"gray"},billboard:"center",see_through:0b,background:0,alignment:"center",transformation:{scale:[0.85f,0.85f,0.85f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
 # 4. a caixa que escuta o clique, um pouco maior que o boneco e na frente dele:
 #    assim o soco morre nela e nunca chega no corpo.
 summon minecraft:interaction ~ ~ ~ {Tags:["gcnpc","gcnpc_pvp"],width:1.2f,height:2.1f,response:1b}
