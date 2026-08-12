@@ -7,7 +7,7 @@ summon minecraft:mannequin ~ ~ ~ {Tags:["gcnpc","gcnpc_pilares","gcnpc_novo"],pr
 # 2. a placa do nome. E entidade de texto e nao o nome da entidade porque so ela
 #    aceita tamanho. A escala 0.93 vem do comprimento de "PILARES DA FORTUNA": a placa fica
 #    com cerca de um bloco para cada lado da cabeca, seja o nome curto ou longo.
-summon minecraft:text_display ~ ~2.35 ~ {Tags:["gcnpc","gcnpc_pilares"],text:[{"text":"PILARES DA FORTUNA","color":"gold","bold":true},{"text":"\nclique","color":"gray","bold":false}],billboard:"center",see_through:0b,background:0,alignment:"center",transformation:{scale:[0.93f,0.93f,0.93f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
+summon minecraft:text_display ~ ~2.35 ~ {Tags:["gcnpc","gcnpc_pilares"],text:{"text":"PILARES DA FORTUNA","color":"gold","bold":true},billboard:"center",see_through:0b,background:0,alignment:"center",transformation:{scale:[0.93f,0.93f,0.93f],translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f]}}
 # 3. a caixa que escuta o clique, um pouco maior que o boneco e na frente dele:
 #    assim o soco morre nela e nunca chega no corpo.
 summon minecraft:interaction ~ ~ ~ {Tags:["gcnpc","gcnpc_pilares"],width:1.2f,height:2.1f,response:1b}
