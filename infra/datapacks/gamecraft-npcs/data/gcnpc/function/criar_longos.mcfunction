@@ -3,7 +3,7 @@
 # 1. o boneco. hide_description tira o "Persona non lusor" que o jogo escreve
 #    sozinho embaixo do nome de todo mannequin. immovable: nao empurra nem cai.
 #    Invulnerable: bater nele nao tira vida.
-summon minecraft:mannequin ~ ~ ~ {Tags:["gcnpc","gcnpc_longos","gcnpc_novo"],profile:"JulioCasare",hide_description:1b,immovable:1b,Invulnerable:1b,Silent:1b}
+summon minecraft:mannequin ~ ~ ~ {Tags:["gcnpc","gcnpc_longos","gcnpc_novo"],profile:"JulioCasare",hide_description:1b,immovable:1b,Invulnerable:1b,Silent:1b,PersistenceRequired:1b}
 # 2. a placa do nome. E entidade de texto e nao o nome da entidade porque so ela
 #    aceita tamanho. A escala 1.39 vem do comprimento de "JOGOS LONGOS": a placa fica
 #    com cerca de um bloco para cada lado da cabeca, seja o nome curto ou longo.

@@ -4,3 +4,12 @@ main: br.com.gamescraft.menus.GcMenus
 api-version: '1.21'
 description: Menus de bau dos bonecos do lobby do Game Craft
 author: Game Craft
+commands:
+  npcskin:
+    description: Copia a skin de um jogador online para o boneco mais proximo
+    usage: /npcskin <jogador>
+    permission: gcmenus.npcskin
+permissions:
+  gcmenus.npcskin:
+    description: Permite trocar a skin dos bonecos
+    default: op

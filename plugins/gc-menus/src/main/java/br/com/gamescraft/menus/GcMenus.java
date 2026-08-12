@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import com.destroystokyo.paper.profile.ProfileProperty;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -82,6 +86,77 @@ public final class GcMenus extends JavaPlugin implements Listener {
         // Canal por onde se pede a troca de servidor ao proxy.
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getLogger().info("Menus dos bonecos prontos: " + menus.size());
+    }
+
+    @Override
+    public boolean onCommand(CommandSender quemMandou, Command comando, String rotulo, String[] argumentos) {
+        if (!(quemMandou instanceof Player jogador)) {
+            quemMandou.sendMessage("Esse comando precisa ser dado em jogo.");
+            return true;
+        }
+        if (argumentos.length != 1) {
+            jogador.sendMessage(ChatColor.RED + "Use: /npcskin <jogador>");
+            return true;
+        }
+        Player modelo = Bukkit.getPlayerExact(argumentos[0]);
+        if (modelo == null) {
+            jogador.sendMessage(ChatColor.RED + "O jogador " + argumentos[0]
+                    + " precisa estar online: a skin e copiada da que ele esta usando agora.");
+            return true;
+        }
+
+        Entity boneco = bonecoMaisPerto(jogador);
+        if (boneco == null) {
+            jogador.sendMessage(ChatColor.RED + "Nenhum boneco por perto. Chegue mais perto de um.");
+            return true;
+        }
+
+        // A textura vem do perfil de quem esta em jogo, e nao do nome. E isso que
+        // congela a skin: se o modelo trocar a dele depois, o boneco continua com
+        // a que foi copiada. Com o SkinsRestorer no ar, o perfil ja vem com a
+        // skin que o /skin aplicou.
+        ProfileProperty textura = null;
+        for (ProfileProperty propriedade : modelo.getPlayerProfile().getProperties()) {
+            if (propriedade.getName().equals("textures")) {
+                textura = propriedade;
+                break;
+            }
+        }
+        if (textura == null) {
+            jogador.sendMessage(ChatColor.RED + "Nao achei a textura de " + modelo.getName() + ".");
+            return true;
+        }
+
+        StringBuilder nbt = new StringBuilder();
+        nbt.append("data merge entity ").append(boneco.getUniqueId())
+                .append(" {profile:{name:\"").append(modelo.getName())
+                .append("\",properties:[{name:\"textures\",value:\"").append(textura.getValue()).append("\"");
+        if (textura.isSigned()) {
+            nbt.append(",signature:\"").append(textura.getSignature()).append("\"");
+        }
+        nbt.append("}]}}");
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), nbt.toString());
+        jogador.sendMessage(ChatColor.GREEN + "Boneco agora usa a skin de " + modelo.getName()
+                + ChatColor.GRAY + " — e fica com ela mesmo que ele troque depois.");
+        return true;
+    }
+
+    /** O mannequin mais proximo de quem deu o comando, ate 8 blocos. */
+    private Entity bonecoMaisPerto(Player jogador) {
+        Entity achado = null;
+        double menor = Double.MAX_VALUE;
+        for (Entity perto : jogador.getNearbyEntities(8, 8, 8)) {
+            if (menuDe(perto) == null || !perto.getType().name().equals("MANNEQUIN")) {
+                continue;
+            }
+            double distancia = perto.getLocation().distanceSquared(jogador.getLocation());
+            if (distancia < menor) {
+                menor = distancia;
+                achado = perto;
+            }
+        }
+        return achado;
     }
 
     /** Clique direito no boneco ou na caixa de interação dele. */
