@@ -219,6 +219,14 @@ services:
       CREATE_CONSOLE_IN_PIPE: "TRUE"
       SERVER_NAME: "Game Craft Capture the Flag"
       MOTD: "Game Craft | Capture the Flag beta"
+      # Mapa proprio: uma ilha construida a mao num mar plano. O mundo `ilha`
+      # nasce so de mar — bedrock, pedra ate y=50 e agua ate y=62 — e a ilha em
+      # si e desenhada por cima com o WorldEdit. Bioma de planicie no mundo
+      # inteiro para a grama sair verde: com bioma de oceano ela puxa para o
+      # azul. O mapa Island que veio pronto continua guardado no mundo `world`.
+      LEVEL: "ilha"
+      LEVEL_TYPE: "minecraft:flat"
+      GENERATOR_SETTINGS: '{"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:stone","height":114},{"block":"minecraft:water","height":12}],"biome":"minecraft:plains"}'
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"
