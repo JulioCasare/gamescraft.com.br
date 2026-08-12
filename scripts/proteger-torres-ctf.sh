@@ -32,8 +32,10 @@ mkdir -p "$FN" "$PACK/data/minecraft/tags/function"
 # brigaria com a da outra.
 #
 # formato: minx miny minz maxx maxy maxz
-AREAS="26 67 -207 65 90 -183
--26 65 190 12 88 214"
+# A area A (26 67 -207 ate 65 90 -183) esta fora da lista de proposito: ela
+# virou um cubo de pedra e a copia dela guarda esse cubo. Voltar para ca so
+# depois que o terreno for refeito e uma foto nova for tirada.
+AREAS="-26 65 190 12 88 214"
 
 # Altura onde as copias das areas moram. Nao pode encostar na faixa das torres
 # (-60 a -50), senao uma copia sobrescreve a outra.

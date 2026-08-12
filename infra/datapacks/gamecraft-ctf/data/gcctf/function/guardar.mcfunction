@@ -48,6 +48,5 @@ clone from minecraft:overworld 62 63 24 68 73 30 to minecraft:overworld 62 -60 2
 clone from minecraft:overworld 82 62 183 88 72 189 to minecraft:overworld 82 -60 183 replace force
 clone from minecraft:overworld 85 62 -90 91 72 -84 to minecraft:overworld 85 -60 -90 replace force
 clone from minecraft:overworld 85 62 85 91 72 91 to minecraft:overworld 85 -60 85 replace force
-clone from minecraft:overworld 26 67 -207 65 90 -183 to minecraft:overworld 26 -40 -207 replace force
 clone from minecraft:overworld -26 65 190 12 88 214 to minecraft:overworld -26 -40 190 replace force
-scoreboard players set #copiado gcctf 1
+setblock -26 -41 190 minecraft:bedrock replace
