@@ -1,6 +1,5 @@
-# Tira uma foto nova das 50 torres. Roda na instalacao e toda vez que alguem
-# desliga o /obras.
-clone from minecraft:overworld -13 61 202 -7 71 208 to minecraft:overworld -13 -60 202 replace force
+# Tira uma foto nova de tudo. Roda na instalacao e toda vez que alguem desliga
+# o /obras.
 clone from minecraft:overworld -107 62 173 -101 72 179 to minecraft:overworld -107 -60 173 replace force
 clone from minecraft:overworld -114 60 -136 -108 70 -130 to minecraft:overworld -114 -60 -136 replace force
 clone from minecraft:overworld -123 61 -34 -117 71 -28 to minecraft:overworld -123 -60 -34 replace force
@@ -44,9 +43,11 @@ clone from minecraft:overworld 27 62 169 33 72 175 to minecraft:overworld 27 -60
 clone from minecraft:overworld 29 62 -123 35 72 -117 to minecraft:overworld 29 -60 -123 replace force
 clone from minecraft:overworld 29 61 118 35 71 124 to minecraft:overworld 29 -60 118 replace force
 clone from minecraft:overworld 57 65 -166 63 75 -160 to minecraft:overworld 57 -60 -166 replace force
-clone from minecraft:overworld 57 63 -198 63 73 -192 to minecraft:overworld 57 -60 -198 replace force
 clone from minecraft:overworld 62 66 -29 68 76 -23 to minecraft:overworld 62 -60 -29 replace force
 clone from minecraft:overworld 62 63 24 68 73 30 to minecraft:overworld 62 -60 24 replace force
 clone from minecraft:overworld 82 62 183 88 72 189 to minecraft:overworld 82 -60 183 replace force
 clone from minecraft:overworld 85 62 -90 91 72 -84 to minecraft:overworld 85 -60 -90 replace force
 clone from minecraft:overworld 85 62 85 91 72 91 to minecraft:overworld 85 -60 85 replace force
+clone from minecraft:overworld 26 67 -207 65 90 -183 to minecraft:overworld 26 -40 -207 replace force
+clone from minecraft:overworld -26 65 190 12 88 214 to minecraft:overworld -26 -40 190 replace force
+scoreboard players set #copiado gcctf 1

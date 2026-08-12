@@ -1,10 +1,9 @@
 # Uma linha por torre. A comparacao vem antes da copia para o servidor so mexer
-# em bloco quando algo mudou de verdade — copiar as 50 toda hora faria os blocos
+# em bloco quando algo mudou de verdade — copiar todas toda hora faria os blocos
 # piscarem na tela de quem esta perto.
 #
 # A condicao do sinalizador na copia e trava de seguranca: sem ela, uma torre
 # nova sem copia feita seria "consertada" com ar e sumiria.
-execute if block -10 -50 205 minecraft:beacon unless blocks -13 -60 202 -7 -50 208 -13 61 202 all run clone from minecraft:overworld -13 -60 202 -7 -50 208 to minecraft:overworld -13 61 202 replace force
 execute if block -104 -50 176 minecraft:beacon unless blocks -107 -60 173 -101 -50 179 -107 62 173 all run clone from minecraft:overworld -107 -60 173 -101 -50 179 to minecraft:overworld -107 62 173 replace force
 execute if block -111 -50 -133 minecraft:beacon unless blocks -114 -60 -136 -108 -50 -130 -114 60 -136 all run clone from minecraft:overworld -114 -60 -136 -108 -50 -130 to minecraft:overworld -114 60 -136 replace force
 execute if block -120 -50 -31 minecraft:beacon unless blocks -123 -60 -34 -117 -50 -28 -123 61 -34 all run clone from minecraft:overworld -123 -60 -34 -117 -50 -28 to minecraft:overworld -123 61 -34 replace force
@@ -48,7 +47,6 @@ execute if block 30 -50 172 minecraft:beacon unless blocks 27 -60 169 33 -50 175
 execute if block 32 -50 -120 minecraft:beacon unless blocks 29 -60 -123 35 -50 -117 29 62 -123 all run clone from minecraft:overworld 29 -60 -123 35 -50 -117 to minecraft:overworld 29 62 -123 replace force
 execute if block 32 -50 121 minecraft:beacon unless blocks 29 -60 118 35 -50 124 29 61 118 all run clone from minecraft:overworld 29 -60 118 35 -50 124 to minecraft:overworld 29 61 118 replace force
 execute if block 60 -50 -163 minecraft:beacon unless blocks 57 -60 -166 63 -50 -160 57 65 -166 all run clone from minecraft:overworld 57 -60 -166 63 -50 -160 to minecraft:overworld 57 65 -166 replace force
-execute if block 60 -50 -195 minecraft:beacon unless blocks 57 -60 -198 63 -50 -192 57 63 -198 all run clone from minecraft:overworld 57 -60 -198 63 -50 -192 to minecraft:overworld 57 63 -198 replace force
 execute if block 65 -50 -26 minecraft:beacon unless blocks 62 -60 -29 68 -50 -23 62 66 -29 all run clone from minecraft:overworld 62 -60 -29 68 -50 -23 to minecraft:overworld 62 66 -29 replace force
 execute if block 65 -50 27 minecraft:beacon unless blocks 62 -60 24 68 -50 30 62 63 24 all run clone from minecraft:overworld 62 -60 24 68 -50 30 to minecraft:overworld 62 63 24 replace force
 execute if block 85 -50 186 minecraft:beacon unless blocks 82 -60 183 88 -50 189 82 62 183 all run clone from minecraft:overworld 82 -60 183 88 -50 189 to minecraft:overworld 82 62 183 replace force
