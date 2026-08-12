@@ -110,6 +110,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         menus.put("eventos", new Menu("EVENTOS", NamedTextColor.YELLOW,
                 ChatColor.YELLOW + "Eventos", "eventos", List.of(
                         new Destino(13, ChatColor.YELLOW + "Entrar", "eventos"))));
+        // O caminho de volta. Este boneco mora nos servidores de jogo, e não no
+        // lobby — é o único que aponta para dentro.
+        menus.put("lobby", new Menu("LOBBY", NamedTextColor.WHITE,
+                ChatColor.WHITE + "Lobby", "lobby", List.of(
+                        new Destino(13, ChatColor.GREEN + "Voltar ao lobby", "lobby"))));
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);

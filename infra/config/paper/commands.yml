@@ -30,3 +30,11 @@ aliases:
     - function gckits:zona_ver
     mobcentro:
     - function gckits:mob_centro
+    # /npc lobby cria o boneco de volta ao lobby, onde voce esta e virado para
+    # onde voce olha. /npcapagar tira o mais proximo; /npcs lista os nomes.
+    npc:
+    - function gcnpc:criar_$1
+    npcapagar:
+    - function gcnpc:apagar
+    npcs:
+    - function gcnpc:lista
