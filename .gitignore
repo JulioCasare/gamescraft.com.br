@@ -23,3 +23,6 @@ world_the_end/
 *.iml
 Thumbs.db
 Desktop.ini
+
+# Saida de compilacao do plugin: o jar e refeito a partir do fonte.
+plugins/*/target/
