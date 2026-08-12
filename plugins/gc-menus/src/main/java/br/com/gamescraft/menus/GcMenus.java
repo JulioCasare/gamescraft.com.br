@@ -40,6 +40,15 @@ public final class GcMenus extends JavaPlugin implements Listener {
     /** Marca que o datapack põe nas três peças de cada boneco. */
     private static final String PREFIXO = "gcnpc_";
 
+    /**
+     * Nome gravado no perfil do boneco. Não é o nome de quem emprestou a skin, e
+     * isso é de propósito: com o nome de uma conta de verdade ali, o cliente de
+     * quem chega depois vai buscar a skin daquela conta em vez de usar a textura
+     * que mandamos — quem copiou via a skin certa e os outros viam a original.
+     * Um nome que não existe força o cliente a usar a textura que veio junto.
+     */
+    private static final String NOME_DO_PERFIL = "GameCraftNPC";
+
     /** Um destino: o que aparece no slot e para onde o jogador vai. */
     private record Destino(int slot, String rotulo, String servidor) {
     }
@@ -129,11 +138,12 @@ public final class GcMenus extends JavaPlugin implements Listener {
 
         StringBuilder nbt = new StringBuilder();
         nbt.append("data merge entity ").append(boneco.getUniqueId())
-                .append(" {profile:{name:\"").append(modelo.getName())
+                .append(" {profile:{name:\"").append(NOME_DO_PERFIL)
                 .append("\",properties:[{name:\"textures\",value:\"").append(textura.getValue()).append("\"");
-        if (textura.isSigned()) {
-            nbt.append(",signature:\"").append(textura.getSignature()).append("\"");
-        }
+        // A assinatura fica de fora de proposito: ela vale para a conta de onde
+        // a textura saiu, e aqui o perfil e outro. Assinatura que nao confere e
+        // pior que assinatura nenhuma — o cliente descarta a textura e volta a
+        // buscar pela conta.
         nbt.append("}]}}");
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), nbt.toString());
