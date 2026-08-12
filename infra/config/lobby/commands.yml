@@ -37,3 +37,6 @@ aliases:
     # /npcapagar tira o boneco mais proximo.
     npcapagar:
     - function gcnpc:apagar
+    # /npcs lista os nomes, cada um clicavel.
+    npcs:
+    - function gcnpc:lista
