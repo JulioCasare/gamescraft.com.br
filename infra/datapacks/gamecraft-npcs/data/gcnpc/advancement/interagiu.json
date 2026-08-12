@@ -1,8 +1,0 @@
-{
-  "criteria": {
-    "clicou": {
-      "trigger": "minecraft:player_interacted_with_entity"
-    }
-  },
-  "rewards": { "function": "gcnpc:clicou" }
-}
