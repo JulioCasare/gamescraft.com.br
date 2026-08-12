@@ -217,8 +217,11 @@ services:
       # Permite mandar comandos de admin sem RCON:
       # docker exec <container> mc-send-to-console <comando>
       CREATE_CONSOLE_IN_PIPE: "TRUE"
-      SERVER_NAME: "Game Craft Capture the Flag"
-      MOTD: "Game Craft | Capture the Flag beta"
+      # O identificador continua `ctf` — e o nome pelo qual o proxy roteia
+      # (/server ctf), o nome do volume e o nome nos scripts. Trocar isso
+      # quebraria os tres de uma vez; o que o jogador ve e o nome abaixo.
+      SERVER_NAME: "Game Craft Jogos Longos"
+      MOTD: "Game Craft | Jogos Longos beta"
       # Mapa proprio: uma ilha construida a mao num mar plano. O mundo `ilha`
       # nasce so de mar — bedrock, pedra ate y=50 e agua ate y=62 — e a ilha em
       # si e desenhada por cima com o WorldEdit. Bioma de planicie no mundo
