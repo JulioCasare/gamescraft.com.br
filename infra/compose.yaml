@@ -17,6 +17,10 @@ services:
       VELOCITY_VERSION: "4.1.0-SNAPSHOT"
       VELOCITY_BUILD_ID: "16"
       MEMORY: "${MEMORY_PROXY:-1G}"
+      # O Velocity corta mensagem de plugin em 32 KB. O Emotecraft manda a
+      # animacao inteira por esse caminho, e emote grande estoura o limite e
+      # derruba o jogador. O proprio plugin avisa disso no arranque.
+      JVM_OPTS: "-Dvelocity.max-plugin-message-payload-size=1048576"
       REPLACE_ENV_VARIABLES: "false"
       PLUGINS_FILE: /server/plugins.txt
     ports:

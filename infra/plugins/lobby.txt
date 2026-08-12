@@ -19,3 +19,7 @@ https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.
 # que e o caso aqui: quem autentica e o proxy, e os servidores de tras rodam
 # com ONLINE_MODE falso. Suporta 26.2.
 https://cdn.modrinth.com/data/TsLS8Py5/versions/wXS6bHiC/SkinsRestorer.jar
+# Emotecraft 3.4.0 build 162 (Modrinth oficial), build de Paper para a 26.2.
+# Serve emotes de verdade, com animacao de corpo. Cliente Java precisa do mod
+# para ver; cliente Bedrock usa os emotes proprios dele pelo Geyser.
+https://cdn.modrinth.com/data/pZ2wrerK/versions/BxLu7cQr/emotecraft-paper-for-MC26.2-3.4.0-b.build.162.jar
