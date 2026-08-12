@@ -169,14 +169,14 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
                 continue;
             }
             String marca = PREFIXO + entrada.getKey();
-            Component texto = Component.text(menu.nome(), menu.cor())
-                    .decorate(TextDecoration.BOLD)
-                    .append(Component.newline())
-                    .append(Component.text(quantos + (quantos == 1 ? " jogando" : " jogando"),
-                            NamedTextColor.GRAY).decoration(TextDecoration.BOLD, false));
+            // Só a placa de baixo, a pequena. O nome fica na de cima, que é
+            // maior e não muda — são duas entidades porque o tamanho vale para a
+            // placa inteira, e a contagem tinha de ser menor que o nome.
+            Component texto = Component.text(quantos + " jogando", NamedTextColor.GRAY);
             for (World mundo : Bukkit.getWorlds()) {
                 for (Entity entidade : mundo.getEntitiesByClass(TextDisplay.class)) {
-                    if (entidade.getScoreboardTags().contains(marca)) {
+                    if (entidade.getScoreboardTags().contains(marca)
+                            && entidade.getScoreboardTags().contains("gcnpc_num")) {
                         ((TextDisplay) entidade).text(texto);
                     }
                 }
