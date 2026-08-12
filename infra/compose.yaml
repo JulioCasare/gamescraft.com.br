@@ -7,7 +7,15 @@ services:
     restart: unless-stopped
     environment:
       TYPE: VELOCITY
-      VELOCITY_VERSION: latest
+      # Versao presa, e nao "latest", desde 2026-08-11: o build 19 saiu naquele
+      # dia e quebrou o registro de listener de todo plugin do proxy — Geyser e
+      # Floodgate param de subir, e a rede fica sem Bedrock. O pior e que isso
+      # nao acontece quando a gente mexe em nada: basta reiniciar o proxy num dia
+      # em que saiu snapshot novo. O 16 e o ultimo que funciona.
+      # Antes de subir esse numero, teste o Bedrock e procure no log do proxy:
+      # "Started Geyser on UDP port 19132".
+      VELOCITY_VERSION: "4.1.0-SNAPSHOT"
+      VELOCITY_BUILD_ID: "16"
       MEMORY: "${MEMORY_PROXY:-1G}"
       REPLACE_ENV_VARIABLES: "false"
       PLUGINS_FILE: /server/plugins.txt

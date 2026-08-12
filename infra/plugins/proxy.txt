@@ -1,0 +1,10 @@
+# Official GeyserMC builds for Java + Bedrock cross-play.
+# These URLs deliberately resolve the current production build; retest after upgrades.
+https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/velocity
+https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/velocity
+# Ele so funciona de verdade com a copia no proxy: o plugin do lado do servidor
+# entra em "proxy mode" e espera que quem aplique a skin seja o Velocity.
+# SkinsRestorer 15.12.5 (Modrinth oficial) - o mesmo jar serve proxy e servidor.
+# Precisa da copia no proxy: o plugin do lado do servidor entra em "proxy mode"
+# e espera que quem aplique a skin seja o Velocity.
+https://cdn.modrinth.com/data/TsLS8Py5/versions/wXS6bHiC/SkinsRestorer.jar
