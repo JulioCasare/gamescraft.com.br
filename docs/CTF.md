@@ -26,35 +26,50 @@ uma troca final de grama e terra por areia em y=62 e 63.
 
 ### As torres
 
-Cinco mini torres de tijolo de pedra, de 7x7 e uns 10 blocos de altura, com sala
-por dentro, porta ao norte e ameia no teto:
+São 50 mini torres de tijolo de pedra, de 7x7 e uns 10 blocos de altura: sala
+por dentro, porta ao norte, escada encostada na parede sul e ameia no teto. O
+último degrau da escada ocupa o bloco do teto e vira o alçapão — sem ele não há
+como chegar no sinalizador.
 
-| torre  | posição     | chão |
-|--------|-------------|------|
-| centro | 0, 0        | 72   |
-| leste  | 150, 0      | 70   |
-| oeste  | -150, 0     | 72   |
-| sul    | 0, 150      | 69   |
-| norte  | 0, -150     | 69   |
+No meio do teto fica um sinalizador **aceso**, em cima de um 3x3 de bloco de
+ferro; é esse quadrado que acende o feixe. O espaço acima de cada torre é limpo
+até 30 blocos, senão uma colina cortaria o feixe.
 
-No meio do teto de cada uma fica um sinalizador **aceso**, em cima de um 3x3 de
-bloco de ferro — é esse quadrado que acende o feixe. O espaço acima da torre é
-limpo até 30 blocos, senão uma colina cortaria o feixe.
+A área de cada torre é marcada por uma cerca de 12 blocos de raio, com uma
+entrada de 3 blocos em cada lado. A cerca acompanha o terreno: fica sempre um
+bloco acima do chão daquele ponto, então ela desce e sobe junto com as colinas.
+
+As posições são o centro, as quatro primeiras torres e quatro anéis (8 em raio
+70, 12 em 125, 12 em 175 e 13 em 205). Anel em vez de grade porque a ilha é
+redonda — grade deixaria canto vazio e beirada cheia. O anel de fora para em
+205: a costa chega a encolher até 222, e a cerca ainda precisa dos 12 de folga.
 
 O nascimento fica em `12 72 0`, logo ao lado da torre do centro.
 
 ## Refazer o mapa
 
+O terreno primeiro, as torres depois:
+
 ```bash
 bash scripts/ilha-ctf.sh
 ```
 
-Demora uns 8 minutos. Roda em pedaços de 100x100 porque um único `//gen` do
-tamanho da ilha são 10 milhões de blocos de uma vez, e o histórico do WorldEdit
-estoura a memória do servidor.
+```bash
+bash scripts/torres-ctf.sh
+```
 
-Se o terreno mudar, as alturas das torres no fim do script precisam ser medidas
-de novo — o comando está anotado lá.
+O terreno demora uns 8 minutos. Roda em pedaços de 100x100 porque um único
+`//gen` do tamanho da ilha são 10 milhões de blocos de uma vez, e o histórico do
+WorldEdit estoura a memória do servidor.
+
+As torres não medem o terreno em jogo: o próprio WorldEdit reavalia a mesma
+fórmula de ruído que desenhou a ilha, só que nas coordenadas do centro de cada
+torre. É o que permite carimbar 50 delas sem sondar 50 terrenos, e é também por
+isso que os dois scripts precisam usar a mesma fórmula — se um mudar, o outro
+muda junto, senão as torres passam a flutuar ou a nascer enterradas.
+
+O `torres-ctf.sh` pode rodar em cima de si mesmo quantas vezes quiser: cada
+torre é refeita do zero no lugar.
 
 ## O único mundo do CTF
 
