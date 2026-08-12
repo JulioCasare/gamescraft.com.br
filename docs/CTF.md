@@ -56,8 +56,10 @@ estoura a memória do servidor.
 Se o terreno mudar, as alturas das torres no fim do script precisam ser medidas
 de novo — o comando está anotado lá.
 
-## O que ficou guardado
+## O único mundo do CTF
 
-O mapa `Island` que veio pronto continua no mundo `world`, e o mundo que o
-servidor tinha gerado sozinho está em `world_gerado_antigo`. Para voltar a
-qualquer um deles, é só trocar `LEVEL` no `compose.yaml`.
+O mapa `Island` que veio pronto e o mundo que o servidor tinha gerado sozinho
+foram apagados a pedido, em 2026-08-11. O volume `gc_ctf` tem só a `ilha`.
+
+Se um dia o mapa se perder, não há backup dentro do servidor: quem refaz é o
+`scripts/ilha-ctf.sh`, e é por isso que ele existe.
