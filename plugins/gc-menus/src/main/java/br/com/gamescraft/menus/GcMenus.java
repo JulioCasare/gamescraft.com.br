@@ -104,8 +104,8 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         menus.put("build", new Menu("BUILD BATTLE", NamedTextColor.GREEN,
                 ChatColor.GREEN + "Build Battle", "buildbattle", List.of(
                         new Destino(13, ChatColor.GREEN + "Entrar", "buildbattle"))));
-        menus.put("longos", new Menu("JOGOS LONGOS", NamedTextColor.LIGHT_PURPLE,
-                ChatColor.LIGHT_PURPLE + "Jogos Longos", "ctf", List.of(
+        menus.put("longos", new Menu("MEGAGAMES", NamedTextColor.LIGHT_PURPLE,
+                ChatColor.LIGHT_PURPLE + "MegaGames", "ctf", List.of(
                         new Destino(13, ChatColor.LIGHT_PURPLE + "Entrar", "ctf"))));
         menus.put("eventos", new Menu("EVENTOS", NamedTextColor.YELLOW,
                 ChatColor.YELLOW + "Eventos", "eventos", List.of(
