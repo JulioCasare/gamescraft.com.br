@@ -35,9 +35,14 @@ No meio do teto fica um sinalizador **aceso**, em cima de um 3x3 de bloco de
 ferro; é esse quadrado que acende o feixe. O espaço acima de cada torre é limpo
 até 30 blocos, senão uma colina cortaria o feixe.
 
-A área de cada torre é marcada por uma cerca de 12 blocos de raio, com uma
-entrada de 3 blocos em cada lado. A cerca acompanha o terreno: fica sempre um
-bloco acima do chão daquele ponto, então ela desce e sobe junto com as colinas.
+A área de cada torre é marcada por uma linha de concreto cinza de 2 blocos de
+largura, rente ao chão — o concreto entra no lugar do bloco de cima do terreno,
+então não vira mureta e não atrapalha quem corre por cima.
+
+A divisão é por proximidade: cada pedaço de chão pertence à torre mais perto
+dele, e a linha passa onde duas torres empatam. É isso que faz as áreas
+encostarem umas nas outras sem sobra de terreno no meio, que era o defeito da
+cerca quadrada de raio fixo que existia antes.
 
 As posições são o centro, as quatro primeiras torres e quatro anéis (8 em raio
 70, 12 em 125, 12 em 175 e 13 em 205). Anel em vez de grade porque a ilha é
@@ -56,6 +61,10 @@ bash scripts/ilha-ctf.sh
 
 ```bash
 bash scripts/torres-ctf.sh
+```
+
+```bash
+bash scripts/fronteiras-ctf.sh
 ```
 
 O terreno demora uns 8 minutos. Roda em pedaços de 100x100 porque um único

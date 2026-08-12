@@ -17,9 +17,6 @@ CONTAINER="${1:-game-craft-beta-ctf-1}"
 LISTA="$(mktemp)"
 trap 'rm -f "$LISTA"' EXIT
 
-# Altura do terreno em qualquer x,z — a mesma conta do ilha-ctf.sh.
-TERR='dd=sqrt(x*x+z*z);rr=250+28*perlin(7,x*0.008,0,z*0.008,1,3,0.5);tt=min(1,max(0,(rr-dd)/45));hh=62+tt*tt*max(2,6+8*perlin(13,x*0.012,0,z*0.012,1,4,0.5));'
-
 # As 50 posicoes: o centro, as quatro primeiras torres e quatro aneis. Anel em
 # vez de grade porque a ilha e redonda — grade deixaria canto vazio e beirada
 # cheia. O anel de fora para em 205: a costa chega a encolher ate 222, e a cerca
@@ -85,11 +82,14 @@ while read -r cx cz; do
   P "//pos1 $cx,51,$cz"; P "//pos2 $cx,110,$cz"
   P "//gen -r minecraft:glowstone ${CEN}y==hc+8"
 
-  # Ameia em volta do teto.
+  # Guarda-corpo do teto, de cerca de spruce — e o alcapao em cima da escada.
+  # Os dois vem da litematica que o Julio mandou.
   P "//pos1 $((cx-3)),51,$((cz-3))"; P "//pos2 $((cx+3)),110,$((cz+3))"
-  P "//gen -r minecraft:stone_brick_wall ${CEN}y==hc+9"
+  P "//gen -r minecraft:spruce_fence ${CEN}y==hc+9"
   P "//pos1 $((cx-2)),51,$((cz-2))"; P "//pos2 $((cx+2)),110,$((cz+2))"
   P "//gen -r minecraft:air ${CEN}y==hc+9"
+  P "//pos1 $cx,51,$((cz+2))"; P "//pos2 $cx,110,$((cz+2))"
+  P "//gen -r minecraft:spruce_trapdoor[facing=north,half=top,open=false] ${CEN}y==hc+9"
 
   # 3x3 de ferro: e ele, logo abaixo, que deixa o sinalizador aceso.
   P "//pos1 $((cx-1)),51,$((cz-1))"; P "//pos2 $((cx+1)),110,$((cz+1))"
@@ -97,11 +97,6 @@ while read -r cx cz; do
 
   P "//pos1 $cx,51,$cz"; P "//pos2 $cx,110,$cz"
   P "//gen -r minecraft:beacon ${CEN}y==hc+10"
-
-  # Cerca da area, 12 blocos de raio, com uma entrada de 3 blocos em cada lado.
-  # Ela acompanha o terreno: fica sempre um bloco acima do chao de cada ponto.
-  P "//pos1 $((cx-12)),55,$((cz-12))"; P "//pos2 $((cx+12)),90,$((cz+12))"
-  P "//gen -r minecraft:oak_fence ${TERR}ax=abs(x-($cx));az=abs(z-($cz));on=(ax==12&&az<=12)||(az==12&&ax<=12);gap=(ax<=1&&az==12)||(az<=1&&ax==12);on&&gap==0&&y==floor(hh)+1"
 
   if [ $((total % 10)) = 0 ]; then P '//clearhistory'; fi
 done < <(posicoes)
