@@ -23,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
@@ -31,6 +32,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -215,6 +217,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             quemMandou.sendMessage("Esse comando precisa ser dado em jogo.");
             return true;
         }
+        if (comando.getName().equals("npcitem")) {
+            return darItem(jogador, argumentos);
+        }
         if (argumentos.length != 1) {
             jogador.sendMessage(ChatColor.RED + "Use: /npcskin <jogador>");
             return true;
@@ -260,6 +265,44 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), nbt.toString());
         jogador.sendMessage(ChatColor.GREEN + "Boneco agora usa a skin de " + modelo.getName()
                 + ChatColor.GRAY + " — e fica com ela mesmo que ele troque depois.");
+        return true;
+    }
+
+    /**
+     * Põe na mão do boneco o item que o jogador está segurando.
+     *
+     * Existe porque a caixa de interação fica na frente do boneco e engole o
+     * clique — sem ela o menu não abriria, mas com ela não há como equipar o
+     * boneco à mão, como se faz numa armadura decorativa.
+     */
+    private boolean darItem(Player jogador, String[] argumentos) {
+        Entity boneco = bonecoMaisPerto(jogador);
+        if (boneco == null) {
+            jogador.sendMessage(ChatColor.RED + "Nenhum boneco por perto. Chegue mais perto de um.");
+            return true;
+        }
+        if (!(boneco instanceof LivingEntity corpo)) {
+            return true;
+        }
+        boolean esquerda = argumentos.length > 0 && argumentos[0].equalsIgnoreCase("esquerda");
+        ItemStack naMao = jogador.getInventory().getItemInMainHand();
+        EntityEquipment equipamento = corpo.getEquipment();
+        if (equipamento == null) {
+            jogador.sendMessage(ChatColor.RED + "Esse boneco nao segura item.");
+            return true;
+        }
+        if (esquerda) {
+            equipamento.setItemInOffHand(naMao.clone());
+        } else {
+            equipamento.setItemInMainHand(naMao.clone());
+        }
+        String onde = esquerda ? "esquerda" : "direita";
+        if (naMao.getType() == Material.AIR) {
+            jogador.sendMessage(ChatColor.YELLOW + "Mao " + onde + " do boneco esvaziada.");
+        } else {
+            jogador.sendMessage(ChatColor.GREEN + "Boneco agora segura "
+                    + naMao.getType().name().toLowerCase() + " na mao " + onde + ".");
+        }
         return true;
     }
 

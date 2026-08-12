@@ -9,7 +9,11 @@ commands:
     description: Copia a skin de um jogador online para o boneco mais proximo
     usage: /npcskin <jogador>
     permission: gcmenus.npcskin
+  npcitem:
+    description: Poe na mao do boneco mais proximo o item que voce esta segurando
+    usage: /npcitem [esquerda]
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
-    description: Permite trocar a skin dos bonecos
+    description: Permite mexer nos bonecos
     default: op
