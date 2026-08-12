@@ -1,0 +1,21 @@
+# Add only reviewed direct JAR URLs, one per line.
+# Do not add a plugin simply because it is popular: check Paper 26.2 support,
+# licence, update history, Bedrock behavior, and source/reputation first.
+#
+# Base instalada (fontes oficiais, testadas em 2026-08-07):
+# LuckPerms 5.5.71 (Modrinth oficial) - permissoes
+https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar
+# spark 1.10.175 (Jenkins oficial do lucko) - medicao de TPS/MSPT
+https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/libs/spark-1.10.175-bukkit.jar
+#
+# Suggested categories after approval:
+# - menus / lobby tools
+# - anti-cheat
+# - moderation
+# WorldEdit 7.4.4 (Modrinth oficial, EngineHub) - construcao, selecao e reset
+# de area. Restrinja o uso a staff pelo LuckPerms antes de abrir o beta.
+https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.jar
+# SkinsRestorer 15.12.5 (Modrinth oficial) - skins em servidor de modo offline,
+# que e o caso aqui: quem autentica e o proxy, e os servidores de tras rodam
+# com ONLINE_MODE falso. Suporta 26.2.
+https://cdn.modrinth.com/data/TsLS8Py5/versions/wXS6bHiC/SkinsRestorer.jar
