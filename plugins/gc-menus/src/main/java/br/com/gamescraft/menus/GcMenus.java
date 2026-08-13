@@ -242,6 +242,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             captura.pintarCastelos(quemMandou);
             return true;
         }
+        if (comando.getName().equals("neutro")) {
+            captura.zerar(quemMandou);
+            return true;
+        }
         if (!(quemMandou instanceof Player jogador)) {
             quemMandou.sendMessage("Esse comando precisa ser dado em jogo.");
             return true;

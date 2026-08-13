@@ -21,6 +21,10 @@ commands:
     description: Repinta o chao dos castelos com a cor do sinalizador de cada um
     usage: /castelos
     permission: gcmenus.npcskin
+  neutro:
+    description: Devolve ao neutro todas as torres menos as dos castelos
+    usage: /neutro
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
     description: Permite mexer nos bonecos
