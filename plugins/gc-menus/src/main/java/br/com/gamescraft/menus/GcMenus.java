@@ -83,6 +83,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** Quem cuida das areas de construcao. */
     private Areas areas;
 
+    /** A disputa das torres. */
+    private Captura captura;
+
     private static final class DonoDoMenu implements InventoryHolder {
         private final Menu menu;
 
@@ -133,6 +136,7 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         getServer().getPluginManager().registerEvents(protecao, this);
         areas = new Areas(this, protecao);
         getServer().getPluginManager().registerEvents(areas, this);
+        captura = new Captura(this, protecao);
         getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);
         getServer().getMessenger().registerIncomingPluginChannel(this, CANAL, this);
 
@@ -232,6 +236,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         // com o servidor vazio.
         if (comando.getName().equals("torres")) {
             protecao.varrer(quemMandou);
+            return true;
+        }
+        if (comando.getName().equals("castelos")) {
+            captura.pintarCastelos(quemMandou);
             return true;
         }
         if (!(quemMandou instanceof Player jogador)) {

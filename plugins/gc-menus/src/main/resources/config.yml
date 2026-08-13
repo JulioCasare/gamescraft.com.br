@@ -2,11 +2,11 @@
 mundo: ilha
 alcance-da-varredura: 288
 
-# Areas que ficam de fora da protecao por torre: um sinalizador dentro de uma
-# delas nao entra na lista. Formato "minx,minz,maxx,maxz".
-areas-fora:
-  - "26,-207,65,-183"
-  - "-26,190,12,214"
+# Nenhuma area fica de fora da varredura: o que as areas de construcao liberam
+# e o chao em volta, nao a torre. A coluna do sinalizador continua travada
+# dentro delas — foi o que o Julio pediu depois de ver que dava para construir
+# em cima do beacon.
+areas-fora: []
 
 # Torres protegidas: uma linha "x,z" por sinalizador. Quem escreve isto e o
 # comando /torres, varrendo o mapa — manter a lista a mao nao funcionou: eu

@@ -17,6 +17,10 @@ commands:
     description: Varre o mapa e refaz a lista de torres protegidas
     usage: /torres
     permission: gcmenus.npcskin
+  castelos:
+    description: Repinta o chao dos castelos com a cor do sinalizador de cada um
+    usage: /castelos
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
     description: Permite mexer nos bonecos

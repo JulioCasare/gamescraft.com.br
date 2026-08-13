@@ -92,6 +92,15 @@ final class Torres implements Listener {
         return torres.size();
     }
 
+    /** As torres achadas, como pares x,z. */
+    java.util.List<int[]> posicoes() {
+        java.util.List<int[]> saida = new ArrayList<>();
+        for (Torre torre : torres) {
+            saida.add(new int[] { torre.x(), torre.z() });
+        }
+        return saida;
+    }
+
     /**
      * Varre o mapa atrás de sinalizadores e refaz a lista.
      *
