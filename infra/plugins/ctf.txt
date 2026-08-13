@@ -1,0 +1,12 @@
+# Keep the Capture the Flag plugin URL here only after reviewing its licence,
+# Paper 26.2 support and map requirements. Confirm that the flag carrier
+# indicator, team colours and scoreboard are visible to Bedrock players, since
+# Geyser renders some particle and glow effects differently.
+#
+# Base instalada (fontes oficiais, testadas em 2026-08-07):
+# LuckPerms 5.5.71 (Modrinth oficial) - permissoes
+https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar
+# spark 1.10.175 (Jenkins oficial do lucko) - medicao de TPS/MSPT
+# WorldEdit 7.4.4 (Modrinth oficial, EngineHub) - construcao, selecao e reset
+# de area. Restrinja o uso a staff pelo LuckPerms antes de abrir o beta.
+https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.jar
