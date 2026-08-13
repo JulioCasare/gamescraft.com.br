@@ -345,9 +345,17 @@ services:
       SPAWN_PROTECTION: "0"
       VIEW_DISTANCE: "10"
       SIMULATION_DISTANCE: "6"
-      # O mapa e trocado por scripts/event.sh, nao gerado pelo servidor.
-      LEVEL_TYPE: FLAT
-      GENERATE_STRUCTURES: "false"
+      # Mundo normal, de semente sorteada: SEED vazio faz o servidor tirar uma
+      # na hora de criar. O nome do mundo mudou junto de proposito — semente e
+      # tipo so valem na criacao, entao pedir mundo novo e pedir pasta nova. A
+      # `world` antiga, plana, continua no volume: para voltar a ela basta
+      # trocar LEVEL de volta.
+      LEVEL: "eventos"
+      SEED: ""
+      # Precisa vir escrito: o valor antigo fica gravado no server.properties do
+      # volume, e sem esta linha o mundo novo nascia plano igual ao velho.
+      LEVEL_TYPE: "minecraft:normal"
+      GENERATE_STRUCTURES: "true"
       PLUGINS_FILE: /data/plugins.txt
     expose:
       - "25565"
