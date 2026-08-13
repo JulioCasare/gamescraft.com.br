@@ -48,10 +48,15 @@ while read -r cx cz; do
   VORONOI="${VORONOI}dq=(x-($cx))*(x-($cx))+(z-($cz))*(z-($cz));if(dq<m1){m2=m1;m1=dq;}else{if(dq<m2){m2=dq;}}"
 done < <(posicoes)
 # Pinta onde as duas mais perto quase empatam: e a linha do meio entre elas.
-# O limite e a largura da linha em blocos: andar um bloco na direcao de uma das
-# torres tira 1 da distancia dela e poe 1 na da outra, entao a diferenca anda de
-# 2 em 2 e o numero aqui sai direto em blocos de largura.
-VORONOI="${VORONOI}(sqrt(m2)-sqrt(m1))<2&&dd<rr&&y==floor(hh)"
+#
+# O limite seria a largura em blocos se toda linha corresse reta no eixo. Nao e
+# o caso: na diagonal, uma faixa de 2 de largura de verdade cobre quase 3 blocos
+# medidos em linha, e o desenho engorda. Com 1,4 a diagonal cai para 2 e a reta
+# fica em 1 ou 2.
+#
+# Onde tres areas se encontram a linha continua mais grossa, e isso nao tem como
+# evitar por aqui: sao tres faixas passando pelo mesmo ponto.
+VORONOI="${VORONOI}(sqrt(m2)-sqrt(m1))<1.4&&dd<rr&&y==floor(hh)"
 
 P() { echo "$1" >> "$LISTA"; }
 
@@ -59,15 +64,29 @@ P '//world ilha'
 
 TILES="-300 -200 -100 0 100 200"
 
-# Fora o que marcava area nas versoes anteriores: a cerca de carvalho e a linha
-# vermelha. A linha antiga era mais estreita que a de agora, entao pintar por
-# cima ja cobre — so precisa trocar a cor antes.
+# Fora o que marcava area nas versoes anteriores: a cerca de carvalho e as
+# linhas ja desenhadas.
 for x0 in $TILES; do
   for z0 in $TILES; do
     P "//pos1 $x0,60,$z0"
     P "//pos2 $((x0+99)),90,$((z0+99))"
     P "//replace minecraft:oak_fence minecraft:air"
-    P "//replace minecraft:red_concrete minecraft:gray_concrete"
+    # A linha antiga sai antes de a nova entrar: agora a nova e mais estreita
+    # que a velha, entao pintar por cima deixaria a sobra da anterior no chao.
+    # Volta a virar grama, e a faixa de areia da beirada e refeita logo abaixo.
+    P "//replace minecraft:red_concrete minecraft:grass_block"
+    P "//replace minecraft:gray_concrete minecraft:grass_block"
+  done
+  P '//clearhistory'
+done
+
+# A faixa de areia da beirada, refeita: a limpeza acima devolveu grama tambem
+# onde a linha antiga passava por cima da praia.
+for x0 in $TILES; do
+  for z0 in $TILES; do
+    P "//pos1 $x0,62,$z0"
+    P "//pos2 $((x0+99)),63,$((z0+99))"
+    P "//replace minecraft:grass_block,minecraft:dirt minecraft:sand"
   done
   P '//clearhistory'
 done
