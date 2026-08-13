@@ -13,6 +13,10 @@ commands:
     description: Poe na mao do boneco mais proximo o item que voce esta segurando
     usage: /npcitem [esquerda]
     permission: gcmenus.npcskin
+  torres:
+    description: Varre o mapa e refaz a lista de torres protegidas
+    usage: /torres
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
     description: Permite mexer nos bonecos

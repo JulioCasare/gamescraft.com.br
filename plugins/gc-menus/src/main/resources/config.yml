@@ -1,0 +1,19 @@
+# Mundo onde as torres moram e ate onde varrer atras delas.
+mundo: ilha
+alcance-da-varredura: 288
+
+# Areas que ficam de fora da protecao por torre: um sinalizador dentro de uma
+# delas nao entra na lista. Formato "minx,minz,maxx,maxz".
+areas-fora:
+  - "26,-207,65,-183"
+  - "-26,190,12,214"
+
+# Torres protegidas: uma linha "x,z" por sinalizador. Quem escreve isto e o
+# comando /torres, varrendo o mapa — manter a lista a mao nao funcionou: eu
+# tinha 48 numa ilha com 116, e as outras ficavam sem protecao sem ninguem
+# perceber.
+#
+# A protecao e uma coluna de 7x7 centrada no sinalizador, tres blocos para cada
+# lado, do fundo do mundo ate o teto. Dentro dela ninguem quebra nem coloca
+# bloco, nem por explosao, fogo ou balde. Quem esta com /obras ligado passa.
+torres: []

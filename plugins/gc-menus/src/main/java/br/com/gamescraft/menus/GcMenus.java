@@ -76,6 +76,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** Quanta gente há em cada servidor, pela última resposta do proxy. */
     private final Map<String, Integer> jogadores = new HashMap<>();
 
+    /** Quem barra o clique dentro das torres. */
+    private Torres protecao;
+
     private static final class DonoDoMenu implements InventoryHolder {
         private final Menu menu;
 
@@ -119,6 +122,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
                         new Destino(13, ChatColor.GREEN + "Voltar ao lobby", "lobby"))));
 
         getServer().getPluginManager().registerEvents(this, this);
+        // A lista de torres protegidas vem da config; onde nao houver lista, o
+        // ouvinte fica ali sem nada para barrar.
+        saveDefaultConfig();
+        protecao = new Torres(this);
+        getServer().getPluginManager().registerEvents(protecao, this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);
         getServer().getMessenger().registerIncomingPluginChannel(this, CANAL, this);
 
@@ -213,6 +221,13 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
 
     @Override
     public boolean onCommand(CommandSender quemMandou, Command comando, String rotulo, String[] argumentos) {
+        // A varredura vem antes da checagem de jogador: ela nao depende de
+        // posicao, e poder rodar pelo console e o que permite refazer a lista
+        // com o servidor vazio.
+        if (comando.getName().equals("torres")) {
+            protecao.varrer(quemMandou);
+            return true;
+        }
         if (!(quemMandou instanceof Player jogador)) {
             quemMandou.sendMessage("Esse comando precisa ser dado em jogo.");
             return true;
