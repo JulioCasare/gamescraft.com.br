@@ -10,6 +10,8 @@ execute if score #ma gc_r matches 1 if entity @s[type=minecraft:zombie] run func
 execute if score #ma gc_r matches 1 if entity @s[type=minecraft:skeleton] run function gckits:mob_armadura
 execute if score #ma gc_r matches 1 if entity @s[type=minecraft:wither_skeleton] run function gckits:mob_armadura
 
-# Nada do que ele veste ou carrega cai no chao. Sem isso a arena vira loja de
-# armadura de graca e o kit sorteado perde a graca.
+# Queda zero no que ele ja nasceu vestindo. Isso nao vale para o que ele catar
+# do chao depois: quando um mob pega um item, o proprio jogo marca aquele slot
+# como "cai na morte". E o que faz a arena devolver so o que foi perdido nela,
+# sem virar loja de armadura de graca.
 data merge entity @s {drop_chances:{head:0.0f,chest:0.0f,legs:0.0f,feet:0.0f,mainhand:0.0f,offhand:0.0f}}
