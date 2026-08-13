@@ -17,3 +17,11 @@ areas-fora:
 # lado, do fundo do mundo ate o teto. Dentro dela ninguem quebra nem coloca
 # bloco, nem por explosao, fogo ou balde. Quem esta com /obras ligado passa.
 torres: []
+
+# Areas de construcao do MegaGames: dentro delas ninguem quebra o que ja estava
+# no mapa, mas todo mundo pode colocar bloco e derrubar o que colocou. A coluna
+# das torres continua intocavel mesmo aqui dentro.
+# Formato "minx,miny,minz,maxx,maxy,maxz".
+areas-construcao:
+  - "26,67,-207,65,90,-183"
+  - "-26,65,190,12,88,214"

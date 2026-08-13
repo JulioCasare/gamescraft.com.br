@@ -172,7 +172,7 @@ final class Torres implements Listener {
     }
 
     /** A coluna vale para qualquer altura, então só x e z entram na conta. */
-    private boolean protegido(Block bloco) {
+    boolean protegido(Block bloco) {
         int x = bloco.getX();
         int z = bloco.getZ();
         for (Torre torre : torres) {
@@ -184,7 +184,7 @@ final class Torres implements Listener {
     }
 
     /** Quem ligou o /obras passa; o resto, não. */
-    private boolean podeMexer(Player jogador) {
+    boolean podeMexer(Player jogador) {
         return jogador.getScoreboardTags().contains("gc_obras");
     }
 

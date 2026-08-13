@@ -80,6 +80,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** Quem barra o clique dentro das torres. */
     private Torres protecao;
 
+    /** Quem cuida das areas de construcao. */
+    private Areas areas;
+
     private static final class DonoDoMenu implements InventoryHolder {
         private final Menu menu;
 
@@ -128,6 +131,8 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         saveDefaultConfig();
         protecao = new Torres(this);
         getServer().getPluginManager().registerEvents(protecao, this);
+        areas = new Areas(this, protecao);
+        getServer().getPluginManager().registerEvents(areas, this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);
         getServer().getMessenger().registerIncomingPluginChannel(this, CANAL, this);
 
@@ -258,15 +263,20 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         String nome = argumentos[0];
         jogador.sendMessage(ChatColor.GRAY + "Buscando a skin da conta " + nome + "...");
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            PlayerProfile perfil = Bukkit.createProfile(nome);
-            perfil.clearProperties();
-            boolean achou = perfil.complete(true);
+            String textura;
+            try {
+                textura = Skins.buscar(nome);
+            } catch (Exception erro) {
+                textura = null;
+                getLogger().warning("Busca de skin falhou: " + erro.getMessage());
+            }
+            String valor = textura;
             Bukkit.getScheduler().runTask(this, () -> {
-                if (!achou) {
-                    jogador.sendMessage(ChatColor.RED + "Nao achei a conta " + nome + ".");
+                if (valor == null) {
+                    jogador.sendMessage(ChatColor.RED + "Nao consegui a skin da conta " + nome + ".");
                     return;
                 }
-                aplicarSkin(jogador, boneco, nome, perfil.getProperties());
+                aplicarSkin(jogador, boneco, nome, valor);
             });
         });
         return true;
@@ -320,22 +330,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
      * A assinatura fica de fora pelo mesmo motivo: ela vale para a conta de
      * origem, e assinatura que nao confere faz o cliente descartar a textura.
      */
-    private void aplicarSkin(Player jogador, Entity boneco, String nome,
-            java.util.Collection<ProfileProperty> propriedades) {
-        ProfileProperty textura = null;
-        for (ProfileProperty propriedade : propriedades) {
-            if (propriedade.getName().equals("textures")) {
-                textura = propriedade;
-                break;
-            }
-        }
-        if (textura == null) {
-            jogador.sendMessage(ChatColor.RED + "A conta " + nome + " nao tem skin.");
-            return;
-        }
+    private void aplicarSkin(Player jogador, Entity boneco, String nome, String textura) {
         String comando = "data merge entity " + boneco.getUniqueId()
                 + " {profile:{name:\"" + NOME_DO_PERFIL
-                + "\",properties:[{name:\"textures\",value:\"" + textura.getValue() + "\"}]}}";
+                + "\",properties:[{name:\"textures\",value:\"" + textura + "\"}]}}";
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), comando);
         jogador.sendMessage(ChatColor.GREEN + "Boneco agora usa a skin da conta " + nome
                 + ChatColor.GRAY + " — e fica com ela mesmo que a conta troque depois.");
