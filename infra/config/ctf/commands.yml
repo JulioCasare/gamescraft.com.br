@@ -1,0 +1,41 @@
+# This is the Bukkit commands configuration file for Paper.
+#
+# If you need help with the configuration or have any questions related to Paper,
+# join us in our Discord or check the docs page.
+#
+# File Reference: https://docs.papermc.io/paper/reference/bukkit-commands-configuration/
+# Docs: https://docs.papermc.io/
+# Discord: https://discord.gg/papermc
+# Website: https://papermc.io/
+
+command-block-overrides: []
+ignore-vanilla-permissions: false
+aliases:
+  icanhasbukkit:
+  - version $1-
+  # /npc lobby cria o boneco de volta ao lobby, onde voce esta e virado para
+  # onde voce olha. /npcapagar tira o mais proximo; /npcs lista os nomes.
+  npc:
+  - function gcnpc:criar_$1
+  npcapagar:
+  - function gcnpc:apagar
+  npcs:
+  - function gcnpc:lista
+  # /emote <nome> roda o emote. /emotes lista os que existem.
+  emote:
+  - function gcemote:$1
+  emotes:
+  - function gcemote:lista
+  # /obras pausa a protecao para editar torre e area. Desligando, o estado novo
+  # vira a referencia.
+  obras:
+  - trigger obras
+  # /arena1 e /arena2 marcam os cantos; /save guarda o estado e /reset devolve.
+  arena1:
+  - function gcctf:arena_canto1
+  arena2:
+  - function gcctf:arena_canto2
+  save:
+  - function gcctf:save
+  reset:
+  - function gcctf:reset
