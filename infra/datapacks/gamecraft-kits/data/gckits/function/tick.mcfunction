@@ -15,6 +15,12 @@ execute as @a[scores={gc_pending=1}] unless entity @s[nbt={Health:0.0f}] run fun
 # golpe nao vira marca de combate.
 execute as @a[tag=gc_dentro,scores={gc_hurt=1..}] run function gckits:zona_ileso
 
+# Veneno do zumbi gigante. O jogo nao deixa dizer "este mob envenena quem ele
+# bate", entao a conta e pelo outro lado: quem levou dano com um gigante colado
+# so pode ter levado dele. Quatro blocos e o alcance do braco dele, ja contando
+# o tamanho tres.
+execute as @a[scores={gc_hurt=1..}] at @s if entity @e[tag=gc_gigante,distance=..4] run effect give @s minecraft:poison 5 0
+
 # Deu ou levou dano: entra em combate por 15 segundos.
 execute as @a[scores={gc_dmg=1..}] run function gckits:marcar_combate
 execute as @a[scores={gc_hurt=1..}] run function gckits:marcar_combate

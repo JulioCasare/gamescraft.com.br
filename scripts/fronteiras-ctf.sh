@@ -40,23 +40,31 @@ posicoes() {
   }'
 }
 
-# m1 e a distancia da torre mais perto, m2 a da segunda. Ficam ao quadrado
-# durante a conta e so viram distancia de verdade no fim, para nao tirar 50
-# raizes por bloco.
-VORONOI='m1=1e9;m2=1e9;'
+# m1 e a distancia da torre mais perto, m2 a da segunda; bx1/bz1 e bx2/bz2 sao
+# as coordenadas dessas duas. As distancias ficam ao quadrado durante a conta e
+# so viram distancia de verdade no fim, para nao tirar 50 raizes por bloco.
+VORONOI='m1=1e9;m2=1e9;bx1=0;bz1=0;bx2=0;bz2=0;'
 while read -r cx cz; do
-  VORONOI="${VORONOI}dq=(x-($cx))*(x-($cx))+(z-($cz))*(z-($cz));if(dq<m1){m2=m1;m1=dq;}else{if(dq<m2){m2=dq;}}"
+  VORONOI="${VORONOI}dq=(x-($cx))*(x-($cx))+(z-($cz))*(z-($cz));if(dq<m1){m2=m1;m1=dq;bx2=bx1;bz2=bz1;bx1=$cx;bz1=$cz;}else{if(dq<m2){m2=dq;bx2=$cx;bz2=$cz;}}"
 done < <(posicoes)
-# Pinta onde as duas mais perto quase empatam: e a linha do meio entre elas.
+# Pinta a faixa em volta da linha do meio entre as duas torres mais perto.
 #
-# O limite seria a largura em blocos se toda linha corresse reta no eixo. Nao e
-# o caso: na diagonal, uma faixa de 2 de largura de verdade cobre quase 3 blocos
-# medidos em linha, e o desenho engorda. Com 1,4 a diagonal cai para 2 e a reta
-# fica em 1 ou 2.
+# Comparar so a diferenca das distancias nao dava largura constante: onde a
+# linha corre reta no eixo, um bloco andado muda a diferenca em 2; onde ela
+# corre na diagonal, muda em 1,4. Com um limite fixo, a mesma conta desenhava
+# 1 bloco num lugar e 3 no outro — foi o que o Julio viu.
 #
-# Onde tres areas se encontram a linha continua mais grossa, e isso nao tem como
-# evitar por aqui: sao tres faixas passando pelo mesmo ponto.
-VORONOI="${VORONOI}(sqrt(m2)-sqrt(m1))<1.4&&dd<rr&&y==floor(hh)"
+# Aqui a diferenca e dividida pela velocidade com que ela muda naquele ponto, o
+# que devolve a distancia de verdade ate a linha, em blocos. Com o limite em 1,
+# sai um bloco de cada lado: dois de largura, em qualquer angulo.
+#
+# A velocidade vem da soma das duas direcoes: da torre 1 para ca e daqui para a
+# torre 2, cada uma valendo 1 de comprimento.
+VORONOI="${VORONOI}d1=sqrt(m1);d2=sqrt(m2);gx=(x-bx1)/d1-(x-bx2)/d2;gz=(z-bz1)/d1-(z-bz2)/d2;g=sqrt(gx*gx+gz*gz);"
+# A altura vem antes na conta de proposito: o bloco so e candidato se estiver na
+# casca do terreno, e assim as outras dezesseis camadas da fatia nem chegam a
+# rodar as cinquenta distancias.
+VORONOI="${VORONOI}y==floor(hh)&&dd<rr&&((d2-d1)/max(g,0.001))<1"
 
 P() { echo "$1" >> "$LISTA"; }
 
@@ -76,6 +84,7 @@ for x0 in $TILES; do
     # Volta a virar grama, e a faixa de areia da beirada e refeita logo abaixo.
     P "//replace minecraft:red_concrete minecraft:grass_block"
     P "//replace minecraft:gray_concrete minecraft:grass_block"
+    P "//replace minecraft:light_blue_concrete minecraft:grass_block"
   done
   P '//clearhistory'
 done
