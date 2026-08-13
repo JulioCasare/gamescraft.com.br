@@ -32,10 +32,8 @@ mkdir -p "$FN" "$PACK/data/minecraft/tags/function"
 # brigaria com a da outra.
 #
 # formato: minx miny minz maxx maxy maxz
-# A area A (26 67 -207 ate 65 90 -183) esta fora da lista de proposito: ela
-# virou um cubo de pedra e a copia dela guarda esse cubo. Voltar para ca so
-# depois que o terreno for refeito e uma foto nova for tirada.
-AREAS="-26 65 190 12 88 214"
+AREAS="26 67 -207 65 90 -183
+-26 65 190 12 88 214"
 
 # Altura onde as copias das areas moram. Nao pode encostar na faixa das torres
 # (-60 a -50), senao uma copia sobrescreve a outra.
@@ -143,23 +141,23 @@ scoreboard players enable @a obras
 execute as @a[scores={obras=1..}] run function gcctf:trigger_obras
 
 scoreboard players add #t gcctf 1
-execute if score #t gcctf matches 20.. run function gcctf:cada_segundo
+execute if score #t gcctf matches 10.. run function gcctf:meio_segundo
 
 # As areas sao grandes: comparar as duas custa mais que as 48 torres juntas.
-# De cinco em cinco segundos e o bastante para ninguem conseguir levar bloco
-# embora.
+# Uma vez por segundo e o ponto em que o conserto parece imediato para quem
+# quebrou sem a conta pesar no servidor.
 scoreboard players add #ta gcctf 1
-execute if score #ta gcctf matches 100.. run function gcctf:cada_cinco
+execute if score #ta gcctf matches 20.. run function gcctf:cada_segundo
 EOF
 
-cat > "$FN/cada_segundo.mcfunction" <<'EOF'
+cat > "$FN/meio_segundo.mcfunction" <<'EOF'
 scoreboard players set #t gcctf 0
 # Com alguem de obras ligado, a protecao para: senao a torre voltaria ao estado
 # antigo no meio da edicao.
 execute unless entity @a[tag=gc_obras] run function gcctf:verificar
 EOF
 
-cat > "$FN/cada_cinco.mcfunction" <<'EOF'
+cat > "$FN/cada_segundo.mcfunction" <<'EOF'
 scoreboard players set #ta gcctf 0
 execute unless entity @a[tag=gc_obras] run function gcctf:verificar_areas
 EOF
