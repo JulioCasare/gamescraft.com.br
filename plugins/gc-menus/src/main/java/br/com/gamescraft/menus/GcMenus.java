@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 
 import net.kyori.adventure.text.Component;
@@ -239,47 +240,35 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             jogador.sendMessage(ChatColor.RED + "Use: /npcskin <jogador>");
             return true;
         }
-        Player modelo = Bukkit.getPlayerExact(argumentos[0]);
-        if (modelo == null) {
-            jogador.sendMessage(ChatColor.RED + "O jogador " + argumentos[0]
-                    + " precisa estar online: a skin e copiada da que ele esta usando agora.");
-            return true;
-        }
-
         Entity boneco = bonecoMaisPerto(jogador);
         if (boneco == null) {
             jogador.sendMessage(ChatColor.RED + "Nenhum boneco por perto. Chegue mais perto de um.");
             return true;
         }
 
-        // A textura vem do perfil de quem está em jogo, e não do nome. É isso que
-        // congela a skin: se o modelo trocar a dele depois, o boneco continua com
-        // a que foi copiada. Com o SkinsRestorer no ar, o perfil já vem com a
-        // skin que o /skin aplicou.
-        ProfileProperty textura = null;
-        for (ProfileProperty propriedade : modelo.getPlayerProfile().getProperties()) {
-            if (propriedade.getName().equals("textures")) {
-                textura = propriedade;
-                break;
-            }
-        }
-        if (textura == null) {
-            jogador.sendMessage(ChatColor.RED + "Nao achei a textura de " + modelo.getName() + ".");
-            return true;
-        }
-
-        StringBuilder nbt = new StringBuilder();
-        nbt.append("data merge entity ").append(boneco.getUniqueId())
-                .append(" {profile:{name:\"").append(NOME_DO_PERFIL)
-                .append("\",properties:[{name:\"textures\",value:\"").append(textura.getValue()).append("\"");
-        // A assinatura fica de fora de propósito: ela vale para a conta de onde a
-        // textura saiu, e aqui o perfil é outro. Assinatura que não confere é
-        // pior que assinatura nenhuma — o cliente descarta a textura.
-        nbt.append("}]}}");
-
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), nbt.toString());
-        jogador.sendMessage(ChatColor.GREEN + "Boneco agora usa a skin de " + modelo.getName()
-                + ChatColor.GRAY + " — e fica com ela mesmo que ele troque depois.");
+        // A skin vem sempre da Mojang, buscada na hora pelo nome da conta, e nao
+        // do perfil de quem esta em jogo. Dois motivos: o servidor guarda o
+        // perfil em cache, entao quem trocou de skin ha pouco continuava vindo
+        // com a antiga; e o SkinsRestorer aplica a skin no proxy, de onde este
+        // servidor nao enxerga — o perfil daqui traz a skin da conta, nao a que
+        // o /skin pos.
+        //
+        // A ida a internet sai da thread principal: o servidor inteiro congela
+        // enquanto ela nao volta.
+        String nome = argumentos[0];
+        jogador.sendMessage(ChatColor.GRAY + "Buscando a skin da conta " + nome + "...");
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            PlayerProfile perfil = Bukkit.createProfile(nome);
+            perfil.clearProperties();
+            boolean achou = perfil.complete(true);
+            Bukkit.getScheduler().runTask(this, () -> {
+                if (!achou) {
+                    jogador.sendMessage(ChatColor.RED + "Nao achei a conta " + nome + ".");
+                    return;
+                }
+                aplicarSkin(jogador, boneco, nome, perfil.getProperties());
+            });
+        });
         return true;
     }
 
@@ -319,6 +308,37 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
                     + naMao.getType().name().toLowerCase() + " na mao " + onde + ".");
         }
         return true;
+    }
+
+    /**
+     * Grava a textura no boneco.
+     *
+     * O nome do perfil nao e o de quem emprestou a skin: com o nome de uma
+     * conta de verdade ali, o cliente de quem chega depois vai buscar a skin
+     * daquela conta em vez de usar a textura que mandamos.
+     *
+     * A assinatura fica de fora pelo mesmo motivo: ela vale para a conta de
+     * origem, e assinatura que nao confere faz o cliente descartar a textura.
+     */
+    private void aplicarSkin(Player jogador, Entity boneco, String nome,
+            java.util.Collection<ProfileProperty> propriedades) {
+        ProfileProperty textura = null;
+        for (ProfileProperty propriedade : propriedades) {
+            if (propriedade.getName().equals("textures")) {
+                textura = propriedade;
+                break;
+            }
+        }
+        if (textura == null) {
+            jogador.sendMessage(ChatColor.RED + "A conta " + nome + " nao tem skin.");
+            return;
+        }
+        String comando = "data merge entity " + boneco.getUniqueId()
+                + " {profile:{name:\"" + NOME_DO_PERFIL
+                + "\",properties:[{name:\"textures\",value:\"" + textura.getValue() + "\"}]}}";
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), comando);
+        jogador.sendMessage(ChatColor.GREEN + "Boneco agora usa a skin da conta " + nome
+                + ChatColor.GRAY + " — e fica com ela mesmo que a conta troque depois.");
     }
 
     /** O boneco mais próximo de quem deu o comando, até 8 blocos. */
