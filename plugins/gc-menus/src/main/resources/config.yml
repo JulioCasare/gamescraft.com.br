@@ -23,5 +23,5 @@ torres: []
 # das torres continua intocavel mesmo aqui dentro.
 # Formato "minx,miny,minz,maxx,maxy,maxz".
 areas-construcao:
-  - "26,67,-207,65,90,-183"
-  - "-26,65,190,12,88,214"
+  - "26,67,-207,65,90,-183,azul"
+  - "-26,65,190,12,88,214,vermelho"

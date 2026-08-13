@@ -118,7 +118,7 @@ final class Captura {
     private boolean emCastelo(int x, int z) {
         for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
             String[] p = linha.split(",");
-            if (p.length != 6) {
+            if (p.length < 6) {
                 continue;
             }
             int minx = Math.min(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
@@ -133,8 +133,14 @@ final class Captura {
     }
 
     /**
-     * Pinta o chao dos castelos com a cor do vidro que esta sobre o sinalizador
-     * de cada um. E o Julio quem escolhe a cor, pondo o vidro; aqui so se copia.
+     * Pinta o chao de cada castelo com a cor que o arquivo manda, e poe a
+     * vidraca da mesma cor sobre os sinalizadores que houver la dentro.
+     *
+     * A cor vem do arquivo, e nao do sinalizador do centro como antes: um dos
+     * castelos nao tem sinalizador nenhum, e nao ha de onde ler.
+     *
+     * O chao do castelo e o concreto que esta mais perto do meio dele do que de
+     * qualquer torre — o castelo entra na divisao como se fosse mais uma.
      */
     void pintarCastelos(org.bukkit.command.CommandSender quemPediu) {
         World mundo = plugin.getServer().getWorld(nomeMundo);
@@ -142,26 +148,77 @@ final class Captura {
             return;
         }
         int quantos = 0;
-        for (int[] pos : torres.posicoes()) {
-            if (!emCastelo(pos[0], pos[1])) {
+        for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
+            String[] p = linha.split(",");
+            if (p.length < 7) {
                 continue;
             }
-            Torre torre = new Torre(pos[0], pos[1]);
-            int alturaBeacon = acharBeacon(mundo, torre);
-            if (alturaBeacon < 0) {
-                continue;
-            }
-            Material vidro = mundo.getBlockAt(torre.x(), alturaBeacon + 1, torre.z()).getType();
-            Dono dono = switch (vidro) {
-                case RED_STAINED_GLASS_PANE -> Dono.VERMELHO;
-                case BLUE_STAINED_GLASS_PANE -> Dono.AZUL;
+            int minx = Math.min(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
+            int maxx = Math.max(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
+            int minz = Math.min(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
+            int maxz = Math.max(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
+            Dono dono = switch (p[6].trim().toLowerCase()) {
+                case "vermelho" -> Dono.VERMELHO;
+                case "azul" -> Dono.AZUL;
                 default -> Dono.NEUTRO;
             };
-            donos.put(torre, dono);
-            pintar(mundo, torre, alturaBeacon, dono);
+            int meiox = (minx + maxx) / 2;
+            int meioz = (minz + maxz) / 2;
+            pintarCela(mundo, meiox, meioz, dono);
+            for (int[] pos : torres.posicoes()) {
+                if (pos[0] < minx || pos[0] > maxx || pos[1] < minz || pos[1] > maxz) {
+                    continue;
+                }
+                Torre torre = new Torre(pos[0], pos[1]);
+                donos.put(torre, dono);
+                int alturaBeacon = acharBeacon(mundo, torre);
+                if (alturaBeacon >= 0) {
+                    mundo.getBlockAt(torre.x(), alturaBeacon + 1, torre.z()).setType(corDoVidro(dono));
+                }
+            }
             quantos++;
         }
-        quemPediu.sendMessage(ChatColor.GREEN + "Castelos repintados: " + quantos);
+        quemPediu.sendMessage(ChatColor.GREEN + "Castelos pintados: " + quantos);
+    }
+
+    private Material corDoVidro(Dono dono) {
+        return switch (dono) {
+            case VERMELHO -> Material.RED_STAINED_GLASS_PANE;
+            case AZUL -> Material.BLUE_STAINED_GLASS_PANE;
+            case NEUTRO -> Material.AIR;
+        };
+    }
+
+    private Material corDoChao(Dono dono) {
+        return switch (dono) {
+            case VERMELHO -> Material.RED_CONCRETE;
+            case AZUL -> Material.BLUE_CONCRETE;
+            case NEUTRO -> Material.GRAY_CONCRETE;
+        };
+    }
+
+    /** Pinta o concreto que pertence aquele ponto, e nao a alguma torre. */
+    private void pintarCela(World mundo, int centrox, int centroz, Dono dono) {
+        Material cor = corDoChao(dono);
+        int alcance = plugin.getConfig().getInt("alcance-da-pintura", 60);
+        for (int x = centrox - alcance; x <= centrox + alcance; x++) {
+            for (int z = centroz - alcance; z <= centroz + alcance; z++) {
+                Block topo = mundo.getHighestBlockAt(x, z);
+                if (!ehConcreto(topo.getType()) || topo.getType() == cor) {
+                    continue;
+                }
+                long meu = (long) (x - centrox) * (x - centrox) + (long) (z - centroz) * (z - centroz);
+                int[] perto = torreMaisPerto(x, z);
+                if (perto != null) {
+                    long dela = (long) (x - perto[0]) * (x - perto[0])
+                            + (long) (z - perto[1]) * (z - perto[1]);
+                    if (dela < meu) {
+                        continue;
+                    }
+                }
+                topo.setType(cor, false);
+            }
+        }
     }
 
     /**

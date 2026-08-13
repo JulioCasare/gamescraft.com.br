@@ -54,7 +54,9 @@ final class Areas implements Listener {
 
         for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
             String[] p = linha.split(",");
-            if (p.length != 6) {
+            // Seis numeros, e um setimo campo opcional com a cor do castelo. A
+            // cor so interessa a pintura; aqui o que vale sao os cantos.
+            if (p.length < 6) {
                 continue;
             }
             int[] v = new int[6];
