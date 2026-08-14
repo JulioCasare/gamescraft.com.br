@@ -1,0 +1,83 @@
+# Mundo onde as torres moram e ate onde varrer atras delas.
+mundo: ilha
+alcance-da-varredura: 288
+
+# Nenhuma area fica de fora da varredura: o que os castelos liberam e o chao em
+# volta, nao a torre. A coluna do sinalizador continua travada dentro deles.
+areas-fora: []
+
+# Castelos: dentro deles nao se quebra o que e do mapa, mas da para construir e
+# derrubar o que voce colocou. Nao ha captura ali, e o chao segue a cor do vidro
+# que estiver sobre o sinalizador do centro.
+# Formato "minx,miny,minz,maxx,maxy,maxz".
+areas-construcao:
+- 27,67,-206,66,90,-182,azul
+- -26,65,190,12,88,214,vermelho
+
+# Times da disputa das torres, e quanto tempo em cima para tomar.
+time-vermelho: Vermelho
+time-azul: Azul
+segundos-para-tomar: 5
+raio-de-captura: 6
+alcance-da-pintura: 60
+
+# Torres protegidas: uma linha "x,z" por sinalizador, escrita pelo /torres.
+torres:
+- -204,14
+- -187,-82
+- -163,-59
+- -171,30
+- -174,107
+- -150,0
+- -133,112
+- -127,-160
+- -120,-31
+- -120,32
+- -111,-133
+- -104,176
+- -87,-87
+- -87,88
+- -64,-26
+- -64,27
+- -59,164
+- -37,-200
+- -29,-171
+- -31,-120
+- -26,-64
+- -26,65
+- -31,121
+- -23,193
+- -23,211
+- -7,202
+- 0,-150
+- 0,0
+- 0,150
+- 9,193
+- 9,211
+- 30,-204
+- 30,-186
+- 27,-64
+- 27,65
+- 30,172
+- 46,-195
+- 32,-120
+- 32,121
+- 62,-204
+- 62,-186
+- 60,-163
+- 65,-26
+- 65,27
+- 88,-87
+- 88,88
+- 85,186
+- 121,-31
+- 121,32
+- 112,134
+- 134,-111
+- 144,-145
+- 150,0
+- 172,-29
+- 164,60
+- 162,125
+- 195,-61
+- 202,36
