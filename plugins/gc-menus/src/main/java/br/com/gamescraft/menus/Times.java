@@ -118,13 +118,22 @@ final class Times implements Listener {
                 + "Voce esta no time " + nome + ".");
     }
 
-    /** O topo do sinalizador do castelo daquele time. */
+    /**
+     * Em cima do bloco que marca o nascimento dentro do castelo: redstone no
+     * vermelho, lapis-lazuli no azul.
+     *
+     * O marcador vale mais que o sinalizador porque o Julio escolhe onde ele
+     * fica — basta mover o bloco no mapa para mudar o ponto de nascimento, sem
+     * mexer em codigo. Ha exatamente um de cada dentro do castelo do seu time.
+     */
     private Location casaDo(String time) {
         World mundo = plugin.getServer().getWorld(nomeMundo);
         if (mundo == null) {
             return null;
         }
-        String cor = time.equals(nomeVermelho) ? "vermelho" : "azul";
+        boolean vermelho = time.equals(nomeVermelho);
+        String cor = vermelho ? "vermelho" : "azul";
+        Material marca = vermelho ? Material.REDSTONE_BLOCK : Material.LAPIS_BLOCK;
         for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
             String[] p = linha.split(",");
             if (p.length < 7 || !p[6].trim().equalsIgnoreCase(cor)) {
@@ -136,24 +145,22 @@ final class Times implements Listener {
             int maxy = Math.max(Integer.parseInt(p[1].trim()), Integer.parseInt(p[4].trim()));
             int minz = Math.min(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
             int maxz = Math.max(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
-            // Procura o sinalizador dentro da caixa do castelo. Nao da para usar
-            // a lista da varredura: ela nao enxerga os sinalizadores de dentro
-            // dos castelos, e essa e outra briga.
             for (int y = maxy; y >= miny; y--) {
                 for (int x = minx; x <= maxx; x++) {
                     for (int z = minz; z <= maxz; z++) {
-                        Block bloco = mundo.getBlockAt(x, y, z);
-                        if (bloco.getType() == Material.BEACON) {
+                        if (mundo.getBlockAt(x, y, z).getType() == marca) {
                             return new Location(mundo, x + 0.5, y + 1, z + 0.5);
                         }
                     }
                 }
             }
+            plugin.getLogger().warning("Nao achei " + marca + " no castelo " + cor
+                    + ": o time nasce onde o jogo mandar ate o bloco aparecer.");
         }
         return null;
     }
 
-    /** Couro tingido da cor do time e espada de madeira. */
+    /** Couro tingido da cor do time, espada e picareta de madeira, e uma barra de ouro. */
     private void darKit(Player jogador, String time) {
         Color cor = time.equals(nomeVermelho) ? Color.RED : Color.BLUE;
         jogador.getInventory().clear();
@@ -161,7 +168,11 @@ final class Times implements Listener {
         jogador.getInventory().setChestplate(couro(Material.LEATHER_CHESTPLATE, cor));
         jogador.getInventory().setLeggings(couro(Material.LEATHER_LEGGINGS, cor));
         jogador.getInventory().setBoots(couro(Material.LEATHER_BOOTS, cor));
-        jogador.getInventory().addItem(new ItemStack(Material.WOODEN_SWORD));
+        // Slot fixo em vez de addItem: o ouro tem de cair no ultimo lugar da
+        // barra, e addItem so procura o primeiro buraco livre.
+        jogador.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
+        jogador.getInventory().setItem(1, new ItemStack(Material.WOODEN_PICKAXE));
+        jogador.getInventory().setItem(8, new ItemStack(Material.GOLD_INGOT));
     }
 
     private ItemStack couro(Material tipo, Color cor) {

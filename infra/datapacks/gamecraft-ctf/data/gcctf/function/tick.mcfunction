@@ -2,6 +2,9 @@
 scoreboard players enable @a obras
 execute as @a[scores={obras=1..}] run function gcctf:trigger_obras
 
+# Copia do mapa em andamento: uma fatia por tique ate acabar.
+execute if score #ativo gcctf matches 1 run function gcctf:fatia
+
 scoreboard players add #t gcctf 1
 execute if score #t gcctf matches 10.. run function gcctf:meio_segundo
 
