@@ -114,6 +114,21 @@ final class Captura {
         }
     }
 
+    /** Quantas torres aquele time tem agora. Castelo nao conta: ele nao se toma. */
+    int quantasDoTime(String nomeDoTime) {
+        Dono procurado = nomeDoTime.equals(timeVermelho) ? Dono.VERMELHO : Dono.AZUL;
+        int total = 0;
+        for (int[] pos : torres.posicoes()) {
+            if (emCastelo(pos[0], pos[1])) {
+                continue;
+            }
+            if (donos.getOrDefault(new Torre(pos[0], pos[1]), Dono.NEUTRO) == procurado) {
+                total++;
+            }
+        }
+        return total;
+    }
+
     /** As duas areas de castelo, em planta. */
     private boolean emCastelo(int x, int z) {
         for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
