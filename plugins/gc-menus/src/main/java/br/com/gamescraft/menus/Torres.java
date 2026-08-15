@@ -185,7 +185,39 @@ final class Torres implements Listener {
         int x = bloco.getX();
         int z = bloco.getZ();
         for (Torre torre : torres) {
-            if (Math.abs(x - torre.x()) <= RAIO && Math.abs(z - torre.z()) <= RAIO) {
+            int raio = raioDe(torre);
+            if (Math.abs(x - torre.x()) <= raio && Math.abs(z - torre.z()) <= raio) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Três blocos para cada lado nas torres do campo, e só a coluna do feixe nos
+     * sinalizadores de dentro dos castelos.
+     *
+     * No campo o raio existe para ninguém enterrar a torre em bloco. Dentro do
+     * castelo é o contrário: ali se constrói a defesa, e um quadrado de sete por
+     * sete intocável no meio da base atrapalha mais do que protege. O que não
+     * pode é tapar o feixe, porque é ele que diz de quem é o castelo.
+     */
+    private int raioDe(Torre torre) {
+        return emCastelo(torre.x(), torre.z()) ? 0 : RAIO;
+    }
+
+    /** As duas áreas de castelo, em planta. */
+    private boolean emCastelo(int x, int z) {
+        for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
+            String[] p = linha.split(",");
+            if (p.length < 6) {
+                continue;
+            }
+            int minx = Math.min(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
+            int maxx = Math.max(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
+            int minz = Math.min(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
+            int maxz = Math.max(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
+            if (x >= minx && x <= maxx && z >= minz && z <= maxz) {
                 return true;
             }
         }

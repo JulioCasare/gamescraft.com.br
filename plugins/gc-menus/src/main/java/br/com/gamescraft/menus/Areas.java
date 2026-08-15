@@ -79,6 +79,11 @@ final class Areas implements Listener {
         return bloco.getX() + "," + bloco.getY() + "," + bloco.getZ();
     }
 
+    /** Se aquele bloco foi posto por um jogador, e nao veio do mapa. */
+    boolean foiColocado(Block bloco) {
+        return colocados.contains(chave(bloco));
+    }
+
     private boolean dentro(Block bloco) {
         for (Caixa caixa : caixas) {
             if (caixa.contem(bloco)) {

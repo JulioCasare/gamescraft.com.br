@@ -148,14 +148,14 @@ final class Captura {
     }
 
     /**
-     * Pinta o chao de cada castelo com a cor que o arquivo manda, e poe a
-     * vidraca da mesma cor sobre os sinalizadores que houver la dentro.
+     * Poe a vidraca da cor do time sobre os sinalizadores de cada castelo, e
+     * marca essas torres como do dono.
      *
      * A cor vem do arquivo, e nao do sinalizador do centro como antes: um dos
      * castelos nao tem sinalizador nenhum, e nao ha de onde ler.
      *
-     * O chao do castelo e o concreto que esta mais perto do meio dele do que de
-     * qualquer torre — o castelo entra na divisao como se fosse mais uma.
+     * O chao do castelo nao e mais pintado: o concreto e o desenho do mapa e
+     * deixou de mudar de cor.
      */
     void pintarCastelos(org.bukkit.command.CommandSender quemPediu) {
         World mundo = plugin.getServer().getWorld(nomeMundo);
@@ -177,9 +177,6 @@ final class Captura {
                 case "azul" -> Dono.AZUL;
                 default -> Dono.NEUTRO;
             };
-            int meiox = (minx + maxx) / 2;
-            int meioz = (minz + maxz) / 2;
-            pintarCela(mundo, meiox, meioz, dono);
             for (int[] pos : torres.posicoes()) {
                 if (pos[0] < minx || pos[0] > maxx || pos[1] < minz || pos[1] > maxz) {
                     continue;
@@ -204,44 +201,13 @@ final class Captura {
         };
     }
 
-    private Material corDoChao(Dono dono) {
-        return switch (dono) {
-            case VERMELHO -> Material.RED_CONCRETE;
-            case AZUL -> Material.BLUE_CONCRETE;
-            case NEUTRO -> Material.GRAY_CONCRETE;
-        };
-    }
-
-    /** Pinta o concreto que pertence aquele ponto, e nao a alguma torre. */
-    private void pintarCela(World mundo, int centrox, int centroz, Dono dono) {
-        Material cor = corDoChao(dono);
-        int alcance = plugin.getConfig().getInt("alcance-da-pintura", 60);
-        for (int x = centrox - alcance; x <= centrox + alcance; x++) {
-            for (int z = centroz - alcance; z <= centroz + alcance; z++) {
-                Block topo = mundo.getHighestBlockAt(x, z);
-                if (!ehConcreto(topo.getType()) || topo.getType() == cor) {
-                    continue;
-                }
-                long meu = (long) (x - centrox) * (x - centrox) + (long) (z - centroz) * (z - centroz);
-                int[] perto = torreMaisPerto(x, z);
-                if (perto != null) {
-                    long dela = (long) (x - perto[0]) * (x - perto[0])
-                            + (long) (z - perto[1]) * (z - perto[1]);
-                    if (dela < meu) {
-                        continue;
-                    }
-                }
-                topo.setType(cor, false);
-            }
-        }
-    }
-
     /**
-     * Devolve ao neutro todas as torres menos as dos castelos.
+     * Devolve ao neutro todas as torres menos as dos castelos, e o chao ao
+     * cinza.
      *
-     * Varre a ilha uma vez só, em vez de repintar torre por torre: cada torre
-     * repintada custa uma varredura de 120 por 120, e quarenta e seis delas
-     * seriam a mesma conta feita quarenta e seis vezes.
+     * A varredura do chao ficou aqui mesmo depois de a captura parar de pintar:
+     * e o que desfaz de uma vez as manchas vermelhas e azuis que as tomadas
+     * antigas deixaram. Fora deste comando, concreto nao muda mais de cor.
      */
     void zerar(org.bukkit.command.CommandSender quemPediu) {
         World mundo = plugin.getServer().getWorld(nomeMundo);
@@ -352,61 +318,19 @@ final class Captura {
     }
 
     /**
-     * Pinta o feixe e o chão da área daquela torre.
+     * Troca a cor do feixe da torre.
      *
-     * O feixe muda com um vidro colorido em cima do sinalizador — é assim que o
-     * jogo colore beacon, não há outro jeito. O chão é repintado varrendo o que
-     * está em volta e trocando só o concreto cuja torre mais próxima é esta: a
-     * linha de fronteira é dividida entre as duas torres que ela separa.
+     * O feixe muda com uma vidraça colorida em cima do sinalizador — é assim que
+     * o jogo colore beacon, não há outro jeito.
+     *
+     * O chão não é mais repintado. Ele era varrido a cada tomada, sessenta
+     * blocos para cada lado, e além de custar caro deixava o mapa manchado: o
+     * concreto é o desenho das fronteiras, e desenho não deveria mudar de dono.
+     * Quem tem a torre se lê no feixe.
      */
     private void pintar(World mundo, Torre torre, int alturaBeacon, Dono dono) {
         Block vidro = mundo.getBlockAt(torre.x(), alturaBeacon + 1, torre.z());
-        vidro.setType(switch (dono) {
-            case VERMELHO -> Material.RED_STAINED_GLASS_PANE;
-            case AZUL -> Material.BLUE_STAINED_GLASS_PANE;
-            case NEUTRO -> Material.AIR;
-        });
-
-        Material cor = switch (dono) {
-            case VERMELHO -> Material.RED_CONCRETE;
-            case AZUL -> Material.BLUE_CONCRETE;
-            case NEUTRO -> Material.GRAY_CONCRETE;
-        };
-        int alcance = plugin.getConfig().getInt("alcance-da-pintura", 60);
-        for (int x = torre.x() - alcance; x <= torre.x() + alcance; x++) {
-            for (int z = torre.z() - alcance; z <= torre.z() + alcance; z++) {
-                Block topo = mundo.getHighestBlockAt(x, z);
-                if (!ehConcreto(topo.getType()) || topo.getType() == cor) {
-                    continue;
-                }
-                if (maisPerto(x, z) != torre.hashCode()) {
-                    continue;
-                }
-                topo.setType(cor, false);
-            }
-        }
-    }
-
-    private boolean ehConcreto(Material material) {
-        return material == Material.GRAY_CONCRETE
-                || material == Material.RED_CONCRETE
-                || material == Material.BLUE_CONCRETE;
-    }
-
-    /** O hash da torre mais próxima daquele ponto, para comparar sem alocar. */
-    private int maisPerto(int x, int z) {
-        int melhor = 0;
-        long menor = Long.MAX_VALUE;
-        for (int[] pos : torres.posicoes()) {
-            long dx = x - pos[0];
-            long dz = z - pos[1];
-            long dist = dx * dx + dz * dz;
-            if (dist < menor) {
-                menor = dist;
-                melhor = new Torre(pos[0], pos[1]).hashCode();
-            }
-        }
-        return melhor;
+        vidro.setType(corDoVidro(dono));
     }
 
     private void anunciar(Torre torre, Dono novo, Dono quemTomou) {

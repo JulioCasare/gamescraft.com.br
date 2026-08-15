@@ -2,6 +2,7 @@ package br.com.gamescraft.menus;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
@@ -172,7 +174,18 @@ final class Times implements Listener {
         // barra, e addItem so procura o primeiro buraco livre.
         jogador.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
         jogador.getInventory().setItem(1, new ItemStack(Material.WOODEN_PICKAXE));
-        jogador.getInventory().setItem(8, new ItemStack(Material.GOLD_INGOT));
+        jogador.getInventory().setItem(8, barraDaLoja());
+    }
+
+    /** A barra de ouro que abre a loja. O nome roxo e o que a distingue de moeda. */
+    private ItemStack barraDaLoja() {
+        ItemStack ouro = new ItemStack(Material.GOLD_INGOT);
+        ItemMeta dados = ouro.getItemMeta();
+        dados.setDisplayName(ChatColor.LIGHT_PURPLE + "Loja");
+        dados.setLore(List.of(ChatColor.GRAY + "Clique com ela na mao",
+                ChatColor.GRAY + "para comprar com diamante"));
+        ouro.setItemMeta(dados);
+        return ouro;
     }
 
     private ItemStack couro(Material tipo, Color cor) {
