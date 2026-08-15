@@ -65,7 +65,15 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** O canal por onde se fala com o proxy. O nome é histórico, do BungeeCord. */
     private static final String CANAL = "BungeeCord";
 
-    private record Destino(int slot, String rotulo, String servidor) {
+    /** Subcanal próprio: por onde a arena escolhida viaja até o Bed Wars. */
+    private static final String CANAL_ARENA = "GcArena";
+
+    /** A arena é só do Bed Wars: nos outros modos o servidor já é o destino. */
+    private record Destino(int slot, String rotulo, String servidor, String arena) {
+
+        Destino(int slot, String rotulo, String servidor) {
+            this(slot, rotulo, servidor, null);
+        }
     }
 
     private record Menu(String nome, NamedTextColor cor, String titulo, String servidor,
@@ -92,6 +100,12 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** A picareta e o machado, que voltam um material atras a cada morte. */
     private Ferramentas ferramentas;
 
+    /** Qual parte do plugin este servidor usa. */
+    private String modo = "menus";
+
+    /** No Bed Wars: quem chegou escolhendo uma arena la no lobby. */
+    private EntradaBedwars entrada;
+
     private static final class DonoDoMenu implements InventoryHolder {
         private final Menu menu;
 
@@ -111,8 +125,8 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         // ficam simétricos em volta do meio.
         menus.put("bedwars", new Menu("BED WARS", NamedTextColor.AQUA,
                 ChatColor.AQUA + "Bed Wars", "bedwars", List.of(
-                        new Destino(11, ChatColor.AQUA + "Solo", "bedwars"),
-                        new Destino(15, ChatColor.AQUA + "Duplas", "bedwars"))));
+                        new Destino(11, ChatColor.AQUA + "Solo", "bedwars", "solo1"),
+                        new Destino(15, ChatColor.AQUA + "Duplas", "bedwars", "duplas1"))));
         menus.put("pilares", new Menu("PILARES DA FORTUNA", NamedTextColor.GOLD,
                 ChatColor.GOLD + "Pilares da Fortuna", "pillars", List.of(
                         new Destino(13, ChatColor.GOLD + "Entrar numa arena", "pillars"))));
@@ -135,9 +149,31 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
                         new Destino(13, ChatColor.GREEN + "Voltar ao lobby", "lobby"))));
 
         getServer().getPluginManager().registerEvents(this, this);
-        // A lista de torres protegidas vem da config; onde nao houver lista, o
-        // ouvinte fica ali sem nada para barrar.
         saveDefaultConfig();
+
+        // O mesmo jar roda no lobby, no PvP, no MegaGames e no Bed Wars, e cada
+        // um quer uma parte diferente. Sem esta chave o lobby dava kit e time de
+        // MegaGames a quem entrasse — os bonecos são a única peça comum a todos.
+        modo = getConfig().getString("modo", "menus");
+        if (modo.equals("megagames")) {
+            ligarMegaGames();
+        } else if (modo.equals("bedwars")) {
+            entrada = new EntradaBedwars(this);
+            getServer().getPluginManager().registerEvents(entrada, this);
+        }
+        getLogger().info("Modo deste servidor: " + modo);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);
+        getServer().getMessenger().registerIncomingPluginChannel(this, CANAL, this);
+
+        // Uma pergunta ao proxy a cada 5 segundos. Mais rápido que isso é
+        // conversa à toa: o número muda quando alguém entra ou sai, não a cada
+        // tique.
+        getServer().getScheduler().runTaskTimer(this, this::perguntarQuantos, 100L, 100L);
+        getLogger().info("Menus dos bonecos prontos: " + menus.size());
+    }
+
+    /** Tudo o que só existe no servidor do MegaGames. */
+    private void ligarMegaGames() {
         protecao = new Torres(this);
         getServer().getPluginManager().registerEvents(protecao, this);
         areas = new Areas(this, protecao);
@@ -153,14 +189,6 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         getServer().getPluginManager().registerEvents(
                 new Especiais(this, protecao, areas, loja.marca()), this);
         getServer().getPluginManager().registerEvents(new Regras(this), this);
-        getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);
-        getServer().getMessenger().registerIncomingPluginChannel(this, CANAL, this);
-
-        // Uma pergunta ao proxy a cada 5 segundos. Mais rápido que isso é
-        // conversa à toa: o número muda quando alguém entra ou sai, não a cada
-        // tique.
-        getServer().getScheduler().runTaskTimer(this, this::perguntarQuantos, 100L, 100L);
-        getLogger().info("Menus dos bonecos prontos: " + menus.size());
     }
 
     /**
@@ -186,7 +214,21 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             return;
         }
         try (DataInputStream leitura = new DataInputStream(new ByteArrayInputStream(mensagem))) {
-            if (!leitura.readUTF().equals("PlayerCount")) {
+            String subcanal = leitura.readUTF();
+            if (subcanal.equals(CANAL_ARENA)) {
+                short tamanho = leitura.readShort();
+                byte[] miolo = new byte[tamanho];
+                leitura.readFully(miolo);
+                try (DataInputStream dentro = new DataInputStream(new ByteArrayInputStream(miolo))) {
+                    String quem = dentro.readUTF();
+                    String arena = dentro.readUTF();
+                    if (entrada != null) {
+                        entrada.anotar(quem, arena);
+                    }
+                }
+                return;
+            }
+            if (!subcanal.equals("PlayerCount")) {
                 return;
             }
             String servidor = leitura.readUTF();
@@ -228,6 +270,34 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
 
     private byte[] montarPlayerCount(String servidor) {
         return montarMensagem("PlayerCount", servidor);
+    }
+
+    /**
+     * Conta ao servidor de destino qual arena o jogador escolheu, antes de
+     * mandá-lo para lá.
+     *
+     * O proxy entrega esta mensagem pela conexão de quem já está no outro
+     * servidor. Com ele vazio ela se perde — e é por isso que o lado de lá
+     * também sabe perguntar, abrindo um menu para quem chega sem escolha.
+     */
+    private void avisarArena(Player jogador, String servidor, String arena) {
+        try {
+            java.io.ByteArrayOutputStream miolo = new java.io.ByteArrayOutputStream();
+            java.io.DataOutputStream dentro = new java.io.DataOutputStream(miolo);
+            dentro.writeUTF(jogador.getName());
+            dentro.writeUTF(arena);
+
+            java.io.ByteArrayOutputStream fora = new java.io.ByteArrayOutputStream();
+            java.io.DataOutputStream escrita = new java.io.DataOutputStream(fora);
+            escrita.writeUTF("Forward");
+            escrita.writeUTF(servidor);
+            escrita.writeUTF(CANAL_ARENA);
+            escrita.writeShort(miolo.size());
+            escrita.write(miolo.toByteArray());
+            jogador.sendPluginMessage(this, CANAL, fora.toByteArray());
+        } catch (IOException erro) {
+            getLogger().warning("Nao consegui avisar a arena escolhida: " + erro.getMessage());
+        }
     }
 
     private byte[] montarMensagem(String subcanal, String argumento) {
@@ -462,6 +532,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         for (Destino destino : dono.menu.destinos()) {
             if (destino.slot() == evento.getRawSlot()) {
                 jogador.closeInventory();
+                // A arena vai na frente, para o outro servidor já saber o que
+                // fazer quando o jogador chegar lá.
+                if (destino.arena() != null) {
+                    avisarArena(jogador, destino.servidor(), destino.arena());
+                }
                 jogador.sendPluginMessage(this, CANAL, montarMensagem("Connect", destino.servidor()));
                 return;
             }

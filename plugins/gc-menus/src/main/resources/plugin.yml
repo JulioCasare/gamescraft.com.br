@@ -1,7 +1,11 @@
 name: GcMenus
 version: 1.0.0
 main: br.com.gamescraft.menus.GcMenus
-api-version: '1.21'
+# 1.20 e nao 1.21: o Bed Wars roda em 1.20.4 e recusa plugin que peca API mais
+# nova que a dele. Declarar API velha nao tira nada — o jar continua rodando
+# igual nos servidores novos, e as peças que so existem na 26.2 vivem em classes
+# que so o modo megagames carrega.
+api-version: '1.20'
 description: Menus de bau dos bonecos do lobby do Game Craft
 author: Game Craft
 commands:
