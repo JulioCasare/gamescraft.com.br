@@ -5,6 +5,7 @@ execute if score #espera gcctf matches 1.. run return 0
 
 execute if score #modo gcctf matches 1 run function gcctf:fatia_save with storage gcctf:tiles atual
 execute if score #modo gcctf matches 2 run function gcctf:fatia_reset with storage gcctf:tiles atual
+execute if score #modo gcctf matches 3 run function gcctf:fatia_limpar with storage gcctf:tiles atual
 function gcctf:tile_soltar with storage gcctf:tiles atual
 
 execute if score #temprox gcctf matches 0 run function gcctf:fatia_fim

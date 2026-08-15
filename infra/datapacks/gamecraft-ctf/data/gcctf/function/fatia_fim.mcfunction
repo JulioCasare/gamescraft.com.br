@@ -8,4 +8,7 @@ forceload remove all
 execute if score #modo gcctf matches 1 run data modify storage gcctf:arena salvo set value 1b
 execute if score #modo gcctf matches 1 run tellraw @a [{"text":"[MegaGames] Mapa salvo.","color":"green"}]
 execute if score #modo gcctf matches 2 run tellraw @a [{"text":"[MegaGames] Mapa restaurado ao ultimo save.","color":"aqua"}]
+# A limpeza leva a copia de seguranca junto: sem ela o /reset tem de recusar.
+execute if score #modo gcctf matches 3 run data remove storage gcctf:arena salvo
+execute if score #modo gcctf matches 3 run tellraw @a [{"text":"[MegaGames] Espaco acima do mapa limpo.","color":"gold"}]
 scoreboard players set #modo gcctf 0
