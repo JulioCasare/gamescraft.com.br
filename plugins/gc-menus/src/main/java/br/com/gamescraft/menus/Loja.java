@@ -85,15 +85,17 @@ final class Loja implements Listener {
     private final Torres torres;
     private final Areas areas;
     private final Armaduras armaduras;
+    private final Ferramentas ferramentas;
     private final String timeVermelho;
     private final Map<String, Aba> abas = new LinkedHashMap<>();
     private final NamespacedKey marca;
 
-    Loja(JavaPlugin plugin, Torres torres, Areas areas, Armaduras armaduras) {
+    Loja(JavaPlugin plugin, Torres torres, Areas areas, Armaduras armaduras, Ferramentas ferramentas) {
         this.plugin = plugin;
         this.torres = torres;
         this.areas = areas;
         this.armaduras = armaduras;
+        this.ferramentas = ferramentas;
         this.timeVermelho = plugin.getConfig().getString("time-vermelho", "Vermelho");
         this.marca = new NamespacedKey(plugin, "especial");
 
@@ -394,6 +396,9 @@ final class Loja implements Listener {
         if (vestir) {
             vestir(jogador, comprado);
         } else {
+            // Picareta, machado e tesoura ficam anotados: eles atravessam a
+            // morte, um material mais baixo a cada vez.
+            ferramentas.guardar(jogador, comprado);
             jogador.getInventory().addItem(comprado);
         }
         jogador.sendMessage(ChatColor.GREEN + "Comprou " + oferta.nome() + ChatColor.GRAY

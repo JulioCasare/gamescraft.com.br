@@ -89,6 +89,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** A armadura que cada um comprou, e que volta depois da morte. */
     private Armaduras armaduras;
 
+    /** A picareta e o machado, que voltam um material atras a cada morte. */
+    private Ferramentas ferramentas;
+
     private static final class DonoDoMenu implements InventoryHolder {
         private final Menu menu;
 
@@ -141,9 +144,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         getServer().getPluginManager().registerEvents(areas, this);
         captura = new Captura(this, protecao);
         armaduras = new Armaduras(this);
-        getServer().getPluginManager().registerEvents(new Times(this, captura, armaduras), this);
+        ferramentas = new Ferramentas(this);
+        getServer().getPluginManager().registerEvents(
+                new Times(this, captura, armaduras, ferramentas), this);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
-        Loja loja = new Loja(this, protecao, areas, armaduras);
+        Loja loja = new Loja(this, protecao, areas, armaduras, ferramentas);
         getServer().getPluginManager().registerEvents(loja, this);
         getServer().getPluginManager().registerEvents(
                 new Especiais(this, protecao, areas, loja.marca()), this);
@@ -258,7 +263,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             // permanente que sobrevive ao recomeço faria a segunda partida
             // começar decidida.
             int limpas = armaduras.limparTudo();
-            quemMandou.sendMessage(ChatColor.GRAY + "Armaduras compradas apagadas: " + limpas);
+            int soltas = ferramentas.limparTudo();
+            quemMandou.sendMessage(ChatColor.GRAY + "Armaduras apagadas: " + limpas
+                    + " | ferramentas apagadas: " + soltas);
             return true;
         }
         if (!(quemMandou instanceof Player jogador)) {

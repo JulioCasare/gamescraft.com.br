@@ -16,7 +16,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -39,16 +41,18 @@ final class Times implements Listener {
     private final JavaPlugin plugin;
     private final Captura captura;
     private final Armaduras armaduras;
+    private final Ferramentas ferramentas;
     private final File arquivo;
     private final YamlConfiguration guardados;
     private final String nomeVermelho;
     private final String nomeAzul;
     private final String nomeMundo;
 
-    Times(JavaPlugin plugin, Captura captura, Armaduras armaduras) {
+    Times(JavaPlugin plugin, Captura captura, Armaduras armaduras, Ferramentas ferramentas) {
         this.plugin = plugin;
         this.captura = captura;
         this.armaduras = armaduras;
+        this.ferramentas = ferramentas;
         this.arquivo = new File(plugin.getDataFolder(), "times.yml");
         this.guardados = YamlConfiguration.loadConfiguration(arquivo);
         this.nomeVermelho = plugin.getConfig().getString("time-vermelho", "Vermelho");
@@ -177,8 +181,39 @@ final class Times implements Listener {
         jogador.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
         jogador.getInventory().setItem(1, new ItemStack(Material.WOODEN_PICKAXE));
         jogador.getInventory().setItem(8, barraDaLoja());
-        // Por ultimo: o que foi comprado na loja vale mais que o couro do kit.
+        // Por ultimo: o que foi comprado na loja vale mais que o kit de entrada.
         armaduras.vestir(jogador);
+        ferramentas.dar(jogador);
+    }
+
+    /**
+     * Morrer cobra um material das ferramentas.
+     *
+     * O aviso vale a linha de chat: sem ele o jogador so descobre o degrau
+     * perdido quando vai bater no bloco do inimigo e demora o dobro.
+     */
+    @EventHandler
+    public void aoMorrer(PlayerDeathEvent evento) {
+        String perdeu = ferramentas.rebaixar(evento.getEntity());
+        if (!perdeu.isEmpty()) {
+            evento.getEntity().sendMessage(ChatColor.YELLOW + "A morte custou um material:"
+                    + ChatColor.GRAY + perdeu);
+        }
+    }
+
+    /**
+     * Sair da partida custa o mesmo que morrer.
+     *
+     * Sem isto, fugir da briga fechando o jogo sairia de graça — e sair é mais
+     * rápido que morrer. O aviso não vem: não há mais para quem mandar.
+     *
+     * Um desligamento do servidor não cobra nada de ninguém: o jogo desliga os
+     * plugins antes de desconectar os jogadores, então este ouvinte já não
+     * existe quando as saídas acontecem.
+     */
+    @EventHandler
+    public void aoSair(PlayerQuitEvent evento) {
+        ferramentas.rebaixar(evento.getPlayer());
     }
 
     /** A barra de ouro que abre a loja. O nome roxo e o que a distingue de moeda. */
