@@ -68,7 +68,7 @@ final class Captura {
                 continue;
             }
             Torre torre = new Torre(pos[0], pos[1]);
-            int alturaBeacon = alturas.computeIfAbsent(torre, t -> acharBeacon(mundo, t));
+            int alturaBeacon = alturaDoBeacon(mundo, torre);
             if (alturaBeacon < 0) {
                 continue;
             }
@@ -316,9 +316,34 @@ final class Captura {
         return time == null ? null : time.getName();
     }
 
-    /** Procura o sinalizador na coluna da torre. */
+    /**
+     * A altura guardada, conferida antes de ser usada.
+     *
+     * Guardar sem conferir ja custou caro: uma copia do mapa 150 blocos acima
+     * fez a busca achar o sinalizador da copia, e a altura errada ficou na
+     * memoria mesmo depois de a copia ser apagada. Uma leitura de bloco por
+     * torre por segundo e barata, e o valor errado se corrige sozinho.
+     */
+    private int alturaDoBeacon(World mundo, Torre torre) {
+        Integer guardada = alturas.get(torre);
+        if (guardada != null && guardada >= 0
+                && mundo.getBlockAt(torre.x(), guardada, torre.z()).getType() == Material.BEACON) {
+            return guardada;
+        }
+        int achada = acharBeacon(mundo, torre);
+        alturas.put(torre, achada);
+        return achada;
+    }
+
+    /**
+     * Procura o sinalizador na coluna da torre, de cima para baixo, comecando
+     * abaixo de onde qualquer copia de seguranca possa estar: o backup do /save
+     * mora bem mais alto, e sem esse teto a busca acharia o sinalizador dele.
+     */
     private int acharBeacon(World mundo, Torre torre) {
-        for (int y = mundo.getMaxHeight() - 1; y >= mundo.getMinHeight(); y--) {
+        int teto = Math.min(plugin.getConfig().getInt("altura-maxima-da-torre", 150),
+                mundo.getMaxHeight() - 1);
+        for (int y = teto; y >= mundo.getMinHeight(); y--) {
             if (mundo.getBlockAt(torre.x(), y, torre.z()).getType() == Material.BEACON) {
                 return y;
             }
