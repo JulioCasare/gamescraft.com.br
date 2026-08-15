@@ -38,15 +38,17 @@ final class Times implements Listener {
 
     private final JavaPlugin plugin;
     private final Captura captura;
+    private final Armaduras armaduras;
     private final File arquivo;
     private final YamlConfiguration guardados;
     private final String nomeVermelho;
     private final String nomeAzul;
     private final String nomeMundo;
 
-    Times(JavaPlugin plugin, Captura captura) {
+    Times(JavaPlugin plugin, Captura captura, Armaduras armaduras) {
         this.plugin = plugin;
         this.captura = captura;
+        this.armaduras = armaduras;
         this.arquivo = new File(plugin.getDataFolder(), "times.yml");
         this.guardados = YamlConfiguration.loadConfiguration(arquivo);
         this.nomeVermelho = plugin.getConfig().getString("time-vermelho", "Vermelho");
@@ -175,6 +177,8 @@ final class Times implements Listener {
         jogador.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
         jogador.getInventory().setItem(1, new ItemStack(Material.WOODEN_PICKAXE));
         jogador.getInventory().setItem(8, barraDaLoja());
+        // Por ultimo: o que foi comprado na loja vale mais que o couro do kit.
+        armaduras.vestir(jogador);
     }
 
     /** A barra de ouro que abre a loja. O nome roxo e o que a distingue de moeda. */

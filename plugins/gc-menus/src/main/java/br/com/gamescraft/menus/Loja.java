@@ -84,14 +84,16 @@ final class Loja implements Listener {
     private final JavaPlugin plugin;
     private final Torres torres;
     private final Areas areas;
+    private final Armaduras armaduras;
     private final String timeVermelho;
     private final Map<String, Aba> abas = new LinkedHashMap<>();
     private final NamespacedKey marca;
 
-    Loja(JavaPlugin plugin, Torres torres, Areas areas) {
+    Loja(JavaPlugin plugin, Torres torres, Areas areas, Armaduras armaduras) {
         this.plugin = plugin;
         this.torres = torres;
         this.areas = areas;
+        this.armaduras = armaduras;
         this.timeVermelho = plugin.getConfig().getString("time-vermelho", "Vermelho");
         this.marca = new NamespacedKey(plugin, "especial");
 
@@ -400,8 +402,12 @@ final class Loja implements Listener {
         abrir(jogador, aba);
     }
 
-    /** Armadura vai direto para o corpo, no lugar do couro do kit. */
+    /**
+     * Armadura vai direto para o corpo, no lugar do couro do kit — e fica
+     * anotada, para voltar depois de cada morte.
+     */
     private void vestir(Player jogador, ItemStack peca) {
+        armaduras.guardar(jogador, peca);
         String tipo = peca.getType().name();
         if (tipo.endsWith("_HELMET")) {
             jogador.getInventory().setHelmet(peca);

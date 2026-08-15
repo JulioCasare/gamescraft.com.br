@@ -86,6 +86,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** A disputa das torres. */
     private Captura captura;
 
+    /** A armadura que cada um comprou, e que volta depois da morte. */
+    private Armaduras armaduras;
+
     private static final class DonoDoMenu implements InventoryHolder {
         private final Menu menu;
 
@@ -137,9 +140,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         areas = new Areas(this, protecao);
         getServer().getPluginManager().registerEvents(areas, this);
         captura = new Captura(this, protecao);
-        getServer().getPluginManager().registerEvents(new Times(this, captura), this);
+        armaduras = new Armaduras(this);
+        getServer().getPluginManager().registerEvents(new Times(this, captura, armaduras), this);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
-        Loja loja = new Loja(this, protecao, areas);
+        Loja loja = new Loja(this, protecao, areas, armaduras);
         getServer().getPluginManager().registerEvents(loja, this);
         getServer().getPluginManager().registerEvents(
                 new Especiais(this, protecao, areas, loja.marca()), this);
@@ -250,6 +254,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         }
         if (comando.getName().equals("neutro")) {
             captura.zerar(quemMandou);
+            // Recomeçar a partida também zera o que foi comprado: armadura
+            // permanente que sobrevive ao recomeço faria a segunda partida
+            // começar decidida.
+            int limpas = armaduras.limparTudo();
+            quemMandou.sendMessage(ChatColor.GRAY + "Armaduras compradas apagadas: " + limpas);
             return true;
         }
         if (!(quemMandou instanceof Player jogador)) {
