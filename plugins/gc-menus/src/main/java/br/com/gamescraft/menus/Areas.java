@@ -118,7 +118,6 @@ final class Areas implements Listener {
         }
         if (torres.protegido(bloco) && !torres.podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
-            evento.getPlayer().sendActionBar(ChatColor.RED + "Nao da para construir em cima da torre.");
             return;
         }
         colocados.add(chave(bloco));
@@ -142,7 +141,6 @@ final class Areas implements Listener {
             return;
         }
         evento.setCancelled(true);
-        evento.getPlayer().sendActionBar(ChatColor.RED + "Esse bloco e do mapa.");
     }
 
     void salvar() {

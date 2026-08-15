@@ -42,9 +42,9 @@ final class Concreto implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void aoQuebrar(BlockBreakEvent evento) {
+        // Em silêncio: o bloco que não quebra já diz o que precisa ser dito.
         if (doMapa(evento.getBlock()) && !torres.podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
-            evento.getPlayer().sendActionBar(ChatColor.RED + "Esse concreto e do mapa.");
         }
     }
 

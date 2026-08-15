@@ -63,6 +63,7 @@ final class Torres implements Listener {
 
     private final JavaPlugin plugin;
     private final Set<Torre> torres = new LinkedHashSet<>();
+    private final Set<Torre> centrais = new LinkedHashSet<>();
     private final List<Excluida> excluidas = new ArrayList<>();
     private boolean varrendo;
 
@@ -86,6 +87,7 @@ final class Torres implements Listener {
         }
         plugin.getLogger().info("Torres protegidas: " + torres.size()
                 + " | areas fora da conta: " + excluidas.size());
+        acharCentrais();
     }
 
     int quantas() {
@@ -175,6 +177,7 @@ final class Torres implements Listener {
         }
         plugin.getConfig().set("torres", linhas);
         plugin.saveConfig();
+        acharCentrais();
         String recado = "Sinalizadores protegidos: " + torres.size();
         quemPediu.sendMessage(ChatColor.GREEN + recado);
         plugin.getLogger().info(recado);
@@ -194,20 +197,29 @@ final class Torres implements Listener {
     }
 
     /**
-     * Três blocos para cada lado nas torres do campo, e só a coluna do feixe nos
-     * sinalizadores de dentro dos castelos.
+     * Três blocos para cada lado em quase tudo, e só a coluna do feixe no
+     * sinalizador do meio de cada castelo.
      *
-     * No campo o raio existe para ninguém enterrar a torre em bloco. Dentro do
-     * castelo é o contrário: ali se constrói a defesa, e um quadrado de sete por
-     * sete intocável no meio da base atrapalha mais do que protege. O que não
-     * pode é tapar o feixe, porque é ele que diz de quem é o castelo.
+     * O do meio é o que marca o castelo, e é em volta dele que a defesa se
+     * constrói: um quadrado de sete por sete intocável bem ali atrapalharia mais
+     * do que protege. O que não pode é tapar o feixe dele.
+     *
+     * Os outros quatro do castelo valem como qualquer torre do campo — são
+     * cantos de mapa, e ninguém constrói em cima deles.
      */
     private int raioDe(Torre torre) {
-        return emCastelo(torre.x(), torre.z()) ? 0 : RAIO;
+        return centrais.contains(torre) ? 0 : RAIO;
     }
 
-    /** As duas áreas de castelo, em planta. */
-    private boolean emCastelo(int x, int z) {
+    /**
+     * Descobre, em cada castelo, qual sinalizador é o do meio: o mais perto do
+     * centro da caixa.
+     *
+     * É calculado e não escrito à mão porque a lista de torres se refaz sozinha
+     * pelo /torres, e uma lista à mão ficaria velha na primeira varredura.
+     */
+    private void acharCentrais() {
+        centrais.clear();
         for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
             String[] p = linha.split(",");
             if (p.length < 6) {
@@ -217,11 +229,27 @@ final class Torres implements Listener {
             int maxx = Math.max(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
             int minz = Math.min(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
             int maxz = Math.max(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
-            if (x >= minx && x <= maxx && z >= minz && z <= maxz) {
-                return true;
+            int meiox = (minx + maxx) / 2;
+            int meioz = (minz + maxz) / 2;
+            Torre central = null;
+            long menor = Long.MAX_VALUE;
+            for (Torre torre : torres) {
+                if (torre.x() < minx || torre.x() > maxx || torre.z() < minz || torre.z() > maxz) {
+                    continue;
+                }
+                long dx = torre.x() - meiox;
+                long dz = torre.z() - meioz;
+                long dist = dx * dx + dz * dz;
+                if (dist < menor) {
+                    menor = dist;
+                    central = torre;
+                }
+            }
+            if (central != null) {
+                centrais.add(central);
             }
         }
-        return false;
+        plugin.getLogger().info("Sinalizadores do meio dos castelos: " + centrais.size());
     }
 
     /** Quem ligou o /obras passa; o resto, não. */
@@ -229,15 +257,14 @@ final class Torres implements Listener {
         return jogador.getScoreboardTags().contains("gc_obras");
     }
 
-    private void avisar(Player jogador) {
-        jogador.sendActionBar(ChatColor.RED + "Torre protegida.");
-    }
+    // Barrar em silêncio, sem aviso na tela. O bloco que não quebra já diz o
+    // que precisa ser dito, e o aviso repetido a cada clique só atrapalhava
+    // quem estava minerando ao lado de uma torre.
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void aoQuebrar(BlockBreakEvent evento) {
         if (protegido(evento.getBlock()) && !podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
-            avisar(evento.getPlayer());
         }
     }
 
@@ -245,7 +272,6 @@ final class Torres implements Listener {
     public void aoColocar(BlockPlaceEvent evento) {
         if (protegido(evento.getBlock()) && !podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
-            avisar(evento.getPlayer());
         }
     }
 
@@ -254,7 +280,6 @@ final class Torres implements Listener {
     public void aoEsvaziarBalde(PlayerBucketEmptyEvent evento) {
         if (protegido(evento.getBlock()) && !podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
-            avisar(evento.getPlayer());
         }
     }
 
