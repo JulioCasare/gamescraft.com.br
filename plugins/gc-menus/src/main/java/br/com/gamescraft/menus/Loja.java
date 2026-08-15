@@ -7,8 +7,12 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,44 +22,57 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
 
 /**
- * A loja da barra de ouro: clique com ela na mão e compre com diamante.
+ * A loja da barra de ouro, no formato do Bed Wars: uma fileira de abas em cima,
+ * a compra rápida na primeira, e o resto separado por categoria.
  *
- * O diamante e a moeda porque ja e o que as torres pagam — quem tem mais torre
- * compra mais rapido, e e isso que faz valer a pena sair do castelo e disputar.
+ * O diamante é a moeda porque já é o que as torres pagam — quem tem mais torre
+ * compra mais rápido, e é isso que faz valer a pena sair do castelo.
  *
- * A loja abre numa capa com as categorias, e cada uma leva a uma pagina. Tudo
- * numa tela so passava de trinta itens e virava um paredao: com as ferramentas
- * completas nos tres materiais nao cabia mais escolher rapido, que e o que se
- * faz no meio de uma partida.
- *
- * Os precos seguem a renda: um diamante por torre a cada trinta segundos.
- * Ferramenta de pedra e troco, a de ferro sai em pouco mais de um minuto com
- * tres torres, e a de diamante custa uma partida inteira de vantagem. Picareta
- * e sempre a mais barata do seu material — sem ela ninguem chega no bloco do
- * inimigo e a partida nao acaba.
+ * Três coisas mudam com o time de quem abre: a lã, que sai na cor do time; a
+ * armadura, que vem com enfeite de redstone ou lápis-lazúli, os mesmos blocos
+ * que cada time defende; e nada mais. O resto é igual para os dois lados.
  */
 final class Loja implements Listener {
 
-    /** Onde fica o botao de voltar, em toda pagina: meio da ultima fileira. */
-    private static final int VOLTAR = 31;
+    /** Onde os itens de cada página cabem: três fileiras de sete, sem as bordas. */
+    private static final int[] FILEIRA_1 = { 19, 20, 21, 22, 23, 24, 25 };
+    private static final int[] FILEIRA_2 = { 28, 29, 30, 31, 32, 33, 34 };
+    private static final int[] FILEIRA_3 = { 37, 38, 39, 40, 41, 42, 43 };
 
-    private record Oferta(int slot, Material tipo, int quantidade, int preco, String nome, String razao) {
+    /** O que um item faz de especial além de existir no inventário. */
+    private enum Truque {
+        NENHUM, LA_DO_TIME, VESTIR, BOLA_DE_FOGO, TNT_AUTOMATICA, TORRE
     }
 
-    private record Categoria(int slot, String chave, Material icone, String nome, String razao,
-            List<Oferta> ofertas) {
+    private record Oferta(int slot, Material tipo, int quantidade, int preco, String nome,
+            String razao, Truque truque) {
+
+        Oferta(int slot, Material tipo, int quantidade, int preco, String nome, String razao) {
+            this(slot, tipo, quantidade, preco, nome, razao, Truque.NENHUM);
+        }
     }
 
-    /** A pagina aberta. Nulo na capa, onde so se escolhe categoria. */
+    private record Aba(int slot, String chave, Material icone, String nome, List<Oferta> ofertas) {
+    }
+
     private static final class DonoDaLoja implements InventoryHolder {
-        private final Categoria pagina;
+        private final Aba aba;
 
-        private DonoDaLoja(Categoria pagina) {
-            this.pagina = pagina;
+        private DonoDaLoja(Aba aba) {
+            this.aba = aba;
         }
 
         @Override
@@ -65,67 +82,109 @@ final class Loja implements Listener {
     }
 
     private final JavaPlugin plugin;
-    private final Map<String, Categoria> categorias = new LinkedHashMap<>();
+    private final Torres torres;
+    private final Areas areas;
+    private final String timeVermelho;
+    private final Map<String, Aba> abas = new LinkedHashMap<>();
+    private final NamespacedKey marca;
 
-    Loja(JavaPlugin plugin) {
+    Loja(JavaPlugin plugin, Torres torres, Areas areas) {
         this.plugin = plugin;
+        this.torres = torres;
+        this.areas = areas;
+        this.timeVermelho = plugin.getConfig().getString("time-vermelho", "Vermelho");
+        this.marca = new NamespacedKey(plugin, "especial");
 
-        // Ferramentas: os tres materiais completos, um por fileira. Pedra em
-        // cima, diamante embaixo — le-se de cima para baixo como quem sobe de
-        // vida.
-        por(new Categoria(10, "ferramentas", Material.IRON_PICKAXE, "Ferramentas",
-                "Espada, machado, picareta e pa nos tres materiais", List.of(
-                        new Oferta(0, Material.STONE_SWORD, 1, 2, "Espada de pedra", "O primeiro passo depois da de madeira"),
-                        new Oferta(1, Material.STONE_AXE, 1, 3, "Machado de pedra", "Bate mais que a espada, e demora a repetir"),
-                        new Oferta(2, Material.STONE_PICKAXE, 1, 2, "Picareta de pedra", "Ja quebra o bloco do inimigo, devagar"),
-                        new Oferta(3, Material.STONE_SHOVEL, 1, 1, "Pa de pedra", "Para abrir caminho pela terra"),
+        aba(new Aba(0, "rapida", Material.NETHER_STAR, "Compra rapida", List.of(
+                new Oferta(FILEIRA_1[0], Material.WHITE_WOOL, 16, 1, "16 las do time", "O bloco de sempre: barato e rapido", Truque.LA_DO_TIME),
+                new Oferta(FILEIRA_1[1], Material.STONE_SWORD, 1, 2, "Espada de pedra", "O primeiro passo depois da de madeira"),
+                new Oferta(FILEIRA_1[2], Material.CHAINMAIL_BOOTS, 1, 3, "Botas de malha", "A armadura mais barata que ja ajuda", Truque.VESTIR),
+                new Oferta(FILEIRA_1[3], Material.IRON_PICKAXE, 1, 5, "Picareta de ferro", "A compra que faz a partida andar"),
+                new Oferta(FILEIRA_1[4], Material.BOW, 1, 7, "Arco", "Para tirar quem esta em cima da torre"),
+                new Oferta(FILEIRA_1[5], Material.ARROW, 16, 2, "16 flechas", "Sem elas o arco nao serve de nada"),
+                new Oferta(FILEIRA_1[6], Material.GOLDEN_APPLE, 1, 8, "Maca dourada", "Vida extra na hora de segurar a torre"),
 
-                        new Oferta(9, Material.IRON_SWORD, 1, 7, "Espada de ferro", "Mata de couro em quatro golpes"),
-                        new Oferta(10, Material.IRON_AXE, 1, 9, "Machado de ferro", "O maior dano por golpe deste preco"),
-                        new Oferta(11, Material.IRON_PICKAXE, 1, 5, "Picareta de ferro", "A compra que faz a partida andar"),
-                        new Oferta(12, Material.IRON_SHOVEL, 1, 4, "Pa de ferro", "Terra e areia em um golpe"),
+                new Oferta(FILEIRA_2[0], Material.FIRE_CHARGE, 1, 8, "Bola de fogo", "Clique para atirar: derruba ponte e quem esta nela", Truque.BOLA_DE_FOGO),
+                new Oferta(FILEIRA_2[1], Material.TNT, 1, 10, "TNT automatica", "Acende sozinha ao ser posta", Truque.TNT_AUTOMATICA),
+                new Oferta(FILEIRA_2[2], Material.ENDER_PEARL, 1, 12, "Perola do End", "Entra no castelo inimigo por cima do muro"),
+                new Oferta(FILEIRA_2[3], Material.WATER_BUCKET, 1, 5, "Balde de agua", "Apaga fogo e derruba quem esta subindo"),
+                new Oferta(FILEIRA_2[4], Material.CHEST, 1, 20, "Torre compacta", "Levanta uma torre pronta, com escada e plataforma", Truque.TORRE),
+                new Oferta(FILEIRA_2[5], Material.COOKED_BEEF, 8, 2, "8 bifes", "Fome vazia nao regenera vida"),
+                new Oferta(FILEIRA_2[6], Material.OBSIDIAN, 4, 12, "4 obsidianas", "Em volta do seu bloco, ganha muito tempo"))));
 
-                        new Oferta(18, Material.DIAMOND_SWORD, 1, 22, "Espada de diamante", "Vale umas dez torres de renda"),
-                        new Oferta(19, Material.DIAMOND_AXE, 1, 24, "Machado de diamante", "Derruba armadura de ferro em tres"),
-                        new Oferta(20, Material.DIAMOND_PICKAXE, 1, 16, "Picareta de diamante", "Quebra obsidiana em tempo util"),
-                        new Oferta(21, Material.DIAMOND_SHOVEL, 1, 12, "Pa de diamante", "Para quem ja tem tudo o resto"))));
+        aba(new Aba(1, "blocos", Material.TERRACOTTA, "Blocos", List.of(
+                new Oferta(FILEIRA_1[0], Material.WHITE_WOOL, 16, 1, "16 las do time", "Barata e rapida de por, mas queima", Truque.LA_DO_TIME),
+                new Oferta(FILEIRA_1[1], Material.OAK_PLANKS, 16, 3, "16 madeiras", "Aguenta mais golpe que a la, e nao pega fogo de longe"),
+                new Oferta(FILEIRA_1[2], Material.END_STONE, 12, 4, "12 pedras do fim", "Dura de quebrar: para o que tem de ficar de pe"),
+                new Oferta(FILEIRA_1[3], Material.OBSIDIAN, 4, 12, "4 obsidianas", "Em volta do seu bloco, ganha muito tempo"),
+                new Oferta(FILEIRA_1[4], Material.LADDER, 16, 2, "16 escadas", "Subir sem virar alvo parado"))));
 
-        // Armadura: so peitoral e calca, que sao as pecas que seguram dano de
-        // verdade. Capacete e bota juntos valem menos que a calca sozinha.
-        por(new Categoria(12, "armadura", Material.IRON_CHESTPLATE, "Armadura",
-                "Peitoral e calca em malha, ferro e diamante", List.of(
-                        new Oferta(0, Material.CHAINMAIL_CHESTPLATE, 1, 7, "Peitoral de malha", "O dobro do couro pelo mesmo peso"),
-                        new Oferta(1, Material.CHAINMAIL_LEGGINGS, 1, 6, "Calcas de malha", "Barata, e ja muda a conta do golpe"),
+        aba(new Aba(2, "armas", Material.IRON_SWORD, "Armas", List.of(
+                new Oferta(FILEIRA_1[0], Material.STONE_SWORD, 1, 2, "Espada de pedra", "O primeiro passo depois da de madeira"),
+                new Oferta(FILEIRA_1[1], Material.IRON_SWORD, 1, 7, "Espada de ferro", "Mata de couro em quatro golpes"),
+                new Oferta(FILEIRA_1[2], Material.DIAMOND_SWORD, 1, 20, "Espada de diamante", "Vale umas dez torres de renda"),
 
-                        new Oferta(9, Material.IRON_CHESTPLATE, 1, 15, "Peitoral de ferro", "A peca que mais segura dano"),
-                        new Oferta(10, Material.IRON_LEGGINGS, 1, 12, "Calcas de ferro", "A segunda que mais segura"),
+                new Oferta(FILEIRA_2[0], Material.BOW, 1, 7, "Arco", "Para tirar quem esta em cima da torre"),
+                new Oferta(FILEIRA_2[1], Material.ARROW, 16, 2, "16 flechas", "Sem elas o arco nao serve de nada"),
+                new Oferta(FILEIRA_2[2], Material.BOW, 1, 14, "Arco Forca I", "Mais dano por flecha, para segurar de longe"))));
 
-                        new Oferta(18, Material.DIAMOND_CHESTPLATE, 1, 32, "Peitoral de diamante", "So compensa com muitas torres"),
-                        new Oferta(19, Material.DIAMOND_LEGGINGS, 1, 26, "Calcas de diamante", "Com o peitoral, quase o dobro de vida util"))));
+        // Armadura por fileira de material, e ela veste na hora: quem compra
+        // peitoral quer estar com ele agora, nao guardado na mochila.
+        aba(new Aba(3, "armadura", Material.IRON_CHESTPLATE, "Armadura", List.of(
+                new Oferta(FILEIRA_1[0], Material.CHAINMAIL_HELMET, 1, 3, "Capacete de malha", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_1[1], Material.CHAINMAIL_CHESTPLATE, 1, 7, "Peitoral de malha", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_1[2], Material.CHAINMAIL_LEGGINGS, 1, 6, "Calcas de malha", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_1[3], Material.CHAINMAIL_BOOTS, 1, 3, "Botas de malha", "Enfeite na cor do time", Truque.VESTIR),
 
-        por(new Categoria(14, "combate", Material.BOW, "Combate",
-                "Arco, escudo e o que se guarda para a hora certa", List.of(
-                        new Oferta(0, Material.BOW, 1, 7, "Arco", "Para tirar quem esta em cima da torre"),
-                        new Oferta(1, Material.ARROW, 16, 2, "16 flechas", "Sem elas o arco nao serve de nada"),
-                        new Oferta(2, Material.SHIELD, 1, 5, "Escudo", "Segura flecha e o primeiro golpe"),
+                new Oferta(FILEIRA_2[0], Material.IRON_HELMET, 1, 6, "Capacete de ferro", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_2[1], Material.IRON_CHESTPLATE, 1, 15, "Peitoral de ferro", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_2[2], Material.IRON_LEGGINGS, 1, 12, "Calcas de ferro", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_2[3], Material.IRON_BOOTS, 1, 5, "Botas de ferro", "Enfeite na cor do time", Truque.VESTIR),
 
-                        new Oferta(9, Material.GOLDEN_APPLE, 1, 9, "Maca dourada", "Vida extra na hora de segurar a torre"),
-                        new Oferta(10, Material.ENDER_PEARL, 1, 11, "Perola do End", "Entra no castelo inimigo por cima do muro"),
-                        new Oferta(11, Material.TNT, 1, 18, "TNT", "Abre a defesa do bloco inimigo de uma vez"))));
+                new Oferta(FILEIRA_3[0], Material.DIAMOND_CHESTPLATE, 1, 30, "Peitoral de diamante", "Enfeite na cor do time", Truque.VESTIR),
+                new Oferta(FILEIRA_3[1], Material.DIAMOND_LEGGINGS, 1, 25, "Calcas de diamante", "Enfeite na cor do time", Truque.VESTIR))));
 
-        por(new Categoria(16, "blocos", Material.STONE, "Blocos e apoio",
-                "Para chegar la, e para nao deixarem chegar", List.of(
-                        new Oferta(0, Material.STONE, 32, 2, "32 pedras", "Caminho, ponte e buraco tapado"),
-                        new Oferta(1, Material.OBSIDIAN, 4, 14, "4 obsidianas", "Em volta do seu bloco, ganha muito tempo"),
-                        new Oferta(2, Material.LADDER, 16, 2, "16 escadas", "Subir na torre sem virar alvo parado"),
+        aba(new Aba(4, "ferramentas", Material.IRON_PICKAXE, "Ferramentas", List.of(
+                new Oferta(FILEIRA_1[0], Material.STONE_PICKAXE, 1, 2, "Picareta de pedra", "Ja quebra o bloco do inimigo, devagar"),
+                new Oferta(FILEIRA_1[1], Material.IRON_PICKAXE, 1, 5, "Picareta de ferro", "A compra que faz a partida andar"),
+                new Oferta(FILEIRA_1[2], Material.GOLDEN_PICKAXE, 1, 4, "Picareta de ouro", "Rapidissima, e some rapido tambem"),
+                new Oferta(FILEIRA_1[3], Material.DIAMOND_PICKAXE, 1, 15, "Picareta de diamante", "Quebra obsidiana em tempo util"),
 
-                        new Oferta(9, Material.WATER_BUCKET, 1, 6, "Balde de agua", "Apaga fogo e derruba quem esta subindo"),
-                        new Oferta(10, Material.COOKED_BEEF, 8, 2, "8 bifes", "Fome vazia nao regenera vida"))));
+                new Oferta(FILEIRA_2[0], Material.STONE_AXE, 1, 3, "Machado de pedra", "Contra madeira, e contra gente"),
+                new Oferta(FILEIRA_2[1], Material.IRON_AXE, 1, 8, "Machado de ferro", "O maior dano por golpe deste preco"),
+                new Oferta(FILEIRA_2[2], Material.GOLDEN_AXE, 1, 6, "Machado de ouro", "Rapido, e dura pouco"),
+                new Oferta(FILEIRA_2[3], Material.DIAMOND_AXE, 1, 18, "Machado de diamante", "Derruba armadura de ferro em tres"),
+
+                new Oferta(FILEIRA_3[0], Material.SHEARS, 1, 3, "Tesoura", "Corta la de defesa em um golpe"))));
+
+        // Trinta segundos em todas: e o tempo de uma investida, nao de uma
+        // partida. Poção longa faria o time forte comprar e nunca mais soltar.
+        aba(new Aba(5, "pocoes", Material.BREWING_STAND, "Pocoes", List.of(
+                new Oferta(FILEIRA_1[0], Material.POTION, 1, 8, "Forca II (30s)", "O dobro de dano enquanto durar"),
+                new Oferta(FILEIRA_1[1], Material.POTION, 1, 6, "Agilidade II (30s)", "Para chegar antes na torre neutra"),
+                new Oferta(FILEIRA_1[2], Material.POTION, 1, 12, "Invisibilidade (30s)", "Entra no castelo sem ser visto"))));
+
+        aba(new Aba(6, "comida", Material.COOKED_BEEF, "Comida", List.of(
+                new Oferta(FILEIRA_1[0], Material.GOLDEN_APPLE, 1, 8, "Maca dourada", "Vida extra na hora de segurar a torre"),
+                new Oferta(FILEIRA_1[1], Material.COOKED_BEEF, 8, 2, "8 bifes", "Fome vazia nao regenera vida"),
+                new Oferta(FILEIRA_1[2], Material.CARROT, 8, 1, "8 cenouras", "Barata, para nao voltar ao castelo so por fome"))));
+
+        aba(new Aba(7, "especiais", Material.TNT, "Especiais", List.of(
+                new Oferta(FILEIRA_1[0], Material.FIRE_CHARGE, 1, 8, "Bola de fogo", "Clique para atirar: derruba ponte e quem esta nela", Truque.BOLA_DE_FOGO),
+                new Oferta(FILEIRA_1[1], Material.TNT, 1, 10, "TNT automatica", "Acende sozinha ao ser posta", Truque.TNT_AUTOMATICA),
+                new Oferta(FILEIRA_1[2], Material.ENDER_PEARL, 1, 12, "Perola do End", "Entra no castelo inimigo por cima do muro"),
+                new Oferta(FILEIRA_1[3], Material.IRON_GOLEM_SPAWN_EGG, 1, 25, "Ovo de golem de ferro", "Guarda o castelo enquanto voce ataca"),
+
+                new Oferta(FILEIRA_2[0], Material.WATER_BUCKET, 1, 5, "Balde de agua", "Apaga fogo e derruba quem esta subindo"),
+                new Oferta(FILEIRA_2[1], Material.LAVA_BUCKET, 1, 10, "Balde de lava", "Fecha um caminho estreito sozinho"),
+                new Oferta(FILEIRA_2[2], Material.CHEST, 1, 20, "Torre compacta", "Levanta uma torre pronta, com escada e plataforma", Truque.TORRE))));
     }
 
-    private void por(Categoria categoria) {
-        categorias.put(categoria.chave(), categoria);
+    private void aba(Aba aba) {
+        abas.put(aba.chave(), aba);
     }
+
+    // ---------------------------------------------------------------- abrir
 
     /** Clique com a barra de ouro na mao abre a loja. */
     @EventHandler
@@ -138,77 +197,153 @@ final class Loja implements Listener {
             return;
         }
         evento.setCancelled(true);
-        abrirCapa(evento.getPlayer());
+        abrir(evento.getPlayer(), abas.get("rapida"));
     }
 
-    private void abrirCapa(Player jogador) {
-        Inventory bau = Bukkit.createInventory(new DonoDaLoja(null), 27,
-                ChatColor.DARK_GREEN + "Loja  " + ChatColor.DARK_GRAY + "(paga em diamante)");
+    private void abrir(Player jogador, Aba aba) {
+        Inventory bau = Bukkit.createInventory(new DonoDaLoja(aba), 54,
+                ChatColor.DARK_GRAY + aba.nome());
         int carteira = diamantes(jogador);
-        for (Categoria categoria : categorias.values()) {
-            ItemStack icone = new ItemStack(categoria.icone());
-            ItemMeta dados = icone.getItemMeta();
-            dados.setDisplayName(ChatColor.YELLOW + categoria.nome());
-            dados.setLore(List.of(
-                    ChatColor.GRAY + categoria.razao(),
-                    ChatColor.DARK_GRAY + "" + categoria.ofertas().size() + " itens",
-                    ChatColor.GREEN + "Clique para abrir"));
-            icone.setItemMeta(dados);
-            bau.setItem(categoria.slot(), icone);
+        boolean vermelho = ehVermelho(jogador);
+
+        for (Aba outra : abas.values()) {
+            bau.setItem(outra.slot(), iconeDaAba(outra, outra == aba));
+            // A fileira de baixo marca a aba aberta, como no Bed Wars.
+            bau.setItem(9 + outra.slot(), outra == aba
+                    ? vidro(Material.LIME_STAINED_GLASS_PANE, ChatColor.GREEN + outra.nome())
+                    : vidro(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
-        bau.setItem(4, carteiraNaTela(carteira));
+        bau.setItem(8, carteiraNaTela(carteira));
+
+        for (Oferta oferta : aba.ofertas()) {
+            bau.setItem(oferta.slot(), etiquetar(montar(oferta, vermelho), oferta, carteira));
+        }
         jogador.openInventory(bau);
     }
 
-    private void abrirPagina(Player jogador, Categoria categoria) {
-        Inventory bau = Bukkit.createInventory(new DonoDaLoja(categoria), 36,
-                ChatColor.DARK_GREEN + "Loja" + ChatColor.DARK_GRAY + " - " + ChatColor.DARK_GREEN + categoria.nome());
-        int carteira = diamantes(jogador);
-        for (Oferta oferta : categoria.ofertas()) {
-            bau.setItem(oferta.slot(), montar(oferta, carteira));
-        }
-        bau.setItem(27, carteiraNaTela(carteira));
-        ItemStack voltar = new ItemStack(Material.ARROW);
-        ItemMeta dados = voltar.getItemMeta();
-        dados.setDisplayName(ChatColor.YELLOW + "Voltar");
-        voltar.setItemMeta(dados);
-        bau.setItem(VOLTAR, voltar);
-        jogador.openInventory(bau);
+    private ItemStack iconeDaAba(Aba aba, boolean aberta) {
+        ItemStack icone = new ItemStack(aba.icone());
+        ItemMeta dados = icone.getItemMeta();
+        dados.setDisplayName((aberta ? ChatColor.GREEN : ChatColor.YELLOW) + aba.nome());
+        dados.setLore(List.of(aberta
+                ? ChatColor.GRAY + "Voce esta aqui"
+                : ChatColor.GRAY + "Clique para abrir"));
+        icone.setItemMeta(dados);
+        return icone;
+    }
+
+    private ItemStack vidro(Material tipo, String nome) {
+        ItemStack vidro = new ItemStack(tipo);
+        ItemMeta dados = vidro.getItemMeta();
+        dados.setDisplayName(nome);
+        vidro.setItemMeta(dados);
+        return vidro;
     }
 
     private ItemStack carteiraNaTela(int carteira) {
         ItemStack moeda = new ItemStack(Material.DIAMOND, Math.max(1, Math.min(64, carteira)));
         ItemMeta dados = moeda.getItemMeta();
-        dados.setDisplayName(ChatColor.AQUA + "Voce tem " + carteira
-                + " diamante" + (carteira == 1 ? "" : "s"));
+        dados.setDisplayName(ChatColor.AQUA + "Voce tem " + carteira + " diamante" + (carteira == 1 ? "" : "s"));
         dados.setLore(List.of(ChatColor.GRAY + "Cada torre do seu time paga",
                 ChatColor.GRAY + "1 diamante a cada 30 segundos"));
         moeda.setItemMeta(dados);
         return moeda;
     }
 
-    /**
-     * A etiqueta do item mostra o preco e se da para pagar agora.
-     *
-     * Dizer "faltam N" e melhor que so pintar de vermelho: o jogador sabe quanto
-     * tempo de torre ainda precisa segurar.
-     */
-    private ItemStack montar(Oferta oferta, int carteira) {
-        ItemStack item = new ItemStack(oferta.tipo(), oferta.quantidade());
+    // ----------------------------------------------------------- os itens
+
+    /** O item como ele sai da loja, ja com a cor e os poderes do time de quem compra. */
+    private ItemStack montar(Oferta oferta, boolean vermelho) {
+        ItemStack item = switch (oferta.truque()) {
+            case LA_DO_TIME -> new ItemStack(vermelho ? Material.RED_WOOL : Material.BLUE_WOOL,
+                    oferta.quantidade());
+            default -> new ItemStack(oferta.tipo(), oferta.quantidade());
+        };
+
+        if (oferta.truque() == Truque.VESTIR) {
+            enfeitar(item, vermelho);
+        }
+        if (oferta.nome().startsWith("Arco Forca")) {
+            item.addUnsafeEnchantment(Enchantment.POWER, 1);
+        }
+        if (item.getType() == Material.POTION) {
+            encher(item, oferta.nome());
+        }
+
         ItemMeta dados = item.getItemMeta();
         dados.setDisplayName(ChatColor.YELLOW + oferta.nome());
+        if (oferta.truque() == Truque.BOLA_DE_FOGO || oferta.truque() == Truque.TNT_AUTOMATICA
+                || oferta.truque() == Truque.TORRE) {
+            dados.getPersistentDataContainer().set(marca, PersistentDataType.STRING,
+                    oferta.truque().name());
+        }
+        item.setItemMeta(dados);
+        return item;
+    }
+
+    /**
+     * Enfeite da cor do time na armadura.
+     *
+     * Redstone para o vermelho e lápis para o azul — os mesmos blocos que cada
+     * time defende, então a cor da armadura diz de qual lado a pessoa é sem
+     * precisar de plaquinha.
+     *
+     * Se a versão do servidor tiver mexido no registro dos enfeites, a armadura
+     * sai lisa em vez de a compra falhar: cor é enfeite, defesa é o que importa.
+     */
+    private void enfeitar(ItemStack peca, boolean vermelho) {
+        try {
+            if (!(peca.getItemMeta() instanceof ArmorMeta dados)) {
+                return;
+            }
+            TrimMaterial material = Registry.TRIM_MATERIAL.get(
+                    NamespacedKey.minecraft(vermelho ? "redstone" : "lapis"));
+            TrimPattern padrao = Registry.TRIM_PATTERN.get(NamespacedKey.minecraft("sentry"));
+            if (material == null || padrao == null) {
+                return;
+            }
+            dados.setTrim(new ArmorTrim(material, padrao));
+            peca.setItemMeta(dados);
+        } catch (Throwable erro) {
+            plugin.getLogger().warning("Nao consegui por o enfeite do time na armadura: " + erro);
+        }
+    }
+
+    /** As três poções, todas de trinta segundos. */
+    private void encher(ItemStack garrafa, String nome) {
+        if (!(garrafa.getItemMeta() instanceof PotionMeta dados)) {
+            return;
+        }
+        if (nome.startsWith("Forca")) {
+            dados.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 30 * 20, 1), true);
+            dados.setColor(Color.fromRGB(0x93, 0x24, 0x23));
+        } else if (nome.startsWith("Agilidade")) {
+            dados.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 30 * 20, 1), true);
+            dados.setColor(Color.fromRGB(0x7C, 0xAF, 0xC6));
+        } else {
+            dados.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 30 * 20, 0), true);
+            dados.setColor(Color.fromRGB(0xF6, 0xF6, 0xF6));
+        }
+        garrafa.setItemMeta(dados);
+    }
+
+    private ItemStack etiquetar(ItemStack item, Oferta oferta, int carteira) {
+        ItemMeta dados = item.getItemMeta();
         List<String> linhas = new ArrayList<>();
         linhas.add(ChatColor.AQUA + "" + oferta.preco() + " diamante" + (oferta.preco() > 1 ? "s" : ""));
         linhas.add(ChatColor.GRAY + oferta.razao());
-        if (carteira >= oferta.preco()) {
-            linhas.add(ChatColor.GREEN + "Clique para comprar");
-        } else {
-            linhas.add(ChatColor.RED + "Faltam " + (oferta.preco() - carteira));
+        if (oferta.truque() == Truque.VESTIR) {
+            linhas.add(ChatColor.DARK_GRAY + "Veste na hora, no lugar do couro");
         }
+        linhas.add(carteira >= oferta.preco()
+                ? ChatColor.GREEN + "Clique para comprar"
+                : ChatColor.RED + "Faltam " + (oferta.preco() - carteira));
         dados.setLore(linhas);
         item.setItemMeta(dados);
         return item;
     }
+
+    // ---------------------------------------------------------- a compra
 
     @EventHandler
     public void aoClicarNaLoja(InventoryClickEvent evento) {
@@ -221,28 +356,21 @@ final class Loja implements Listener {
         if (!(evento.getWhoClicked() instanceof Player jogador)) {
             return;
         }
-        if (dono.pagina == null) {
-            for (Categoria categoria : categorias.values()) {
-                if (categoria.slot() == evento.getRawSlot()) {
-                    abrirPagina(jogador, categoria);
-                    return;
-                }
+        for (Aba aba : abas.values()) {
+            if (aba.slot() == evento.getRawSlot()) {
+                abrir(jogador, aba);
+                return;
             }
-            return;
         }
-        if (evento.getRawSlot() == VOLTAR) {
-            abrirCapa(jogador);
-            return;
-        }
-        for (Oferta oferta : dono.pagina.ofertas()) {
+        for (Oferta oferta : dono.aba.ofertas()) {
             if (oferta.slot() == evento.getRawSlot()) {
-                comprar(jogador, dono.pagina, oferta);
+                comprar(jogador, dono.aba, oferta);
                 return;
             }
         }
     }
 
-    private void comprar(Player jogador, Categoria pagina, Oferta oferta) {
+    private void comprar(Player jogador, Aba aba, Oferta oferta) {
         int carteira = diamantes(jogador);
         if (carteira < oferta.preco()) {
             int falta = oferta.preco() - carteira;
@@ -251,20 +379,44 @@ final class Loja implements Listener {
             jogador.playSound(jogador.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
             return;
         }
+        boolean vestir = oferta.truque() == Truque.VESTIR;
         // Espaco antes de cobrar: pagar e ver o item cair no chao seria pior que
-        // nao comprar.
-        if (jogador.getInventory().firstEmpty() == -1) {
+        // nao comprar. Armadura nao precisa de espaco — ela vai para o corpo.
+        if (!vestir && jogador.getInventory().firstEmpty() == -1) {
             jogador.sendMessage(ChatColor.RED + "Inventario cheio.");
             jogador.playSound(jogador.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
             return;
         }
         cobrar(jogador, oferta.preco());
-        jogador.getInventory().addItem(new ItemStack(oferta.tipo(), oferta.quantidade()));
+        ItemStack comprado = montar(oferta, ehVermelho(jogador));
+        if (vestir) {
+            vestir(jogador, comprado);
+        } else {
+            jogador.getInventory().addItem(comprado);
+        }
         jogador.sendMessage(ChatColor.GREEN + "Comprou " + oferta.nome() + ChatColor.GRAY
                 + " por " + oferta.preco() + " diamante" + (oferta.preco() > 1 ? "s" : "") + ".");
         jogador.playSound(jogador.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.4f);
-        // Reabre a mesma pagina para as etiquetas mostrarem a carteira nova.
-        abrirPagina(jogador, pagina);
+        abrir(jogador, aba);
+    }
+
+    /** Armadura vai direto para o corpo, no lugar do couro do kit. */
+    private void vestir(Player jogador, ItemStack peca) {
+        String tipo = peca.getType().name();
+        if (tipo.endsWith("_HELMET")) {
+            jogador.getInventory().setHelmet(peca);
+        } else if (tipo.endsWith("_CHESTPLATE")) {
+            jogador.getInventory().setChestplate(peca);
+        } else if (tipo.endsWith("_LEGGINGS")) {
+            jogador.getInventory().setLeggings(peca);
+        } else if (tipo.endsWith("_BOOTS")) {
+            jogador.getInventory().setBoots(peca);
+        }
+    }
+
+    private boolean ehVermelho(Player jogador) {
+        Team time = jogador.getScoreboard().getEntryTeam(jogador.getName());
+        return time != null && timeVermelho.equals(time.getName());
     }
 
     private int diamantes(Player jogador) {
@@ -297,5 +449,17 @@ final class Loja implements Listener {
             plugin.getLogger().warning("Cobranca de " + preco + " diamantes ficou incompleta para "
                     + jogador.getName() + ": faltaram " + falta + ".");
         }
+    }
+
+    NamespacedKey marca() {
+        return marca;
+    }
+
+    Torres torres() {
+        return torres;
+    }
+
+    Areas areas() {
+        return areas;
     }
 }

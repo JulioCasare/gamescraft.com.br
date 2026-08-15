@@ -139,7 +139,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         captura = new Captura(this, protecao);
         getServer().getPluginManager().registerEvents(new Times(this, captura), this);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
-        getServer().getPluginManager().registerEvents(new Loja(this), this);
+        Loja loja = new Loja(this, protecao, areas);
+        getServer().getPluginManager().registerEvents(loja, this);
+        getServer().getPluginManager().registerEvents(
+                new Especiais(this, protecao, areas, loja.marca()), this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, CANAL);
         getServer().getMessenger().registerIncomingPluginChannel(this, CANAL, this);
 

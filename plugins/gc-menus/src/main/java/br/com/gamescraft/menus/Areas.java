@@ -84,6 +84,19 @@ final class Areas implements Listener {
         return colocados.contains(chave(bloco));
     }
 
+    /**
+     * Anota um bloco que o plugin pos no lugar do jogador — a torre compacta da
+     * loja, por exemplo. Sem isto ele entraria na conta como bloco do mapa e
+     * ficaria intocavel dentro de um castelo.
+     */
+    void registrarColocado(Block bloco) {
+        if (!dentro(bloco)) {
+            return;
+        }
+        colocados.add(chave(bloco));
+        sujo = true;
+    }
+
     private boolean dentro(Block bloco) {
         for (Caixa caixa : caixas) {
             if (caixa.contem(bloco)) {
