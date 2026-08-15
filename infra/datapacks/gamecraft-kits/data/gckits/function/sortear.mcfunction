@@ -9,6 +9,10 @@
 # inventario.
 clear @s
 scoreboard players set @s gc_s 0
+# Conta de pecas de diamante deste kit. Duas ja e muita defesa; a terceira e a
+# quarta faziam kits que so morriam de totem, e quem pegava o outro lado do
+# sorteio nao tinha o que fazer. A terceira vira ferro.
+scoreboard players set #dima gc_r 0
 function gckits:slot_cabeca
 function gckits:slot_peito
 function gckits:slot_pernas
