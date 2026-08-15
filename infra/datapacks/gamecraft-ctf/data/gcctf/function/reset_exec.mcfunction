@@ -12,8 +12,6 @@ execute store result score #cminz gcctf run data get storage gcctf:arena minz
 execute store result score #cmaxz gcctf run data get storage gcctf:arena maxz
 data modify storage gcctf:tiles molde.y1 set from storage gcctf:arena miny
 data modify storage gcctf:tiles molde.y2 set from storage gcctf:arena maxy
-data modify storage gcctf:tiles molde.by1 set from storage gcctf:arena bkpy
-data modify storage gcctf:tiles molde.by2 set from storage gcctf:arena bkpymax
 
 scoreboard players operation #tx gcctf = #cminx gcctf
 scoreboard players operation #tz gcctf = #cminz gcctf

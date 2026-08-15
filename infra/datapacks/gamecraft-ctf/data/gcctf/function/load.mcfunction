@@ -3,10 +3,19 @@ scoreboard objectives add gcctf dummy
 # /trigger obras.
 scoreboard objectives add obras trigger
 
-# O /clone vem de fabrica limitado a 32.768 blocos, e uma fatia do mapa tem
-# 441.800. Sem levantar isto o save e o reset falham calados — foi o que
+# O /clone vem de fabrica limitado a 32.768 blocos, e um pedaco do mapa passa de
+# meio milhao. Sem levantar isto o save e o reset falham calados — foi o que
 # aconteceu ate agora.
-gamerule max_block_modifications 1000000
+gamerule max_block_modifications 4000000
+
+# Onde mora a copia de seguranca: cinco mil blocos ao lado, no mesmo Y.
+#
+# Ela ja morou 150 blocos acima do mapa, e foi um erro caro. Bloco em cima de
+# sinalizador tapa o feixe, e o mapa inteiro sobre as torres apagou os 58
+# beacons de uma vez. Ao lado, e em chunks que ninguem visita, ela nao tapa nada
+# — e ainda deixa o Julio marcar a arena na altura que quiser, sem a copia
+# esbarrar na origem.
+scoreboard players set #desvio gcctf 5000
 
 # Uma copia interrompida por reinicio nao pode ficar marcada como em andamento:
 # o cursor se perdeu junto com o tique. E o pedaco que estava preso na hora da

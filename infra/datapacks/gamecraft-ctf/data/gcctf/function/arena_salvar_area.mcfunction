@@ -1,9 +1,10 @@
 # Guarda os dois cantos em forma de minimo, maximo e tamanho — o clone precisa
 # de minimo e maximo, os seletores precisam de minimo e tamanho.
 #
-# O backup fica 150 blocos acima, nos mesmos chunks: nao gera terreno novo em
-# lugar nenhum e some do caminho de todo mundo. Na ilha o chao vai ate uns 78, e
-# 150 acima disso ainda cabe folgado no teto do mundo.
+# O backup nao mora mais acima do mapa, e sim cinco mil blocos ao lado (ver o
+# #desvio no load): por cima ele tapava o feixe de todos os sinalizadores, e
+# marcar a arena alta demais fazia origem e destino se cruzarem, o que o /clone
+# recusa. Ao lado, qualquer marcacao funciona.
 scoreboard players operation #aminx gcctf = #ax1 gcctf
 scoreboard players operation #aminx gcctf < #ax2 gcctf
 scoreboard players operation #amaxx gcctf = #ax1 gcctf
