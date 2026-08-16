@@ -139,7 +139,10 @@ final class Especiais implements Listener {
             evento.setCancelled(true);
             atirar(jogador);
             gastarUm(jogador, naMao);
-        } else if ("TORRE".equals(truque) && evento.getClickedBlock() != null) {
+        } else if ("TORRE".equals(truque)) {
+            // Sem exigir bloco clicado: a torre sobe em volta de quem usou, e
+            // em modo aventura o clique no ar e o clique no bloco chegam aqui
+            // do mesmo jeito.
             evento.setCancelled(true);
             if (levantarTorre(jogador, evento.getClickedBlock())) {
                 gastarUm(jogador, naMao);
@@ -392,20 +395,29 @@ final class Especiais implements Listener {
     // -------------------------------------------------------------- torre
 
     /**
-     * Levanta a torre inteira: poço oco de três por três com escada dentro, e
-     * uma plataforma de cinco por cinco no topo.
+     * Levanta a torre no formato do Bed Wars: poço oco de três por três com
+     * escada dentro, e no topo uma plataforma de cinco por cinco cercada por um
+     * murinho de um bloco.
      *
-     * Só ocupa lugar vazio. Bloco que já existe fica onde está — a torre serve
-     * para subir depressa numa disputa, não para engolir o que estava lá.
+     * Ela sobe em volta de quem a usou, e não onde o clique caiu — é assim no
+     * Bed Wars, e é o que faz sentido: a torre serve para tirar você do chão
+     * depressa, e ter de sair de perto para acionar acabaria com a graça.
+     *
+     * O murinho do topo é a parte que mais importa numa briga: sem ele a
+     * primeira flechada derruba quem subiu, e a torre vira um pedestal.
+     *
+     * Só ocupa lugar vazio. Bloco que já existe fica onde está — a torre não
+     * engole o que estava lá.
      */
-    private boolean levantarTorre(Player jogador, Block base) {
-        World mundo = base.getWorld();
+    private boolean levantarTorre(Player jogador, Block clicado) {
+        World mundo = jogador.getWorld();
         Material la = ehVermelho(jogador) ? Material.RED_WOOL : Material.BLUE_WOOL;
-        int x = base.getX();
-        int y = base.getY() + 1;
-        int z = base.getZ();
+        Block chao = jogador.getLocation().getBlock();
+        int x = chao.getX();
+        int y = chao.getY();
+        int z = chao.getZ();
 
-        if (torres.protegido(base) && !torres.podeMexer(jogador)) {
+        if (torres.protegido(chao) && !torres.podeMexer(jogador)) {
             jogador.sendActionBar(ChatColor.RED + "Aqui não dá para levantar a torre.");
             return false;
         }
@@ -426,9 +438,22 @@ final class Especiais implements Listener {
             // A escada encosta na parede do norte, então olha para o sul.
             postos += por(mundo, x, y + altura, z, escada) ? 1 : 0;
         }
+        // O chão do mirante, com o buraco por onde a escada sai.
         for (int dx = -2; dx <= 2; dx++) {
             for (int dz = -2; dz <= 2; dz++) {
+                if (dx == 0 && dz == 0) {
+                    continue;
+                }
                 postos += por(mundo, x + dx, y + ALTURA, z + dz, la.createBlockData()) ? 1 : 0;
+            }
+        }
+        // O murinho em volta, um bloco de altura.
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                if (Math.abs(dx) != 2 && Math.abs(dz) != 2) {
+                    continue;
+                }
+                postos += por(mundo, x + dx, y + ALTURA + 1, z + dz, la.createBlockData()) ? 1 : 0;
             }
         }
         jogador.playSound(jogador.getLocation(), Sound.BLOCK_WOOL_PLACE, 1f, 1f);
