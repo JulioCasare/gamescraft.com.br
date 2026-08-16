@@ -1,0 +1,22 @@
+# Servidor do Among Us.
+#
+# Este e o unico servidor da rede que nao roda a versao nova do jogo. O plugin
+# de Among Us declara suporte ate a 1.21.11, e plugin de minigame mexe fundo no
+# jogo: papel de impostor, tarefas, reuniao, votacao, morte falsa. Nao e o tipo
+# de coisa que se poe para rodar numa versao que o autor nunca viu. O ViaVersion
+# resolve o resto — quem tem cliente novo entra do mesmo jeito, que e o arranjo
+# que o Bed Wars ja usa desde o comeco.
+#
+# Base instalada (fontes oficiais, testadas em 2026-08-16):
+# LuckPerms 5.5.71 (Modrinth oficial) - permissoes
+https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar
+# ViaVersion 5.11.0 (Modrinth oficial) - deixa o cliente novo entrar no
+# servidor velho. Sem ele so quem tiver exatamente a 1.21.11 consegue jogar.
+https://cdn.modrinth.com/data/P1OZGk5p/versions/ZH8459B6/ViaVersion-5.11.0.jar
+# WorldEdit 7.3.9 (Modrinth oficial, EngineHub) - construir a nave e resetar a
+# area entre partidas. Restrinja o uso a staff pelo LuckPerms.
+https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar
+# GreatImpostor 1.3.0 (Hangar, repositorio oficial do PaperMC) - o jogo em si:
+# impostor, tarefas, reuniao e votacao. Suporte declarado da 1.19 a 1.21.11,
+# atualizado em fevereiro de 2026.
+https://hangarcdn.papermc.io/plugins/greatericontop/GreatImpostor/versions/1.3.0/PAPER/GreatImpostor-1.3.0.jar

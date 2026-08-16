@@ -367,6 +367,59 @@ services:
       database:
         condition: service_healthy
 
+  amongus:
+    # Java 21, e nao 25: a 1.21.11 e anterior ao Java 25 e nao sobe nele.
+    image: itzg/minecraft-server:java21
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      # Presa na 1.21.11, e nao na 26.2 como o resto da rede: o plugin de Among
+      # Us declara suporte ate a 1.21.11, e plugin de minigame mexe fundo no
+      # jogo — nao e o tipo de coisa que se poe para rodar fora da versao que o
+      # autor testou. O ViaVersion deixa quem tem cliente novo entrar assim
+      # mesmo, que e o mesmo arranjo do Bed Wars.
+      VERSION: "${MINECRAFT_VERSION_AMONGUS:-1.21.11}"
+      MEMORY: "${MEMORY_AMONGUS:-1500M}"
+      ONLINE_MODE: "FALSE"
+      ENABLE_RCON: "FALSE"
+      # Permite mandar comandos de admin sem RCON:
+      # docker exec <container> mc-send-to-console <comando>
+      CREATE_CONSOLE_IN_PIPE: "TRUE"
+      SERVER_NAME: "Game Craft Among Us"
+      MOTD: "Game Craft | Among Us beta"
+      # Mapa proprio, construido a mao: mundo plano e vazio, para a nave nascer
+      # sobre nada em vez de sobre terreno gerado. Uma camada de bedrock so para
+      # o mundo existir; o resto e ar.
+      LEVEL: "nave"
+      LEVEL_TYPE: "minecraft:flat"
+      GENERATOR_SETTINGS: '{"layers":[{"block":"minecraft:bedrock","height":1}],"biome":"minecraft:the_void"}'
+      ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
+      MAX_PLAYERS: "15"
+      # Aventura: no Among Us ninguem quebra nem poe bloco — as tarefas sao
+      # cliques em blocos ja postos, e um impostor que cava chao acaba a partida
+      # sozinho.
+      MODE: adventure
+      DIFFICULTY: peaceful
+      PVP: "false"
+      SPAWN_MONSTERS: "FALSE"
+      SPAWN_ANIMALS: "FALSE"
+      ALLOW_NETHER: "false"
+      SPAWN_PROTECTION: "0"
+      VIEW_DISTANCE: "8"
+      SIMULATION_DISTANCE: "6"
+      PLUGINS_FILE: /data/plugins.txt
+    expose:
+      - "25565"
+    volumes:
+      - gc_amongus:/data
+    networks:
+      - gamecraft
+    depends_on:
+      database:
+        condition: service_healthy
+
   # Tunel para amigos de fora da rede de casa. O agente conversa com o playit
   # e entrega o trafego ao proxy por dentro da rede do Docker, entao o IP da
   # casa nunca aparece para quem entra. Sem PLAYIT_SECRET no .env ele nao sobe.
@@ -432,6 +485,8 @@ volumes:
   gc_pvp:
     external: true
   gc_eventos:
+    external: true
+  gc_amongus:
     external: true
   gc_mariadb:
     external: true

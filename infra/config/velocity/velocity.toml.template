@@ -23,6 +23,7 @@ buildbattle = "buildbattle:25565"
 ctf = "ctf:25565"
 pvp = "pvp:25565"
 eventos = "eventos:25565"
+amongus = "amongus:25565"
 try = ["lobby"]
 
 [forced-hosts]
