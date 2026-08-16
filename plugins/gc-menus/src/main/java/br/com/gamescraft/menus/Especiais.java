@@ -27,10 +27,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -56,6 +59,12 @@ final class Especiais implements Listener {
     /** Quinze corações. O de fábrica tem cinquenta, e não morria nunca. */
     private static final double VIDA_DO_GOLEM = 30.0;
 
+    /**
+     * Dano cru do golpe do golem. Depois da armadura de couro inteira sobram
+     * cinco pontos, que é um quarto dos vinte de vida.
+     */
+    private static final double DANO_DO_GOLEM = 6.0;
+
     private final JavaPlugin plugin;
     private final Torres torres;
     private final Areas areas;
@@ -65,16 +74,22 @@ final class Especiais implements Listener {
     /** A armadura guardada de quem está invisível, para devolver depois. */
     private final Map<UUID, ItemStack[]> escondidas = new HashMap<>();
 
+    /** De qual time é cada golem, gravado no próprio bicho. */
+    private final NamespacedKey marcaDoTime;
+
     Especiais(JavaPlugin plugin, Torres torres, Areas areas, NamespacedKey marca) {
         this.plugin = plugin;
         this.torres = torres;
         this.areas = areas;
         this.marca = marca;
+        this.marcaDoTime = new NamespacedKey(plugin, "time_do_golem");
         this.timeVermelho = plugin.getConfig().getString("time-vermelho", "Vermelho");
 
         // Quem some tem de reaparecer quando a poção acaba, e o fim de um efeito
         // não avisa ninguém: só olhando de tempos em tempos.
         plugin.getServer().getScheduler().runTaskTimer(plugin, this::conferirInvisiveis, 20L, 20L);
+        // O golem procura inimigo sozinho, uma vez por segundo.
+        plugin.getServer().getScheduler().runTaskTimer(plugin, this::caçarInimigos, 40L, 20L);
     }
 
     private String truqueDe(ItemStack item) {
@@ -93,9 +108,23 @@ final class Especiais implements Listener {
 
     // ------------------------------------------------------- bola de fogo
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    /**
+     * Sem ignoreCancelled, de propósito.
+     *
+     * O servidor está em modo aventura, e nele o jogo já marca o clique como
+     * cancelado antes de qualquer plugin ver — é assim que ele impede de pôr e
+     * quebrar bloco. Com o ouvinte ignorando evento cancelado, a bola só saía
+     * no caso em que o clique escapava dessa marca: mirando um bloco de perto.
+     * Era o que parecia falta de alcance, e era o evento nunca chegando aqui.
+     */
+    @EventHandler(priority = EventPriority.HIGH)
     public void aoUsar(PlayerInteractEvent evento) {
         if (evento.getAction() != Action.RIGHT_CLICK_AIR && evento.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+        // Só a mão principal: o clique chega uma vez por mão, e sem isto a
+        // bola sairia em dobro e cobraria duas.
+        if (evento.getHand() != EquipmentSlot.HAND) {
             return;
         }
         ItemStack naMao = evento.getItem();
@@ -166,7 +195,27 @@ final class Especiais implements Listener {
         }
         golem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(VIDA_DO_GOLEM);
         golem.setHealth(VIDA_DO_GOLEM);
-        golem.setCustomName(ChatColor.GRAY + "Golem (5 min)");
+
+        // De quem ele é: o jogador mais perto na hora em que o ovo foi usado.
+        // O evento do ovo não diz quem o quebrou, e quem invoca está sempre a
+        // um ou dois blocos do bicho que acabou de aparecer.
+        Player dono = null;
+        double menor = Double.MAX_VALUE;
+        for (Player perto : golem.getWorld().getPlayers()) {
+            double distancia = perto.getLocation().distanceSquared(golem.getLocation());
+            if (distancia < menor && distancia <= 64) {
+                menor = distancia;
+                dono = perto;
+            }
+        }
+        String time = dono == null ? null : timeDe(dono);
+        if (time != null) {
+            golem.getPersistentDataContainer().set(marcaDoTime, PersistentDataType.STRING, time);
+            golem.setCustomName((timeVermelho.equals(time) ? ChatColor.RED : ChatColor.BLUE)
+                    + "Golem do " + time);
+        } else {
+            golem.setCustomName(ChatColor.GRAY + "Golem");
+        }
         golem.setCustomNameVisible(true);
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (golem.isValid()) {
@@ -175,6 +224,86 @@ final class Especiais implements Listener {
                 golem.remove();
             }
         }, SEGUNDOS_DO_GOLEM * 20L);
+    }
+
+    /** O time dono daquele golem, ou nulo se ele não for de ninguém. */
+    private String donoDoGolem(IronGolem golem) {
+        return golem.getPersistentDataContainer().get(marcaDoTime, PersistentDataType.STRING);
+    }
+
+    /**
+     * O golem não encosta em quem é do time dele, e caça quem não é.
+     *
+     * De fábrica ele só revida, e um guarda que espera apanhar não guarda nada:
+     * quem entra no castelo passa direto por ele até bater em alguém.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void aoMirar(EntityTargetLivingEntityEvent evento) {
+        if (!(evento.getEntity() instanceof IronGolem golem)
+                || !(evento.getTarget() instanceof Player alvo)) {
+            return;
+        }
+        String dono = donoDoGolem(golem);
+        if (dono != null && dono.equals(timeDe(alvo))) {
+            evento.setCancelled(true);
+            evento.setTarget(null);
+        }
+    }
+
+    private void caçarInimigos() {
+        for (org.bukkit.World mundo : plugin.getServer().getWorlds()) {
+            for (IronGolem golem : mundo.getEntitiesByClass(IronGolem.class)) {
+                String dono = donoDoGolem(golem);
+                if (dono == null) {
+                    continue;
+                }
+                if (golem.getTarget() instanceof Player atual && atual.isValid()
+                        && !dono.equals(timeDe(atual))) {
+                    continue;
+                }
+                Player achado = null;
+                double menor = Double.MAX_VALUE;
+                for (Player perto : mundo.getPlayers()) {
+                    if (dono.equals(timeDe(perto)) || perto.isDead()
+                            || perto.getGameMode() == GameMode.SPECTATOR
+                            || perto.getGameMode() == GameMode.CREATIVE) {
+                        continue;
+                    }
+                    double distancia = perto.getLocation().distanceSquared(golem.getLocation());
+                    if (distancia < menor && distancia <= 16 * 16) {
+                        menor = distancia;
+                        achado = perto;
+                    }
+                }
+                golem.setTarget(achado);
+            }
+        }
+    }
+
+    /**
+     * O golpe do golem tira um quarto da vida de quem está de couro inteiro.
+     *
+     * O de fábrica bate entre sete e vinte e um, e vinte e um mata de couro num
+     * golpe e meio — a defesa comprada decidia a partida sozinha. Seis de dano
+     * cru viram cinco depois da armadura de couro, que é um quarto dos vinte
+     * pontos de vida.
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void aoBaterGolem(EntityDamageByEntityEvent evento) {
+        if (!(evento.getDamager() instanceof IronGolem golem)) {
+            return;
+        }
+        String dono = donoDoGolem(golem);
+        if (dono != null && evento.getEntity() instanceof Player alvo && dono.equals(timeDe(alvo))) {
+            evento.setCancelled(true);
+            return;
+        }
+        evento.setDamage(DANO_DO_GOLEM);
+    }
+
+    private String timeDe(Player jogador) {
+        Team time = jogador.getScoreboard().getEntryTeam(jogador.getName());
+        return time == null ? null : time.getName();
     }
 
     // ------------------------------------------------------ invisibilidade
