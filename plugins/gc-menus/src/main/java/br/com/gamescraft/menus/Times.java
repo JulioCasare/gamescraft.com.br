@@ -157,7 +157,7 @@ final class Times implements Listener {
                 for (int x = minx; x <= maxx; x++) {
                     for (int z = minz; z <= maxz; z++) {
                         if (mundo.getBlockAt(x, y, z).getType() == marca) {
-                            return new Location(mundo, x + 0.5, y + 1, z + 0.5);
+                            return emCimaDaPilha(mundo, x, y, z);
                         }
                     }
                 }
@@ -166,6 +166,28 @@ final class Times implements Listener {
                     + ": o time nasce onde o jogo mandar ate o bloco aparecer.");
         }
         return null;
+    }
+
+    /**
+     * O primeiro lugar de pé acima do bloco que marca o nascimento.
+     *
+     * O time tapa o próprio bloco com obsidiana para defendê-lo, e nascer na
+     * casa logo acima dele punha a pessoa dentro da parede: sufocando, ou
+     * empurrada para fora da defesa que ela mesma construiu. Sobe-se a pilha
+     * inteira e nasce-se em cima dela.
+     *
+     * "De pé" é dois blocos de ar seguidos: um para o corpo e outro para a
+     * cabeça. Só um não basta — o jogo empurra quem nasce com o teto colado.
+     */
+    private Location emCimaDaPilha(World mundo, int x, int ondeEstaMarca, int z) {
+        int teto = mundo.getMaxHeight() - 2;
+        for (int y = ondeEstaMarca + 1; y < teto; y++) {
+            if (mundo.getBlockAt(x, y, z).getType().isAir()
+                    && mundo.getBlockAt(x, y + 1, z).getType().isAir()) {
+                return new Location(mundo, x + 0.5, y, z + 0.5);
+            }
+        }
+        return new Location(mundo, x + 0.5, ondeEstaMarca + 1, z + 0.5);
     }
 
     /** Couro tingido da cor do time, espada e picareta de madeira, e uma barra de ouro. */

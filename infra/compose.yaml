@@ -1,4 +1,4 @@
-name: game-craft-beta
+﻿name: game-craft-beta
 
 services:
   proxy:
@@ -8,7 +8,7 @@ services:
     environment:
       TYPE: VELOCITY
       # Versao presa, e nao "latest", desde 2026-08-11: o build 19 saiu naquele
-      # dia e quebrou o registro de listener de todo plugin do proxy — Geyser e
+      # dia e quebrou o registro de listener de todo plugin do proxy â€” Geyser e
       # Floodgate param de subir, e a rede fica sem Bedrock. O pior e que isso
       # nao acontece quando a gente mexe em nada: basta reiniciar o proxy num dia
       # em que saiu snapshot novo. O 16 e o ultimo que funciona.
@@ -67,10 +67,16 @@ services:
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_lobby:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -89,7 +95,7 @@ services:
       # mais novos (e o Geyser) entrarem mesmo assim.
       VERSION: "${MINECRAFT_VERSION_BEDWARS:-1.20.4}"
       MEMORY: "${MEMORY_BEDWARS:-2500M}"
-      # Mundo void: fora do mapa de BedWars nao gera terreno nenhum — cair do
+      # Mundo void: fora do mapa de BedWars nao gera terreno nenhum â€” cair do
       # mapa e cair no vazio. Vale so na criacao do mundo (fica no level.dat).
       LEVEL_TYPE: "minecraft:flat"
       GENERATOR_SETTINGS: '{"biome":"minecraft:the_void","layers":[]}'
@@ -115,10 +121,16 @@ services:
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_bedwars:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -163,10 +175,16 @@ services:
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_pillars:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -206,10 +224,16 @@ services:
       VIEW_DISTANCE: "6"
       SIMULATION_DISTANCE: "4"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_buildbattle:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -229,13 +253,13 @@ services:
       # Permite mandar comandos de admin sem RCON:
       # docker exec <container> mc-send-to-console <comando>
       CREATE_CONSOLE_IN_PIPE: "TRUE"
-      # O identificador continua `ctf` — e o nome pelo qual o proxy roteia
+      # O identificador continua `ctf` â€” e o nome pelo qual o proxy roteia
       # (/server ctf), o nome do volume e o nome nos scripts. Trocar isso
       # quebraria os tres de uma vez; o que o jogador ve e o nome abaixo.
       SERVER_NAME: "Game Craft MegaGames"
       MOTD: "Game Craft | MegaGames beta"
       # Mapa proprio: uma ilha construida a mao num mar plano. O mundo `ilha`
-      # nasce so de mar — bedrock, pedra ate y=50 e agua ate y=62 — e a ilha em
+      # nasce so de mar â€” bedrock, pedra ate y=50 e agua ate y=62 â€” e a ilha em
       # si e desenhada por cima com o WorldEdit. Bioma de planicie no mundo
       # inteiro para a grama sair verde: com bioma de oceano ela puxa para o
       # azul. O mapa Island que veio pronto continua guardado no mundo `world`.
@@ -257,10 +281,16 @@ services:
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_ctf:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -300,10 +330,16 @@ services:
       VIEW_DISTANCE: "6"
       SIMULATION_DISTANCE: "4"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_pvp:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -346,7 +382,7 @@ services:
       VIEW_DISTANCE: "10"
       SIMULATION_DISTANCE: "6"
       # Mundo normal, de semente sorteada: SEED vazio faz o servidor tirar uma
-      # na hora de criar. O nome do mundo mudou junto de proposito — semente e
+      # na hora de criar. O nome do mundo mudou junto de proposito â€” semente e
       # tipo so valem na criacao, entao pedir mundo novo e pedir pasta nova. A
       # `world` antiga, plana, continua no volume: para voltar a ela basta
       # trocar LEVEL de volta.
@@ -357,10 +393,16 @@ services:
       LEVEL_TYPE: "minecraft:normal"
       GENERATE_STRUCTURES: "true"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_eventos:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -376,7 +418,7 @@ services:
       TYPE: PAPER
       # Presa na 1.21.11, e nao na 26.2 como o resto da rede: o plugin de Among
       # Us declara suporte ate a 1.21.11, e plugin de minigame mexe fundo no
-      # jogo — nao e o tipo de coisa que se poe para rodar fora da versao que o
+      # jogo â€” nao e o tipo de coisa que se poe para rodar fora da versao que o
       # autor testou. O ViaVersion deixa quem tem cliente novo entrar assim
       # mesmo, que e o mesmo arranjo do Bed Wars.
       VERSION: "${MINECRAFT_VERSION_AMONGUS:-1.21.11}"
@@ -397,7 +439,7 @@ services:
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "15"
-      # Aventura: no Among Us ninguem quebra nem poe bloco — as tarefas sao
+      # Aventura: no Among Us ninguem quebra nem poe bloco â€” as tarefas sao
       # cliques em blocos ja postos, e um impostor que cava chao acaba a partida
       # sozinho.
       MODE: adventure
@@ -410,10 +452,16 @@ services:
       VIEW_DISTANCE: "8"
       SIMULATION_DISTANCE: "6"
       PLUGINS_FILE: /data/plugins.txt
+      # Repasse do Velocity, ligado a cada arranque pelo remendo em
+      # config/paper/patches. Sem ele o jogador chega com um UUID inventado a
+      # partir do nome, e whitelist, op e LuckPerms olham para outra pessoa.
+      PATCH_DEFINITIONS: /patches
+      CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
     volumes:
       - gc_amongus:/data
+      - ./config/paper/patches:/patches:ro
     networks:
       - gamecraft
     depends_on:
@@ -459,7 +507,7 @@ networks:
     driver: bridge
 
 # Os dados dos servidores vivem em volumes do Docker, dentro do disco Linux do
-# WSL — nao em pasta do Windows. O compartilhamento de arquivos do Docker
+# WSL â€” nao em pasta do Windows. O compartilhamento de arquivos do Docker
 # Desktop com o disco D: colapsava depois de algumas horas de escrita e
 # derrubava a rede (arquivo corrompido, container que nao sobe, erro de
 # leitura no proprio JAR). Sem bind, esse caminho deixa de existir.
