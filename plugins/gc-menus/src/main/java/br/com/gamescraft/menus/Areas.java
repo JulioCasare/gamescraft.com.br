@@ -47,6 +47,7 @@ final class Areas implements Listener {
     private final Torres torres;
     private final List<Caixa> caixas = new ArrayList<>();
     private final Set<String> colocados = new HashSet<>();
+    private final Set<String> emObras = new HashSet<>();
     private final File arquivo;
     private boolean sujo;
 
@@ -76,6 +77,40 @@ final class Areas implements Listener {
         // Grava de trinta em trinta segundos, e nao a cada bloco: numa area de
         // construcao o povo coloca bloco as dezenas por segundo.
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::salvar, 600L, 600L);
+        plugin.getServer().getScheduler().runTaskTimer(plugin, this::verObras, 40L, 20L);
+    }
+
+    /**
+     * Desligar o /obras congela o mapa: tudo o que está de pé vira castelo.
+     *
+     * É o mesmo sentido que o /obras já tem no datapack — "acabei de editar,
+     * este é o novo estado de referência". Sem isto, cada bloco posto durante
+     * uma obra continuaria contando como defesa de jogador, e uma TNT levaria
+     * junto a mobília que o Julio acabou de construir.
+     */
+    private void verObras() {
+        Set<String> agora = new HashSet<>();
+        for (Player jogador : plugin.getServer().getOnlinePlayers()) {
+            if (torres.podeMexer(jogador)) {
+                agora.add(jogador.getName());
+            }
+        }
+        for (String quem : emObras) {
+            if (agora.contains(quem)) {
+                continue;
+            }
+            Player jogador = plugin.getServer().getPlayerExact(quem);
+            int quantos = colocados.size();
+            colocados.clear();
+            sujo = true;
+            if (jogador != null && quantos > 0) {
+                jogador.sendMessage(ChatColor.GREEN + "Obras desligadas: " + quantos
+                        + " blocos passaram a contar como mapa.");
+            }
+            break;
+        }
+        emObras.clear();
+        emObras.addAll(agora);
     }
 
     private String chave(Block bloco) {
@@ -121,6 +156,14 @@ final class Areas implements Listener {
         }
         if (torres.protegido(bloco) && !torres.podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
+            return;
+        }
+        // Quem está de /obras está construindo o mapa, e não jogando: o que ele
+        // põe é castelo, não defesa. Sem esta distinção o baú e a alavanca que
+        // o Julio pôs entravam na lista do que pode ser quebrado e explodido.
+        if (torres.podeMexer(evento.getPlayer())) {
+            colocados.remove(chave(bloco));
+            sujo = true;
             return;
         }
         colocados.add(chave(bloco));
