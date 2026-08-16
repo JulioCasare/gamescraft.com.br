@@ -88,8 +88,10 @@ final class Especiais implements Listener {
         // Quem some tem de reaparecer quando a poção acaba, e o fim de um efeito
         // não avisa ninguém: só olhando de tempos em tempos.
         plugin.getServer().getScheduler().runTaskTimer(plugin, this::conferirInvisiveis, 20L, 20L);
-        // O golem procura inimigo sozinho, uma vez por segundo.
-        plugin.getServer().getScheduler().runTaskTimer(plugin, this::caçarInimigos, 40L, 20L);
+        // Meio segundo entre uma olhada e outra: a IA do golem larga o alvo
+        // sozinha de vez em quando, e uma vez por segundo era tempo bastante
+        // para ele parar no meio da perseguição.
+        plugin.getServer().getScheduler().runTaskTimer(plugin, this::caçarInimigos, 40L, 10L);
     }
 
     private String truqueDe(ItemStack item) {
@@ -196,6 +198,11 @@ final class Especiais implements Listener {
         golem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(VIDA_DO_GOLEM);
         golem.setHealth(VIDA_DO_GOLEM);
 
+        // Golem de ovo nasce marcado como "feito por jogador", e essa marca é o
+        // que faz a IA dele recusar mirar em gente: ele fica de guarda de aldeia
+        // e só revida. Tirando a marca, o alvo que a gente põe fica de pé.
+        golem.setPlayerCreated(false);
+
         // De quem ele é: o jogador mais perto na hora em que o ovo foi usado.
         // O evento do ovo não diz quem o quebrou, e quem invoca está sempre a
         // um ou dois blocos do bicho que acabou de aparecer.
@@ -255,8 +262,16 @@ final class Especiais implements Listener {
             for (IronGolem golem : mundo.getEntitiesByClass(IronGolem.class)) {
                 String dono = donoDoGolem(golem);
                 if (dono == null) {
+                    // Golem sem dono é de antes desta versão, ou nasceu sem
+                    // ninguém por perto. Ele não vira inimigo de ninguém, mas
+                    // também não fica de guarda de aldeia batendo em quem passa.
+                    golem.setPlayerCreated(false);
+                    if (golem.getTarget() instanceof Player) {
+                        golem.setTarget(null);
+                    }
                     continue;
                 }
+                golem.setPlayerCreated(false);
                 if (golem.getTarget() instanceof Player atual && atual.isValid()
                         && !dono.equals(timeDe(atual))) {
                     continue;

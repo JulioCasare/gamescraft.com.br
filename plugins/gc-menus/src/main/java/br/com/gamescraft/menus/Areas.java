@@ -15,7 +15,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -141,6 +144,35 @@ final class Areas implements Listener {
             return;
         }
         evento.setCancelled(true);
+    }
+
+    /**
+     * Explosão não derruba castelo.
+     *
+     * A bola de fogo e a TNT abriam buraco na parede e no chão da base, e o
+     * castelo não se conserta sozinho: em duas partidas ele virava ruína. O que
+     * os jogadores puseram continua indo pelos ares — é defesa, e defesa se
+     * quebra.
+     */
+    private boolean doMapaEmArea(Block bloco) {
+        return dentro(bloco) && !foiColocado(bloco);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void aoExplodirEntidade(EntityExplodeEvent evento) {
+        evento.blockList().removeIf(this::doMapaEmArea);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void aoExplodirBloco(BlockExplodeEvent evento) {
+        evento.blockList().removeIf(this::doMapaEmArea);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void aoQueimar(BlockBurnEvent evento) {
+        if (doMapaEmArea(evento.getBlock())) {
+            evento.setCancelled(true);
+        }
     }
 
     void salvar() {

@@ -178,8 +178,8 @@ final class Times implements Listener {
         jogador.getInventory().setBoots(couro(Material.LEATHER_BOOTS, cor));
         // Slot fixo em vez de addItem: o ouro tem de cair no ultimo lugar da
         // barra, e addItem so procura o primeiro buraco livre.
-        jogador.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
-        jogador.getInventory().setItem(1, new ItemStack(Material.WOODEN_PICKAXE));
+        jogador.getInventory().setItem(0, Ferramentas.semDesgaste(new ItemStack(Material.WOODEN_SWORD)));
+        jogador.getInventory().setItem(1, Ferramentas.semDesgaste(new ItemStack(Material.WOODEN_PICKAXE)));
         jogador.getInventory().setItem(8, barraDaLoja());
         // Por ultimo: o que foi comprado na loja vale mais que o kit de entrada.
         armaduras.vestir(jogador);
@@ -231,6 +231,7 @@ final class Times implements Listener {
         ItemStack peca = new ItemStack(tipo);
         LeatherArmorMeta dados = (LeatherArmorMeta) peca.getItemMeta();
         dados.setColor(cor);
+        dados.setUnbreakable(true);
         peca.setItemMeta(dados);
         return peca;
     }

@@ -124,7 +124,8 @@ final class Loja implements Listener {
 
                 new Oferta("arco", FILEIRA_2[0], Material.BOW, 1, 7, "Arco", "Para tirar quem está em cima da torre"),
                 new Oferta("flechas", FILEIRA_2[1], Material.ARROW, 16, 2, "16 flechas", "Sem elas o arco não serve de nada"),
-                new Oferta("arco_forca", FILEIRA_2[2], Material.BOW, 1, 14, "Arco Força I", "Mais dano por flecha, para segurar de longe"))));
+                new Oferta("arco_forca", FILEIRA_2[2], Material.BOW, 1, 14, "Arco Força I", "Mais dano por flecha, para segurar de longe"),
+                new Oferta("escudo", FILEIRA_2[3], Material.SHIELD, 1, 5, "Escudo", "Segura flecha e o primeiro golpe"))));
 
         aba(new Aba(3, "armadura", Material.IRON_CHESTPLATE, "Armadura", List.of(
                 new Oferta("malha_capacete", FILEIRA_1[0], Material.CHAINMAIL_HELMET, 1, 3, "Capacete de malha", "Enfeite na cor do time", Truque.VESTIR),

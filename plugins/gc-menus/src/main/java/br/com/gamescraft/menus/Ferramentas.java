@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -87,15 +88,36 @@ final class Ferramentas {
         Material picareta = lerMaterial(jogador.getUniqueId() + ".picareta");
         if (picareta != null) {
             // O kit ja poe a de madeira no lugar 1; esta troca por cima.
-            jogador.getInventory().setItem(1, new ItemStack(picareta));
+            jogador.getInventory().setItem(1, semDesgaste(new ItemStack(picareta)));
         }
         Material machado = lerMaterial(jogador.getUniqueId() + ".machado");
         if (machado != null) {
-            jogador.getInventory().addItem(new ItemStack(machado));
+            jogador.getInventory().addItem(semDesgaste(new ItemStack(machado)));
         }
         if (lerMaterial(jogador.getUniqueId() + ".tesoura") != null) {
-            jogador.getInventory().addItem(new ItemStack(Material.SHEARS));
+            jogador.getInventory().addItem(semDesgaste(new ItemStack(Material.SHEARS)));
         }
+    }
+
+    /**
+     * Marca o item como indestrutivel.
+     *
+     * Vale para tudo o que se equipa neste jogo, e nao so para o que sai da
+     * loja: a ferramenta que volta depois da morte e o kit de entrada sao itens
+     * novos, e sem esta passagem nasciam gastaveis. O desgaste so criava uma
+     * segunda moeda invisivel — a pessoa voltava ao castelo no meio da disputa
+     * por causa de uma barrinha, e isso nao decidia nada.
+     */
+    static ItemStack semDesgaste(ItemStack item) {
+        if (item == null || item.getType().getMaxDurability() <= 0) {
+            return item;
+        }
+        ItemMeta dados = item.getItemMeta();
+        if (dados != null) {
+            dados.setUnbreakable(true);
+            item.setItemMeta(dados);
+        }
+        return item;
     }
 
     /**
