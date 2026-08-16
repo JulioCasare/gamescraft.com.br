@@ -1,4 +1,15 @@
 scoreboard objectives add gcctf dummy
+
+# Sempre de dia. A ilha e aberta e a disputa acontece no chao: de noite o mapa
+# fica escuro demais para ver quem esta subindo na torre ao lado, e a partida
+# vira um jogo de ouvido.
+#
+# Feito no relogio, e nao por gamerule: na 26.2 o ciclo do dia deixou de ter
+# regra com esse nome — o tempo virou marcador por dimensao, e `gamerule
+# doDaylightCycle` nao existe mais. Repor o dia de dez em dez segundos custa
+# nada e nao depende de adivinhar o nome novo.
+time set day
+weather clear
 # Placar do gatilho: o jogador liga e desliga com /obras, que e um apelido para
 # /trigger obras.
 scoreboard objectives add obras trigger

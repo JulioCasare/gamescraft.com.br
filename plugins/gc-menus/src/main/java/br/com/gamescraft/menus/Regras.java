@@ -127,8 +127,44 @@ final class Regras implements Listener {
                 + "Esse baú é do time " + dono + ".");
     }
 
+    /**
+     * O time dono de um castelo, se o bloco estiver dentro de um.
+     *
+     * Vem do lugar, e não de quem pôs o baú: os baús dos castelos foram postos
+     * pelo Julio, que é de um time só, e pelo registro de quem coloca os dois
+     * castelos teriam o mesmo dono. Dentro do castelo vermelho o baú é do
+     * vermelho, tenha sido posto por quem for.
+     */
+    private String donoPeloCastelo(Block bloco) {
+        for (String linha : plugin.getConfig().getStringList("areas-construcao")) {
+            String[] p = linha.split(",");
+            if (p.length < 7) {
+                continue;
+            }
+            int minx = Math.min(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
+            int maxx = Math.max(Integer.parseInt(p[0].trim()), Integer.parseInt(p[3].trim()));
+            int miny = Math.min(Integer.parseInt(p[1].trim()), Integer.parseInt(p[4].trim()));
+            int maxy = Math.max(Integer.parseInt(p[1].trim()), Integer.parseInt(p[4].trim()));
+            int minz = Math.min(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
+            int maxz = Math.max(Integer.parseInt(p[2].trim()), Integer.parseInt(p[5].trim()));
+            if (bloco.getX() < minx || bloco.getX() > maxx
+                    || bloco.getY() < miny || bloco.getY() > maxy
+                    || bloco.getZ() < minz || bloco.getZ() > maxz) {
+                continue;
+            }
+            return p[6].trim().equalsIgnoreCase("vermelho")
+                    ? timeVermelho
+                    : plugin.getConfig().getString("time-azul", "Azul");
+        }
+        return null;
+    }
+
     /** O dono do baú, contando a outra metade se ele for duplo. */
     private String donoDe(Block bloco) {
+        String doCastelo = donoPeloCastelo(bloco);
+        if (doCastelo != null) {
+            return doCastelo;
+        }
         String dono = donos.getString(chave(bloco));
         if (dono != null) {
             return dono;

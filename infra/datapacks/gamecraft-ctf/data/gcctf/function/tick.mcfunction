@@ -13,3 +13,8 @@ execute if score #t gcctf matches 10.. run function gcctf:meio_segundo
 # quebrou sem a conta pesar no servidor.
 scoreboard players add #ta gcctf 1
 execute if score #ta gcctf matches 20.. run function gcctf:cada_segundo
+
+# De dez em dez segundos o dia volta. O porque esta no load: na 26.2 nao ha mais
+# gamerule para o ciclo do dia.
+scoreboard players add #dia gcctf 1
+execute if score #dia gcctf matches 200.. run function gcctf:manter_dia

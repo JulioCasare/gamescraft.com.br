@@ -117,7 +117,11 @@ final class Loja implements Listener {
                 new Oferta("obsidiana", FILEIRA_1[3], Material.OBSIDIAN, 4, 12, "4 obsidianas", "Em volta do seu bloco, ganha muito tempo"),
                 new Oferta("escada", FILEIRA_1[4], Material.LADDER, 16, 2, "16 escadas", "Subir sem virar alvo parado"))));
 
-        aba(new Aba(2, "armas", Material.IRON_SWORD, "Armas", List.of(
+        // As lancas so existem no jogo novo, e este plugin e compilado contra
+        // uma API mais antiga para tambem rodar no Bed Wars: o nome delas tem de
+        // ser procurado em tempo de execucao. Onde nao existirem, a loja abre
+        // sem elas em vez de nao abrir.
+        List<Oferta> armas = new ArrayList<>(List.of(
                 new Oferta("espada_pedra", FILEIRA_1[0], Material.STONE_SWORD, 1, 2, "Espada de pedra", "O primeiro passo depois da de madeira"),
                 new Oferta("espada_ferro", FILEIRA_1[1], Material.IRON_SWORD, 1, 7, "Espada de ferro", "Mata de couro em quatro golpes"),
                 new Oferta("espada_diamante", FILEIRA_1[2], Material.DIAMOND_SWORD, 1, 10, "Espada de diamante", "A melhor lâmina do jogo"),
@@ -125,7 +129,16 @@ final class Loja implements Listener {
                 new Oferta("arco", FILEIRA_2[0], Material.BOW, 1, 7, "Arco", "Para tirar quem está em cima da torre"),
                 new Oferta("flechas", FILEIRA_2[1], Material.ARROW, 16, 2, "16 flechas", "Sem elas o arco não serve de nada"),
                 new Oferta("arco_forca", FILEIRA_2[2], Material.BOW, 1, 14, "Arco Força I", "Mais dano por flecha, para segurar de longe"),
-                new Oferta("escudo", FILEIRA_2[3], Material.SHIELD, 1, 5, "Escudo", "Segura flecha e o primeiro golpe"))));
+                new Oferta("escudo", FILEIRA_2[3], Material.SHIELD, 1, 5, "Escudo", "Segura flecha e o primeiro golpe")));
+
+        lanca(armas, "lanca_pedra", FILEIRA_3[0], "stone_spear", 4, 1,
+                "Lança de pedra", "Alcance maior que o da espada, e arremessável");
+        lanca(armas, "lanca_ferro", FILEIRA_3[1], "iron_spear", 10, 2,
+                "Lança de ferro", "Investida mais longa: alcança quem está fugindo");
+        lanca(armas, "lanca_dima", FILEIRA_3[2], "diamond_spear", 24, 3,
+                "Lança de diamante", "A investida mais longa do jogo");
+
+        aba(new Aba(2, "armas", Material.IRON_SWORD, "Armas", armas));
 
         aba(new Aba(3, "armadura", Material.IRON_CHESTPLATE, "Armadura", List.of(
                 new Oferta("malha_capacete", FILEIRA_1[0], Material.CHAINMAIL_HELMET, 1, 3, "Capacete de malha", "Enfeite na cor do time", Truque.VESTIR),
@@ -180,6 +193,27 @@ final class Loja implements Listener {
         // castelo, na ordem em que se costuma precisar.
         this.rapidaDeFabrica = List.of("la", "espada_pedra", "malha_bota", "picareta_ferro",
                 "arco", "flechas", "maca", "bola_de_fogo", "tnt", "perola", "agua", "obsidiana");
+    }
+
+    /** Quanto Lunge cada lança carrega, por id. Vazio onde não houver lança. */
+    private final Map<String, Integer> investidas = new LinkedHashMap<>();
+
+    /**
+     * Põe uma lança na lista, se este servidor tiver lanças.
+     *
+     * O nível de Lunge fica de fora da oferta e mora num mapa à parte: o
+     * encantamento também só existe no jogo novo, e procurá-lo pelo nome na hora
+     * da compra evita que a loja inteira dependa dele.
+     */
+    private void lanca(List<Oferta> onde, String id, int slot, String nomeDoItem,
+            int preco, int investida, String nome, String razao) {
+        Material tipo = Material.matchMaterial(nomeDoItem);
+        if (tipo == null) {
+            plugin.getLogger().info("Sem " + nomeDoItem + " nesta versão: a loja abre sem ela.");
+            return;
+        }
+        onde.add(new Oferta(id, slot, tipo, 1, preco, nome, razao));
+        investidas.put(id, investida);
     }
 
     private void aba(Aba aba) {
@@ -354,6 +388,13 @@ final class Loja implements Listener {
         }
         if ("arco_forca".equals(oferta.id())) {
             item.addUnsafeEnchantment(Enchantment.POWER, 1);
+        }
+        Integer investida = investidas.get(oferta.id());
+        if (investida != null) {
+            Enchantment lunge = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("lunge"));
+            if (lunge != null) {
+                item.addUnsafeEnchantment(lunge, investida);
+            }
         }
         if (item.getType() == Material.POTION) {
             encher(item, oferta.id());
