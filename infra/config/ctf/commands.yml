@@ -30,12 +30,13 @@ aliases:
   # vira a referencia.
   obras:
   - trigger obras
-  # /arena1 e /arena2 marcam os cantos; /save guarda o estado e /reset devolve.
+  # O /save e o /reset sairam daqui: eles agora sao do plugin, e trocam a pasta
+  # do mundo em vez de copiar bloco a bloco. Um levava mais de um minuto na ilha
+  # inteira; o outro leva um ou dois segundos.
+  #
+  # O /arena1 e o /arena2 do datapack ficaram sem uso pelo mesmo motivo: nao ha
+  # mais area a marcar, a arena e o mundo todo.
   arena1:
   - function gcctf:arena_canto1
   arena2:
   - function gcctf:arena_canto2
-  save:
-  - function gcctf:save
-  reset:
-  - function gcctf:reset

@@ -271,9 +271,15 @@ services:
       # si e desenhada por cima com o WorldEdit. Bioma de planicie no mundo
       # inteiro para a grama sair verde: com bioma de oceano ela puxa para o
       # azul. O mapa Island que veio pronto continua guardado no mundo `world`.
-      LEVEL: "ilha"
+      # O mundo principal e a sala de votacao, vazia de proposito. A ilha e as
+      # outras arenas sao mundos a parte, carregados pelo plugin.
+      #
+      # Isso nao e capricho de arrumacao: o Bukkit recusa descarregar o mundo
+      # principal, e sem descarregar nao da para resetar uma arena trocando a
+      # pasta. E o mesmo arranjo do Bed Wars, e pelo mesmo motivo.
+      LEVEL: "saguao"
       LEVEL_TYPE: "minecraft:flat"
-      GENERATOR_SETTINGS: '{"layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:stone","height":114},{"block":"minecraft:water","height":12}],"biome":"minecraft:plains"}'
+      GENERATOR_SETTINGS: '{"layers":[],"biome":"minecraft:the_void"}'
       ENABLE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       ENFORCE_WHITELIST: "${BETA_WHITELIST:-TRUE}"
       MAX_PLAYERS: "24"

@@ -61,11 +61,16 @@ final class Partida implements Listener {
     private final File arquivo;
     private final YamlConfiguration guardado;
 
+    private final Arenas arenas;
     private Fase fase = Fase.ESPERA;
     private int restante;
 
+    /** Em qual mundo a partida esta acontecendo. */
+    private String arenaAtual = "ilha";
+
     Partida(JavaPlugin plugin, Times times, Captura captura, Armaduras armaduras,
-            Ferramentas ferramentas) {
+            Ferramentas ferramentas, Arenas arenas) {
+        this.arenas = arenas;
         this.plugin = plugin;
         this.times = times;
         this.captura = captura;
@@ -344,8 +349,20 @@ final class Partida implements Listener {
         armaduras.limparTudo();
         ferramentas.limparTudo();
         captura.zerar(Bukkit.getConsoleSender());
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "function gcctf:reset");
-        anunciar(ChatColor.GRAY + "Mapa voltando ao estado salvo. A proxima partida comeca "
+
+        // Troca a pasta do mundo pela copia guardada. Antes isso era um /clone de
+        // trinta e quatro milhoes de blocos, que levava mais de um minuto com todo
+        // mundo parado no saguao esperando.
+        long comeco = System.currentTimeMillis();
+        boolean deu = arenas != null && arenas.resetar(arenaAtual, saguao());
+        if (deu) {
+            plugin.getLogger().info("Arena " + arenaAtual + " refeita em "
+                    + (System.currentTimeMillis() - comeco) + " ms.");
+        } else {
+            plugin.getLogger().warning("Arena " + arenaAtual + " nao foi refeita: "
+                    + "provavelmente ela nunca foi salva com /save.");
+        }
+        anunciar(ChatColor.GRAY + "Mapa refeito. A proxima partida comeca "
                 + "quando houver " + MINIMO + " pessoas.");
     }
 

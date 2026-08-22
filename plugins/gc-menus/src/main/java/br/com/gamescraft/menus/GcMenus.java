@@ -103,6 +103,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** O ciclo da partida: espera, contagem, jogo e recomeco. */
     private Partida partida;
 
+    /** As arenas, uma por mundo, com reset por troca de pasta. */
+    private Arenas arenas;
+
     /** Qual parte do plugin este servidor usa. */
     private String modo = "menus";
 
@@ -184,9 +187,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         captura = new Captura(this, protecao);
         armaduras = new Armaduras(this);
         ferramentas = new Ferramentas(this);
+        arenas = new Arenas(this);
+        arenas.carregarTodas();
         Times equipes = new Times(this, captura, armaduras, ferramentas);
         getServer().getPluginManager().registerEvents(equipes, this);
-        partida = new Partida(this, equipes, captura, armaduras, ferramentas);
+        partida = new Partida(this, equipes, captura, armaduras, ferramentas, arenas);
         equipes.ligarPartida(partida);
         getServer().getPluginManager().registerEvents(partida, this);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
@@ -339,6 +344,27 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         }
         if (comando.getName().equals("forcestart")) {
             return partida != null && partida.forcar(quemMandou);
+        }
+        if (comando.getName().equals("setup")) {
+            return arenas != null && arenas.setup(quemMandou, argumentos);
+        }
+        if (comando.getName().equals("save")) {
+            return arenas != null && arenas.salvarOndeEstou(quemMandou);
+        }
+        if (comando.getName().equals("reset")) {
+            return arenas != null && arenas.resetarOndeEstou(quemMandou);
+        }
+        if (comando.getName().equals("arenas")) {
+            if (arenas == null) {
+                return true;
+            }
+            for (Arenas.Arena arena : arenas.todas()) {
+                boolean carregada = getServer().getWorld(arena.mundo()) != null;
+                quemMandou.sendMessage((carregada ? ChatColor.GREEN : ChatColor.GRAY)
+                        + arena.nome() + ChatColor.GRAY + " - mundo " + arena.mundo()
+                        + " - jogo " + arena.jogo() + (carregada ? " - no ar" : " - fora"));
+            }
+            return true;
         }
         if (comando.getName().equals("neutro")) {
             captura.zerar(quemMandou);

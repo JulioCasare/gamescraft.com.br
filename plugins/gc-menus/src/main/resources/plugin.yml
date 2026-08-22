@@ -37,6 +37,22 @@ commands:
     description: Comeca a partida agora, sem esperar juntar gente
     usage: /forcestart
     permission: gcmenus.npcskin
+  setup:
+    description: Leva voce a uma arena em criativo para construir o mapa
+    usage: /setup <arena>
+    permission: gcmenus.npcskin
+  save:
+    description: Guarda a arena onde voce esta como o mapa oficial dela
+    usage: /save
+    permission: gcmenus.npcskin
+  reset:
+    description: Devolve a arena onde voce esta ao mapa guardado
+    usage: /reset
+    permission: gcmenus.npcskin
+  arenas:
+    description: Lista as arenas e diz quais ja tem modelo guardado
+    usage: /arenas
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
     description: Permite mexer nos bonecos
