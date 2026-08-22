@@ -36,6 +36,13 @@ import org.bukkit.scoreboard.Team;
  */
 final class Times implements Listener {
 
+    /** Quem manda no ciclo da partida. Nulo ate o plugin terminar de subir. */
+    private Partida partida;
+
+    void ligarPartida(Partida partida) {
+        this.partida = partida;
+    }
+
     private static final int SEGUNDOS_DO_PAGAMENTO = 30;
 
     private final JavaPlugin plugin;
@@ -65,14 +72,12 @@ final class Times implements Listener {
 
     @EventHandler
     public void aoEntrar(PlayerJoinEvent evento) {
-        Player jogador = evento.getPlayer();
-        String time = escolherTime(jogador.getUniqueId());
-        entrarNoTime(jogador, time);
-        Location casa = casaDo(time);
-        if (casa != null) {
-            jogador.teleport(casa);
+        // Quem decide o que acontece com quem chega e a Partida: em espera ele
+        // vai para o saguao, em jogo ele entra no time menor. Sem ela, todo
+        // mundo caia no castelo com kit mesmo sem partida acontecendo.
+        if (partida != null) {
+            partida.aoEntrar(evento.getPlayer());
         }
-        darKit(jogador, time);
     }
 
     @EventHandler
@@ -91,7 +96,7 @@ final class Times implements Listener {
     }
 
     /** Time guardado, ou o menor dos dois para quem chega agora. */
-    private String escolherTime(UUID quem) {
+    String escolherTime(UUID quem) {
         String guardado = guardados.getString(quem.toString());
         if (guardado != null) {
             return guardado;
@@ -115,7 +120,29 @@ final class Times implements Listener {
         return time;
     }
 
-    private void entrarNoTime(Player jogador, String nome) {
+    /** Grava o time da pessoa, sem mexer no placar. Usado pelo sorteio. */
+    void marcarTime(Player jogador, String nome) {
+        guardados.set(jogador.getUniqueId().toString(), nome);
+        salvarTimes();
+    }
+
+    /** Apaga o sorteio da partida anterior. */
+    void limparTimes() {
+        for (String chave : guardados.getKeys(false)) {
+            guardados.set(chave, null);
+        }
+        salvarTimes();
+    }
+
+    private void salvarTimes() {
+        try {
+            guardados.save(arquivo);
+        } catch (IOException erro) {
+            plugin.getLogger().warning("Nao consegui guardar o time: " + erro.getMessage());
+        }
+    }
+
+    void entrarNoTime(Player jogador, String nome) {
         Team time = jogador.getScoreboard().getTeam(nome);
         if (time == null) {
             time = jogador.getScoreboard().registerNewTeam(nome);
@@ -134,7 +161,7 @@ final class Times implements Listener {
      * fica — basta mover o bloco no mapa para mudar o ponto de nascimento, sem
      * mexer em codigo. Ha exatamente um de cada dentro do castelo do seu time.
      */
-    private Location casaDo(String time) {
+    Location casaDo(String time) {
         World mundo = plugin.getServer().getWorld(nomeMundo);
         if (mundo == null) {
             return null;
@@ -191,7 +218,7 @@ final class Times implements Listener {
     }
 
     /** Couro tingido da cor do time, espada e picareta de madeira, e uma barra de ouro. */
-    private void darKit(Player jogador, String time) {
+    void darKit(Player jogador, String time) {
         Color cor = time.equals(nomeVermelho) ? Color.RED : Color.BLUE;
         jogador.getInventory().clear();
         jogador.getInventory().setHelmet(couro(Material.LEATHER_HELMET, cor));

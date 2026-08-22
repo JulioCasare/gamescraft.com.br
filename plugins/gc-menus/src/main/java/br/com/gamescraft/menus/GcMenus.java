@@ -100,6 +100,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** A picareta e o machado, que voltam um material atras a cada morte. */
     private Ferramentas ferramentas;
 
+    /** O ciclo da partida: espera, contagem, jogo e recomeco. */
+    private Partida partida;
+
     /** Qual parte do plugin este servidor usa. */
     private String modo = "menus";
 
@@ -181,8 +184,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         captura = new Captura(this, protecao);
         armaduras = new Armaduras(this);
         ferramentas = new Ferramentas(this);
-        getServer().getPluginManager().registerEvents(
-                new Times(this, captura, armaduras, ferramentas), this);
+        Times equipes = new Times(this, captura, armaduras, ferramentas);
+        getServer().getPluginManager().registerEvents(equipes, this);
+        partida = new Partida(this, equipes, captura, armaduras, ferramentas);
+        equipes.ligarPartida(partida);
+        getServer().getPluginManager().registerEvents(partida, this);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
         Loja loja = new Loja(this, protecao, areas, armaduras, ferramentas);
         getServer().getPluginManager().registerEvents(loja, this);
@@ -327,6 +333,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         if (comando.getName().equals("castelos")) {
             captura.pintarCastelos(quemMandou);
             return true;
+        }
+        if (comando.getName().equals("espera")) {
+            return partida != null && partida.definirEspera(quemMandou);
         }
         if (comando.getName().equals("neutro")) {
             captura.zerar(quemMandou);

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -175,6 +176,12 @@ final class Areas implements Listener {
     public void aoQuebrar(BlockBreakEvent evento) {
         Block bloco = evento.getBlock();
         if (!dentro(bloco)) {
+            return;
+        }
+        // A redstone e o lapis sao a excecao: sao blocos do mapa, mas quebra-los
+        // e como se ganha a partida. Quem decide se aquele golpe vale e a
+        // Partida, que ja conferiu de quem e o bloco antes de deixar passar.
+        if (bloco.getType() == Material.REDSTONE_BLOCK || bloco.getType() == Material.LAPIS_BLOCK) {
             return;
         }
         if (torres.podeMexer(evento.getPlayer())) {

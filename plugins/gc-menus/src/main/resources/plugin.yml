@@ -29,6 +29,10 @@ commands:
     description: Devolve ao neutro todas as torres menos as dos castelos
     usage: /neutro
     permission: gcmenus.npcskin
+  espera:
+    description: Marca onde voce esta como o saguao entre partidas
+    usage: /espera
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
     description: Permite mexer nos bonecos
