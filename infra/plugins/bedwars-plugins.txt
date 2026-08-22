@@ -20,3 +20,8 @@ https://cdn.modrinth.com/data/lTZS71wY/versions/Q9oqHkjP/BetterInvisibility-4.0.
 # WorldEdit 7.3.9 (Modrinth oficial) - versao que suporta o Paper 1.20.4 deste
 # backend; os outros modos usam a 7.4.4, que exige 1.21+.
 https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar
+# Simple Voice Chat 2.6.21 (Modrinth oficial) - voz por proximidade e por grupo.
+# Cada servidor escuta numa porta UDP propria (24451 a 24456): a voz nao passa
+# pelo proxy, o mod do jogador fala direto com o servidor onde ele esta.
+# Quem nao instalar o mod joga igual, so nao ouve nem fala.
+https://cdn.modrinth.com/data/9eGKb6K1/versions/62MVmInV/voicechat-bukkit-2.6.21.jar

@@ -74,6 +74,10 @@ services:
       CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
+    # Porta da voz. Ela nao passa pelo proxy: o mod fala direto com cada
+    # servidor, entao cada um precisa da sua.
+    ports:
+      - "24451:24451/udp"
     volumes:
       - gc_lobby:/data
       - ./config/paper/patches:/patches:ro
@@ -128,6 +132,10 @@ services:
       CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
+    # Porta da voz. Ela nao passa pelo proxy: o mod fala direto com cada
+    # servidor, entao cada um precisa da sua.
+    ports:
+      - "24453:24453/udp"
     volumes:
       - gc_bedwars:/data
       - ./config/paper/patches:/patches:ro
@@ -288,6 +296,10 @@ services:
       CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
+    # Porta da voz. Ela nao passa pelo proxy: o mod fala direto com cada
+    # servidor, entao cada um precisa da sua.
+    ports:
+      - "24454:24454/udp"
     volumes:
       - gc_ctf:/data
       - ./config/paper/patches:/patches:ro
@@ -337,6 +349,10 @@ services:
       CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
+    # Porta da voz. Ela nao passa pelo proxy: o mod fala direto com cada
+    # servidor, entao cada um precisa da sua.
+    ports:
+      - "24452:24452/udp"
     volumes:
       - gc_pvp:/data
       - ./config/paper/patches:/patches:ro
@@ -400,6 +416,10 @@ services:
       CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
+    # Porta da voz. Ela nao passa pelo proxy: o mod fala direto com cada
+    # servidor, entao cada um precisa da sua.
+    ports:
+      - "24455:24455/udp"
     volumes:
       - gc_eventos:/data
       - ./config/paper/patches:/patches:ro
@@ -459,6 +479,10 @@ services:
       CFG_VELOCITY_SECRET: ${VELOCITY_SECRET:?defina VELOCITY_SECRET no infra/.env}
     expose:
       - "25565"
+    # Porta da voz. Ela nao passa pelo proxy: o mod fala direto com cada
+    # servidor, entao cada um precisa da sua.
+    ports:
+      - "24456:24456/udp"
     volumes:
       - gc_amongus:/data
       - ./config/paper/patches:/patches:ro
@@ -501,6 +525,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  # Vigia que avisa no Discord quando um servidor cai ou volta.
+  #
+  # Fica atras de um perfil: `docker compose up -d statusbot` liga, e o
+  # `docker compose up -d` de sempre o ignora. Assim ele nao atrapalha quem
+  # so quer subir a rede, e nao reclama enquanto o token nao estiver posto.
+  #
+  # Le o Docker de fora, pelo soquete, em vez de perguntar a cada servidor:
+  # servidor travado nao responde pergunta nenhuma, e e justamente esse o caso
+  # que interessa avisar. O soquete entra somente para leitura.
+  statusbot:
+    image: docker:27-cli
+    restart: unless-stopped
+    profiles: ["extras"]
+    environment:
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_CANAL_STATUS: ${DISCORD_CANAL_STATUS:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./status-bot:/app:ro
+    entrypoint: ["sh", "/app/checar.sh"]
+    networks:
+      - gamecraft
 
 networks:
   gamecraft:

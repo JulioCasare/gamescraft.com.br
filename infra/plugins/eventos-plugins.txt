@@ -20,3 +20,8 @@ https://ci.lucko.me/job/spark/lastSuccessfulBuild/artifact/spark-bukkit/build/li
 # WorldEdit 7.4.4 (Modrinth oficial, EngineHub) - construcao, selecao e reset
 # de area. Restrinja o uso a staff pelo LuckPerms antes de abrir o beta.
 https://cdn.modrinth.com/data/1u6JkXh5/versions/qNuPcliz/worldedit-bukkit-7.4.4.jar
+# Simple Voice Chat 2.6.21 (Modrinth oficial) - voz por proximidade e por grupo.
+# Cada servidor escuta numa porta UDP propria (24451 a 24456): a voz nao passa
+# pelo proxy, o mod do jogador fala direto com o servidor onde ele esta.
+# Quem nao instalar o mod joga igual, so nao ouve nem fala.
+https://cdn.modrinth.com/data/9eGKb6K1/versions/62MVmInV/voicechat-bukkit-2.6.21.jar
