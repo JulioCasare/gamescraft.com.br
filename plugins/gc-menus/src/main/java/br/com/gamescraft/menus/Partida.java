@@ -104,6 +104,29 @@ final class Partida implements Listener {
         return true;
     }
 
+    /**
+     * O /forcestart: larga a partida agora, com quem estiver online.
+     *
+     * Existe para testar. O gatilho normal precisa de oito pessoas, e uma rede
+     * que ainda tem quatro jogadores nunca chegaria lá — sem este comando não
+     * havia como ver o ciclo funcionando antes de o servidor encher.
+     */
+    boolean forcar(CommandSender quemPediu) {
+        if (fase == Fase.JOGO) {
+            quemPediu.sendMessage(ChatColor.RED + "Ja tem partida acontecendo.");
+            return true;
+        }
+        int quantos = online().size();
+        if (quantos < 2) {
+            quemPediu.sendMessage(ChatColor.RED + "Precisa de pelo menos duas pessoas: "
+                    + "com uma so nao ha dois times, e a partida acabaria sozinha.");
+            return true;
+        }
+        anunciar(ChatColor.YELLOW + "Partida forcada por " + quemPediu.getName() + ".");
+        comecar();
+        return true;
+    }
+
     Location saguao() {
         String nome = guardado.getString("mundo");
         if (nome == null) {

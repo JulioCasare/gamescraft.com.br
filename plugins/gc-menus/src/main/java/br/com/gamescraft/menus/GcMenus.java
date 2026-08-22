@@ -337,6 +337,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         if (comando.getName().equals("espera")) {
             return partida != null && partida.definirEspera(quemMandou);
         }
+        if (comando.getName().equals("forcestart")) {
+            return partida != null && partida.forcar(quemMandou);
+        }
         if (comando.getName().equals("neutro")) {
             captura.zerar(quemMandou);
             // Recomeçar a partida também zera o que foi comprado: armadura

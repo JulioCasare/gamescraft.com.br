@@ -33,6 +33,10 @@ commands:
     description: Marca onde voce esta como o saguao entre partidas
     usage: /espera
     permission: gcmenus.npcskin
+  forcestart:
+    description: Comeca a partida agora, sem esperar juntar gente
+    usage: /forcestart
+    permission: gcmenus.npcskin
 permissions:
   gcmenus.npcskin:
     description: Permite mexer nos bonecos
