@@ -226,11 +226,24 @@ final class Arenas {
             quemPediu.sendMessage("Esse comando precisa ser dado em jogo.");
             return true;
         }
+        World principal = Bukkit.getWorlds().get(0);
         if (argumentos.length != 1) {
             jogador.sendMessage(ChatColor.RED + "Use: /setup <arena>");
+            jogador.sendMessage(ChatColor.GRAY + "  " + principal.getName() + " — saguao");
             for (Arena arena : arenas.values()) {
                 jogador.sendMessage(ChatColor.GRAY + "  " + arena.mundo() + " — " + arena.nome());
             }
+            return true;
+        }
+        // O saguao tambem entra aqui, e nao e arena: e o unico jeito de voltar
+        // quando o /espera foi marcado num lugar ruim. Ele vai para o nascimento
+        // do mundo, e nao para o ponto do /espera — que e justamente o que pode
+        // estar quebrado.
+        if (argumentos[0].equals(principal.getName()) || argumentos[0].equalsIgnoreCase("saguao")) {
+            jogador.teleport(principal.getSpawnLocation());
+            jogador.setGameMode(org.bukkit.GameMode.CREATIVE);
+            jogador.sendMessage(ChatColor.GREEN + "Voce esta no saguao, no nascimento do mundo.");
+            jogador.sendMessage(ChatColor.GRAY + "Se o /espera estava errado, marque de novo daqui.");
             return true;
         }
         Arena arena = arenas.get(argumentos[0]);

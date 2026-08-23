@@ -93,6 +93,14 @@ final class Partida implements Listener {
             return true;
         }
         Location onde = jogador.getLocation();
+        // Saguão dentro de arena é armadilha: no fim da partida todo mundo seria
+        // mandado para lá, e se fosse a arena da vez cairia num mundo que está
+        // sendo descarregado e trocado naquele instante.
+        if (arenas != null && arenas.de(onde.getWorld().getName()) != null) {
+            jogador.sendMessage(ChatColor.RED + "Aqui e uma arena, nao da para ser o saguao.");
+            jogador.sendMessage(ChatColor.GRAY + "Use /setup saguao e marque de la.");
+            return true;
+        }
         guardado.set("mundo", onde.getWorld().getName());
         guardado.set("x", onde.getX());
         guardado.set("y", onde.getY());
