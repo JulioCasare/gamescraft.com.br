@@ -187,8 +187,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         captura = new Captura(this, protecao);
         armaduras = new Armaduras(this);
         ferramentas = new Ferramentas(this);
+        // Nenhuma arena sobe junto com o servidor: o mundo so existe enquanto
+        // alguem esta nele, e nasce do zip quando a partida vai comecar.
         arenas = new Arenas(this);
-        arenas.carregarTodas();
         Times equipes = new Times(this, captura, armaduras, ferramentas);
         getServer().getPluginManager().registerEvents(equipes, this);
         partida = new Partida(this, equipes, captura, armaduras, ferramentas, arenas);

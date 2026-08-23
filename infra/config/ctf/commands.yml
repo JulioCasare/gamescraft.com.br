@@ -34,9 +34,5 @@ aliases:
   # do mundo em vez de copiar bloco a bloco. Um levava mais de um minuto na ilha
   # inteira; o outro leva um ou dois segundos.
   #
-  # O /arena1 e o /arena2 do datapack ficaram sem uso pelo mesmo motivo: nao ha
-  # mais area a marcar, a arena e o mundo todo.
-  arena1:
-  - function gcctf:arena_canto1
-  arena2:
-  - function gcctf:arena_canto2
+  # O /arena1 e o /arena2 sairam junto: nao ha mais area a marcar dentro de um
+  # mapa, porque a arena passou a ser o mundo inteiro.

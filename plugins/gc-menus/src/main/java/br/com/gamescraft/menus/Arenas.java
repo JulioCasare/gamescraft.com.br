@@ -1,20 +1,29 @@
 package br.com.gamescraft.menus;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -23,22 +32,25 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * As arenas do MegaGames: um mundo para cada, e reset trocando a pasta.
+ * As arenas do MegaGames: cada uma vive num mundo próprio, que só existe
+ * enquanto está em uso.
  *
- * O reset por cópia de blocos que existia antes levava mais de um minuto na
- * ilha inteira — são trinta e quatro milhões de blocos, e o /clone anda bloco a
- * bloco. Trocar a pasta do mundo leva um ou dois segundos, porque o disco copia
- * arquivo, não bloco. É o mesmo caminho que o BedWars1058 usa, e foi de olhar o
- * `Cache/duplas1.zip` dele que veio a ideia.
+ * O ciclo é o do Bed Wars: o mapa oficial fica guardado como zip, o mundo é
+ * criado a partir dele quando a partida vai começar, e apagado quando ela
+ * acaba. Nada de mapa velho ocupando memória e disco entre uma partida e outra
+ * — e nada de sobra da partida anterior aparecendo na seguinte, porque não há
+ * o que sobrar: o mundo é outro.
  *
- * O preço é o arranjo: o Bukkit recusa descarregar o mundo principal, e sem
- * descarregar não há como trocar a pasta debaixo dele. Por isso o mundo
- * principal deste servidor é a sala de votação, vazia, e as arenas são mundos
- * carregados por aqui.
+ * Só uma arena fica aberta por vez durante a partida. As outras são fechadas,
+ * porque manter três mapas carregados para jogar em um é pagar memória e tique
+ * por mundo que ninguém está vendo.
+ *
+ * Fora de partida, ficam abertas as que tiverem gente dentro — é o caso de quem
+ * está construindo com /setup.
  */
 final class Arenas {
 
-    /** Onde ficam as cópias intactas de cada arena. */
+    /** Onde ficam os zips com o mapa oficial de cada arena. */
     private static final String MODELOS = "modelos";
 
     /** Uma arena: o mundo dela e o jogo que acontece ali. */
@@ -49,9 +61,11 @@ final class Arenas {
     private final Map<String, Arena> arenas = new LinkedHashMap<>();
     private final File pastaDoServidor;
 
+    /** A arena da partida em andamento. Nula fora de partida. */
+    private String emJogo;
+
     Arenas(JavaPlugin plugin) {
         this.plugin = plugin;
-        // As pastas dos mundos ficam ao lado do plugins/, na raiz do servidor.
         this.pastaDoServidor = plugin.getDataFolder().getParentFile().getParentFile();
 
         for (String linha : plugin.getConfig().getStringList("arenas")) {
@@ -63,6 +77,11 @@ final class Arenas {
             arenas.put(arena.mundo(), arena);
         }
         plugin.getLogger().info("Arenas configuradas: " + arenas.size());
+
+        // De dez em dez segundos, fecha arena vazia. Quem saiu de uma obra e
+        // esqueceu o mundo aberto nao deveria deixar um mapa carregado a noite
+        // inteira.
+        plugin.getServer().getScheduler().runTaskTimer(plugin, this::fecharVazias, 200L, 200L);
     }
 
     List<Arena> todas() {
@@ -73,18 +92,18 @@ final class Arenas {
         return arenas.get(mundo);
     }
 
+    void marcarEmJogo(String mundo) {
+        this.emJogo = mundo;
+    }
+
+    // ------------------------------------------------------------- caminhos
+
     /**
      * Onde o Paper guarda os blocos de uma arena.
      *
      * Na 26.2 mundo secundário não tem pasta própria: ele vive como dimensão
-     * dentro do mundo principal, em `<principal>/dimensions/minecraft/<nome>`.
-     * O layout de pasta por mundo, que valeu por dez anos, acabou.
-     *
-     * Isto não é detalhe: o código procurava `/data/ilha`, não achava, e dava a
-     * ilha por mundo novo — o /save teria copiado nada e o reset devolveria uma
-     * arena vazia no lugar do mapa. O caminho velho fica como alternativa para o
-     * caso de a pasta antiga ainda existir, que é o que acontece num servidor
-     * que ainda não migrou.
+     * dentro do mundo principal. O layout de pasta por mundo, que valeu por dez
+     * anos, acabou — e foi por não saber disso que o código quase apagou a ilha.
      */
     private File pastaDoMundo(String mundo) {
         File antigo = new File(pastaDoServidor, mundo);
@@ -93,134 +112,142 @@ final class Arenas {
         }
         World principal = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().get(0);
         String nomeDoPrincipal = principal == null ? "world" : principal.getName();
-        return new File(pastaDoServidor,
-                nomeDoPrincipal + "/dimensions/minecraft/" + mundo);
+        return new File(pastaDoServidor, nomeDoPrincipal + "/dimensions/minecraft/" + mundo);
     }
 
-    private File pastaDoModelo(String mundo) {
-        return new File(new File(plugin.getDataFolder(), MODELOS), mundo);
+    private File zipDoModelo(String mundo) {
+        return new File(new File(plugin.getDataFolder(), MODELOS), mundo + ".zip");
     }
 
-    /**
-     * Carrega as arenas que ainda não estão no ar.
-     *
-     * Mundo que não existe é criado na hora, com semente sorteada. É assim que
-     * as duas arenas novas nascem sem eu precisar escolher terreno: elas ficam
-     * de rascunho até alguém construir o mapa de verdade.
-     */
-    void carregarTodas() {
-        for (Arena arena : arenas.values()) {
-            if (Bukkit.getWorld(arena.mundo()) != null) {
-                continue;
-            }
-            boolean nova = !pastaDoMundo(arena.mundo()).isDirectory();
-            WorldCreator criador = new WorldCreator(arena.mundo());
-            if (nova) {
-                criador.type(WorldType.NORMAL);
-            }
-            World mundo = criador.createWorld();
-            if (mundo == null) {
-                plugin.getLogger().warning("Nao consegui carregar a arena " + arena.mundo() + ".");
-                continue;
-            }
-            // Nada de ciclo do dia nem de monstro nas arenas: partida de
-            // minigame nao deveria virar noite no meio.
-            mundo.setTime(6000);
-            mundo.setStorm(false);
-            mundo.setDifficulty(org.bukkit.Difficulty.NORMAL);
-            plugin.getLogger().info("Arena no ar: " + arena.mundo()
-                    + (nova ? " (mundo novo, semente sorteada)" : ""));
-        }
+    boolean temModelo(String mundo) {
+        return zipDoModelo(mundo).isFile();
     }
+
+    // ------------------------------------------------------- abrir e fechar
 
     /**
-     * Guarda a cópia intacta de uma arena. É dela que o reset vai puxar.
+     * Põe a arena no ar, sempre a partir do zip.
      *
-     * Salva o mundo antes de copiar: o que está em memória e ainda não foi ao
-     * disco não entraria na cópia, e o modelo nasceria diferente do que se vê.
+     * O mundo que estiver no disco é jogado fora antes: ele é o resto da
+     * partida anterior, ou de uma obra que não foi salva. Partida que começa
+     * com sobra da anterior é partida injusta.
      */
-    boolean guardarModelo(String mundo, CommandSender quemPediu) {
-        World world = Bukkit.getWorld(mundo);
-        if (world == null) {
-            quemPediu.sendMessage(ChatColor.RED + "A arena " + mundo + " nao esta carregada.");
-            return false;
-        }
-        world.save();
-        File origem = pastaDoMundo(mundo);
-        File destino = pastaDoModelo(mundo);
-        try {
-            apagar(destino.toPath());
-            copiar(origem.toPath(), destino.toPath());
-        } catch (IOException erro) {
-            quemPediu.sendMessage(ChatColor.RED + "Falhou ao guardar o modelo: " + erro.getMessage());
-            plugin.getLogger().warning("Modelo de " + mundo + " falhou: " + erro);
-            return false;
-        }
-        quemPediu.sendMessage(ChatColor.GREEN + "Modelo de " + mundo + " guardado.");
-        return true;
-    }
-
-    /**
-     * Devolve a arena ao estado do modelo: descarrega, troca a pasta, carrega.
-     *
-     * Quem estiver dentro é tirado antes — descarregar mundo com gente lá joga
-     * todo mundo para o mundo principal de qualquer jeito, e é melhor que isso
-     * aconteça de propósito e no lugar certo.
-     */
-    boolean resetar(String mundo, org.bukkit.Location paraOnde) {
+    World abrir(String mundo, CommandSender aviso) {
         Arena arena = arenas.get(mundo);
         if (arena == null) {
-            return false;
+            return null;
         }
-        File modelo = pastaDoModelo(mundo);
-        if (!modelo.isDirectory()) {
-            plugin.getLogger().warning("Arena " + mundo + " sem modelo guardado: "
-                    + "rode /modelo " + mundo + " uma vez com o mapa do jeito certo.");
-            return false;
+        World jaAberta = Bukkit.getWorld(mundo);
+        if (jaAberta != null) {
+            return jaAberta;
+        }
+        long comeco = System.currentTimeMillis();
+        File zip = zipDoModelo(mundo);
+        if (zip.isFile()) {
+            try {
+                apagar(pastaDoMundo(mundo).toPath());
+                descompactar(zip, pastaDoMundo(mundo));
+            } catch (IOException erro) {
+                plugin.getLogger().warning("Nao consegui abrir " + mundo + " do zip: " + erro);
+                if (aviso != null) {
+                    aviso.sendMessage(ChatColor.RED + "Falhou ao abrir " + mundo + ".");
+                }
+                return null;
+            }
+        } else if (aviso != null) {
+            aviso.sendMessage(ChatColor.YELLOW + "A arena " + mundo + " ainda nao tem mapa salvo. "
+                    + "Vou abrir uma vazia para voce construir — use /save quando terminar.");
         }
 
+        WorldCreator criador = new WorldCreator(mundo);
+        if (!zip.isFile() && !pastaDoMundo(mundo).isDirectory()) {
+            criador.type(WorldType.NORMAL);
+        }
+        World world = criador.createWorld();
+        if (world == null) {
+            plugin.getLogger().warning("Arena " + mundo + " nao carregou.");
+            return null;
+        }
+        world.setTime(6000);
+        world.setStorm(false);
+        world.setDifficulty(Difficulty.NORMAL);
+        world.setAutoSave(false);
+        plugin.getLogger().info("Arena " + mundo + " aberta em "
+                + (System.currentTimeMillis() - comeco) + " ms.");
+        return world;
+    }
+
+    /**
+     * Tira a arena do ar. Com apagar, some também do disco.
+     *
+     * Apagar é o certo no fim da partida: o mundo daquela partida não serve para
+     * mais nada, e o próximo nasce do zip. Sem apagar é o certo em obra, porque
+     * o que a pessoa construiu e ainda não salvou está ali.
+     */
+    void fechar(String mundo, boolean apagar, Location paraOnde) {
         World world = Bukkit.getWorld(mundo);
         if (world != null) {
             for (Player jogador : new ArrayList<>(world.getPlayers())) {
                 if (paraOnde != null) {
                     jogador.teleport(paraOnde);
+                } else {
+                    jogador.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
                 }
             }
-            // Sem salvar: o que aconteceu na partida vai ser jogado fora agora.
-            if (!Bukkit.unloadWorld(world, false)) {
-                plugin.getLogger().warning("Nao consegui descarregar " + mundo + ".");
-                return false;
+            if (!Bukkit.unloadWorld(world, !apagar)) {
+                plugin.getLogger().warning("Nao consegui fechar " + mundo + ".");
+                return;
             }
         }
-
-        long comeco = System.currentTimeMillis();
-        try {
-            apagar(pastaDoMundo(mundo).toPath());
-            copiar(modelo.toPath(), pastaDoMundo(mundo).toPath());
-        } catch (IOException erro) {
-            plugin.getLogger().warning("Troca da pasta de " + mundo + " falhou: " + erro);
-            return false;
+        // Só apaga o que tem zip para voltar. Sem esta trava, uma arena que nunca
+        // foi salva seria apagada no fim da primeira partida e não teria de onde
+        // renascer — o mapa iria embora de vez. É o mesmo erro que já custou uma
+        // área de castelo aqui: apagar confiando numa cópia que não existia.
+        if (apagar && !temModelo(mundo)) {
+            plugin.getLogger().warning("Arena " + mundo + " nao tem zip salvo: "
+                    + "vou deixar a pasta onde esta em vez de apagar sem volta.");
+            return;
         }
-        World novo = new WorldCreator(mundo).createWorld();
-        if (novo == null) {
-            plugin.getLogger().warning("Arena " + mundo + " nao voltou depois do reset.");
-            return false;
+        if (apagar) {
+            try {
+                apagar(pastaDoMundo(mundo).toPath());
+            } catch (IOException erro) {
+                plugin.getLogger().warning("Nao consegui apagar a pasta de " + mundo + ": " + erro);
+            }
         }
-        novo.setTime(6000);
-        novo.setStorm(false);
-        plugin.getLogger().info("Arena " + mundo + " refeita em "
-                + (System.currentTimeMillis() - comeco) + " ms.");
-        return true;
     }
 
-    // ------------------------------------------------------------ comandos
+    /** Fecha e apaga todas menos a que vai ser jogada. */
+    void fecharOutras(String manter, Location paraOnde) {
+        for (Arena arena : arenas.values()) {
+            if (arena.mundo().equals(manter) || Bukkit.getWorld(arena.mundo()) == null) {
+                continue;
+            }
+            fechar(arena.mundo(), true, paraOnde);
+        }
+    }
 
     /**
-     * O /setup: leva você à arena, em criativo, para construir.
-     *
-     * Sem lista de arena o comando não adivinha: dizer o nome errado e cair num
-     * mundo que não existe seria pior que a mensagem de ajuda.
+     * Fecha arena vazia. A da partida em andamento nunca, mesmo vazia — ela
+     * esvazia por um instante toda vez que alguém morre e renasce.
      */
+    private void fecharVazias() {
+        for (Arena arena : arenas.values()) {
+            if (arena.mundo().equals(emJogo)) {
+                continue;
+            }
+            World world = Bukkit.getWorld(arena.mundo());
+            if (world != null && world.getPlayers().isEmpty()) {
+                // Sem apagar: pode ser obra em andamento e ainda nao salva.
+                fechar(arena.mundo(), false, null);
+                plugin.getLogger().info("Arena " + arena.mundo() + " fechada por estar vazia.");
+            }
+        }
+    }
+
+    // ------------------------------------------------------------- comandos
+
+    /** O /setup: abre a arena e leva você lá, em criativo. */
     boolean setup(CommandSender quemPediu, String[] argumentos) {
         if (!(quemPediu instanceof Player jogador)) {
             quemPediu.sendMessage("Esse comando precisa ser dado em jogo.");
@@ -229,21 +256,17 @@ final class Arenas {
         World principal = Bukkit.getWorlds().get(0);
         if (argumentos.length != 1) {
             jogador.sendMessage(ChatColor.RED + "Use: /setup <arena>");
-            jogador.sendMessage(ChatColor.GRAY + "  " + principal.getName() + " — saguao");
+            jogador.sendMessage(ChatColor.GRAY + "  saguao — a sala de votacao");
             for (Arena arena : arenas.values()) {
-                jogador.sendMessage(ChatColor.GRAY + "  " + arena.mundo() + " — " + arena.nome());
+                jogador.sendMessage(ChatColor.GRAY + "  " + arena.mundo() + " — " + arena.nome()
+                        + (temModelo(arena.mundo()) ? "" : ChatColor.DARK_GRAY + " (sem mapa salvo)"));
             }
             return true;
         }
-        // O saguao tambem entra aqui, e nao e arena: e o unico jeito de voltar
-        // quando o /espera foi marcado num lugar ruim. Ele vai para o nascimento
-        // do mundo, e nao para o ponto do /espera — que e justamente o que pode
-        // estar quebrado.
         if (argumentos[0].equals(principal.getName()) || argumentos[0].equalsIgnoreCase("saguao")) {
             jogador.teleport(principal.getSpawnLocation());
-            jogador.setGameMode(org.bukkit.GameMode.CREATIVE);
+            jogador.setGameMode(GameMode.CREATIVE);
             jogador.sendMessage(ChatColor.GREEN + "Voce esta no saguao, no nascimento do mundo.");
-            jogador.sendMessage(ChatColor.GRAY + "Se o /espera estava errado, marque de novo daqui.");
             return true;
         }
         Arena arena = arenas.get(argumentos[0]);
@@ -251,54 +274,61 @@ final class Arenas {
             jogador.sendMessage(ChatColor.RED + "Nao conheco a arena " + argumentos[0] + ".");
             return true;
         }
-        World mundo = Bukkit.getWorld(arena.mundo());
+        World mundo = abrir(arena.mundo(), jogador);
         if (mundo == null) {
-            jogador.sendMessage(ChatColor.RED + "A arena " + arena.mundo() + " nao esta carregada.");
+            jogador.sendMessage(ChatColor.RED + "Nao consegui abrir " + arena.mundo() + ".");
             return true;
         }
         jogador.teleport(mundo.getSpawnLocation());
-        jogador.setGameMode(org.bukkit.GameMode.CREATIVE);
+        jogador.setGameMode(GameMode.CREATIVE);
         jogador.addScoreboardTag("gc_obras");
         jogador.sendMessage(ChatColor.GREEN + "Voce esta em " + arena.nome() + ".");
-        jogador.sendMessage(ChatColor.GRAY + "Construa o mapa e depois use /save aqui dentro. "
-                + "E o /save que decide para onde a arena volta ao fim de cada partida.");
+        jogador.sendMessage(ChatColor.GRAY + "Construa e use /save aqui dentro. "
+                + "O que nao for salvo se perde quando a arena fechar.");
         return true;
     }
 
-    /**
-     * O /save: a arena onde você está vira o mapa oficial dela.
-     *
-     * Aceita o nome como argumento para poder ser dado do console — é assim que
-     * dá para testar o reset sem entrar no jogo, e é assim que um dia ele vai
-     * poder ser automatizado.
-     */
+    /** O /save: a arena vira zip, e é desse zip que toda partida vai nascer. */
     boolean salvarOndeEstou(CommandSender quemPediu, String[] argumentos) {
+        String mundo;
         if (argumentos.length == 1) {
-            if (!arenas.containsKey(argumentos[0])) {
-                quemPediu.sendMessage(ChatColor.RED + "Nao conheco a arena " + argumentos[0] + ".");
-                return true;
-            }
-            guardarModelo(argumentos[0], quemPediu);
-            return true;
-        }
-        if (!(quemPediu instanceof Player jogador)) {
+            mundo = argumentos[0];
+        } else if (quemPediu instanceof Player jogador) {
+            mundo = jogador.getWorld().getName();
+        } else {
             quemPediu.sendMessage("Do console, use: /save <arena>");
             return true;
         }
-        String mundo = jogador.getWorld().getName();
         if (!arenas.containsKey(mundo)) {
-            jogador.sendMessage(ChatColor.RED + "Voce nao esta numa arena — esta em " + mundo + ".");
+            quemPediu.sendMessage(ChatColor.RED + "Nao e uma arena: " + mundo + ".");
             return true;
         }
-        if (guardarModelo(mundo, quemPediu)) {
+        World world = Bukkit.getWorld(mundo);
+        if (world == null) {
+            quemPediu.sendMessage(ChatColor.RED + "A arena " + mundo + " nao esta aberta.");
+            return true;
+        }
+        long comeco = System.currentTimeMillis();
+        world.save();
+        File zip = zipDoModelo(mundo);
+        zip.getParentFile().mkdirs();
+        try {
+            compactar(pastaDoMundo(mundo), zip);
+        } catch (IOException erro) {
+            quemPediu.sendMessage(ChatColor.RED + "Falhou ao salvar: " + erro.getMessage());
+            plugin.getLogger().warning("Zip de " + mundo + " falhou: " + erro);
+            return true;
+        }
+        quemPediu.sendMessage(ChatColor.GREEN + "Arena " + mundo + " salva em "
+                + (System.currentTimeMillis() - comeco) + " ms (" + (zip.length() / 1024) + " KB).");
+        quemPediu.sendMessage(ChatColor.GRAY + "E deste estado que toda partida vai nascer.");
+        if (quemPediu instanceof Player jogador) {
             jogador.removeScoreboardTag("gc_obras");
-            jogador.sendMessage(ChatColor.GRAY + "E para este estado que a arena volta "
-                    + "no fim de cada partida.");
         }
         return true;
     }
 
-    /** O /reset à mão. No fim da partida ele acontece sozinho. */
+    /** O /reset à mão: fecha, apaga e abre do zip. */
     boolean resetarOndeEstou(CommandSender quemPediu, String[] argumentos) {
         String mundo;
         if (argumentos.length == 1) {
@@ -313,19 +343,73 @@ final class Arenas {
             quemPediu.sendMessage(ChatColor.RED + "Nao e uma arena: " + mundo + ".");
             return true;
         }
-        World principal = Bukkit.getWorlds().get(0);
-        long comeco = System.currentTimeMillis();
-        if (resetar(mundo, principal.getSpawnLocation())) {
-            quemPediu.sendMessage(ChatColor.GREEN + "Arena " + mundo + " refeita em "
-                    + (System.currentTimeMillis() - comeco) + " ms.");
-        } else {
-            quemPediu.sendMessage(ChatColor.RED + "Nao deu. Se a arena nunca foi salva, "
-                    + "entre nela e rode /save primeiro.");
+        if (!temModelo(mundo)) {
+            quemPediu.sendMessage(ChatColor.RED + "A arena " + mundo + " nunca foi salva. "
+                    + "Entre nela e rode /save primeiro.");
+            return true;
         }
+        Location saguao = Bukkit.getWorlds().get(0).getSpawnLocation();
+        long comeco = System.currentTimeMillis();
+        fechar(mundo, true, saguao);
+        World novo = abrir(mundo, quemPediu);
+        quemPediu.sendMessage(novo == null
+                ? ChatColor.RED + "Nao deu."
+                : ChatColor.GREEN + "Arena " + mundo + " refeita em "
+                        + (System.currentTimeMillis() - comeco) + " ms.");
         return true;
     }
 
-    // ------------------------------------------------------------ arquivos
+    // ---------------------------------------------------------- zip e disco
+
+    private void compactar(File pasta, File zip) throws IOException {
+        Path raiz = pasta.toPath();
+        try (ZipOutputStream saida = new ZipOutputStream(new FileOutputStream(zip))) {
+            Files.walkFileTree(raiz, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path arquivo, BasicFileAttributes atributos)
+                        throws IOException {
+                    // O session.lock e do mundo rodando, nao do mapa: guardado no
+                    // zip, ele faz o servidor achar que outra instancia abriu o
+                    // mundo quando for descompactado.
+                    if (arquivo.getFileName().toString().equals("session.lock")) {
+                        return FileVisitResult.CONTINUE;
+                    }
+                    saida.putNextEntry(new ZipEntry(raiz.relativize(arquivo).toString()
+                            .replace('\\', '/')));
+                    try (InputStream entrada = new FileInputStream(arquivo.toFile())) {
+                        entrada.transferTo(saida);
+                    }
+                    saida.closeEntry();
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
+    }
+
+    private void descompactar(File zip, File pasta) throws IOException {
+        Path destino = pasta.toPath();
+        Files.createDirectories(destino);
+        try (ZipInputStream entrada = new ZipInputStream(new FileInputStream(zip))) {
+            ZipEntry item;
+            while ((item = entrada.getNextEntry()) != null) {
+                Path alvo = destino.resolve(item.getName()).normalize();
+                // Um zip pode trazer caminho para fora da pasta. Nao vem de
+                // fora aqui, mas conferir custa uma linha.
+                if (!alvo.startsWith(destino)) {
+                    continue;
+                }
+                if (item.isDirectory()) {
+                    Files.createDirectories(alvo);
+                } else {
+                    Files.createDirectories(alvo.getParent());
+                    try (OutputStream saida = new FileOutputStream(alvo.toFile())) {
+                        entrada.transferTo(saida);
+                    }
+                }
+                entrada.closeEntry();
+            }
+        }
+    }
 
     private void apagar(Path alvo) throws IOException {
         if (!Files.exists(alvo)) {
@@ -343,30 +427,6 @@ final class Arenas {
             public FileVisitResult postVisitDirectory(Path pasta, IOException erro)
                     throws IOException {
                 Files.deleteIfExists(pasta);
-                return FileVisitResult.CONTINUE;
-            }
-        });
-    }
-
-    private void copiar(Path origem, Path destino) throws IOException {
-        Files.walkFileTree(origem, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path pasta, BasicFileAttributes atributos)
-                    throws IOException {
-                Files.createDirectories(destino.resolve(origem.relativize(pasta)));
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path arquivo, BasicFileAttributes atributos)
-                    throws IOException {
-                // O session.lock e do mundo que esta rodando, nao do mapa: copiar
-                // ele faz o servidor achar que outra instancia abriu o mundo.
-                if (arquivo.getFileName().toString().equals("session.lock")) {
-                    return FileVisitResult.CONTINUE;
-                }
-                Files.copy(arquivo, destino.resolve(origem.relativize(arquivo)),
-                        StandardCopyOption.REPLACE_EXISTING);
                 return FileVisitResult.CONTINUE;
             }
         });

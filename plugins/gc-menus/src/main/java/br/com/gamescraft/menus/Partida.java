@@ -276,6 +276,28 @@ final class Partida implements Listener {
      * partida ja comeca decidida.
      */
     private void comecar() {
+        // A arena nasce agora, do zip, e as outras saem do ar. Tres mapas
+        // carregados para jogar em um e pagar memoria e tique por mundo que
+        // ninguem esta vendo.
+        if (arenas != null) {
+            // Sem zip salvo não se joga. A partida apaga o mundo no fim, e apagar
+            // sem ter de onde renascer é perder o mapa — melhor recusar a largada
+            // e dizer o que falta.
+            if (!arenas.temModelo(arenaAtual)) {
+                anunciar(ChatColor.RED + "A arena " + arenaAtual + " ainda nao foi salva.");
+                anunciar(ChatColor.GRAY + "Entre nela com /setup " + arenaAtual
+                        + " e rode /save. So depois disso ela pode ser jogada.");
+                return;
+            }
+            arenas.marcarEmJogo(null);
+            arenas.fecharOutras(arenaAtual, saguao());
+            if (arenas.abrir(arenaAtual, null) == null) {
+                anunciar(ChatColor.RED + "A arena " + arenaAtual + " nao abriu. "
+                        + "Ela precisa ser salva uma vez com /save.");
+                return;
+            }
+            arenas.marcarEmJogo(arenaAtual);
+        }
         fase = Fase.JOGO;
         List<Player> gente = online();
         Collections.shuffle(gente);
@@ -386,19 +408,13 @@ final class Partida implements Listener {
         ferramentas.limparTudo();
         captura.zerar(Bukkit.getConsoleSender());
 
-        // Troca a pasta do mundo pela copia guardada. Antes isso era um /clone de
-        // trinta e quatro milhoes de blocos, que levava mais de um minuto com todo
-        // mundo parado no saguao esperando.
-        long comeco = System.currentTimeMillis();
-        boolean deu = arenas != null && arenas.resetar(arenaAtual, saguao());
-        if (deu) {
-            plugin.getLogger().info("Arena " + arenaAtual + " refeita em "
-                    + (System.currentTimeMillis() - comeco) + " ms.");
-        } else {
-            plugin.getLogger().warning("Arena " + arenaAtual + " nao foi refeita: "
-                    + "provavelmente ela nunca foi salva com /save.");
+        // O mundo da partida e apagado, e nao consertado: o proximo nasce do
+        // zip. Nao ha o que sobrar da partida anterior porque o mundo e outro.
+        if (arenas != null) {
+            arenas.marcarEmJogo(null);
+            arenas.fechar(arenaAtual, true, saguao());
         }
-        anunciar(ChatColor.GRAY + "Mapa refeito. A proxima partida comeca "
+        anunciar(ChatColor.GRAY + "Arena fechada. A proxima partida comeca "
                 + "quando houver " + MINIMO + " pessoas.");
     }
 
