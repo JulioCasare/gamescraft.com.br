@@ -132,14 +132,42 @@ final class Partida implements Listener {
         return true;
     }
 
+    /**
+     * O /saguao: leva de volta à sala de votação.
+     *
+     * Existe porque não havia caminho de volta. O jogo devolve cada um ao mundo
+     * onde estava da última vez, e quem tinha jogado na ilha voltava para lá —
+     * o /setup só leva às arenas, e não havia nada apontando para o saguão.
+     */
+    boolean irAoSaguao(CommandSender quemPediu) {
+        if (!(quemPediu instanceof Player jogador)) {
+            quemPediu.sendMessage("Esse comando precisa ser dado em jogo.");
+            return true;
+        }
+        if (fase == Fase.JOGO && jogador.getGameMode() != GameMode.CREATIVE) {
+            jogador.sendMessage(ChatColor.RED + "Tem partida acontecendo. "
+                    + "Sair agora deixa o seu time com menos gente.");
+            return true;
+        }
+        paraOSaguao(jogador);
+        jogador.removeScoreboardTag("gc_obras");
+        jogador.sendMessage(ChatColor.GREEN + "Voce esta no saguao.");
+        return true;
+    }
+
+    /**
+     * Onde fica o saguão.
+     *
+     * Sem /espera dado, vale o nascimento do mundo principal — que é o próprio
+     * saguão. Antes isto devolvia nulo e ninguém era teleportado, e no fim da
+     * partida cada um ficava parado no mapa que estava sendo refeito debaixo
+     * dele.
+     */
     Location saguao() {
         String nome = guardado.getString("mundo");
-        if (nome == null) {
-            return null;
-        }
-        World mundo = plugin.getServer().getWorld(nome);
+        World mundo = nome == null ? null : plugin.getServer().getWorld(nome);
         if (mundo == null) {
-            return null;
+            return Bukkit.getWorlds().get(0).getSpawnLocation();
         }
         return new Location(mundo, guardado.getDouble("x"), guardado.getDouble("y"),
                 guardado.getDouble("z"), (float) guardado.getDouble("yaw"),

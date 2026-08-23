@@ -33,6 +33,9 @@ commands:
     description: Marca onde voce esta como o saguao entre partidas
     usage: /espera
     permission: gcmenus.npcskin
+  saguao:
+    description: Leva voce ao saguao, a sala de votacao
+    usage: /saguao
   forcestart:
     description: Comeca a partida agora, sem esperar juntar gente
     usage: /forcestart

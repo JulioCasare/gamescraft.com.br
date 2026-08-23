@@ -73,8 +73,28 @@ final class Arenas {
         return arenas.get(mundo);
     }
 
+    /**
+     * Onde o Paper guarda os blocos de uma arena.
+     *
+     * Na 26.2 mundo secundário não tem pasta própria: ele vive como dimensão
+     * dentro do mundo principal, em `<principal>/dimensions/minecraft/<nome>`.
+     * O layout de pasta por mundo, que valeu por dez anos, acabou.
+     *
+     * Isto não é detalhe: o código procurava `/data/ilha`, não achava, e dava a
+     * ilha por mundo novo — o /save teria copiado nada e o reset devolveria uma
+     * arena vazia no lugar do mapa. O caminho velho fica como alternativa para o
+     * caso de a pasta antiga ainda existir, que é o que acontece num servidor
+     * que ainda não migrou.
+     */
     private File pastaDoMundo(String mundo) {
-        return new File(pastaDoServidor, mundo);
+        File antigo = new File(pastaDoServidor, mundo);
+        if (antigo.isDirectory()) {
+            return antigo;
+        }
+        World principal = Bukkit.getWorlds().isEmpty() ? null : Bukkit.getWorlds().get(0);
+        String nomeDoPrincipal = principal == null ? "world" : principal.getName();
+        return new File(pastaDoServidor,
+                nomeDoPrincipal + "/dimensions/minecraft/" + mundo);
     }
 
     private File pastaDoModelo(String mundo) {
@@ -232,10 +252,24 @@ final class Arenas {
         return true;
     }
 
-    /** O /save: a arena onde você está vira o mapa oficial dela. */
-    boolean salvarOndeEstou(CommandSender quemPediu) {
+    /**
+     * O /save: a arena onde você está vira o mapa oficial dela.
+     *
+     * Aceita o nome como argumento para poder ser dado do console — é assim que
+     * dá para testar o reset sem entrar no jogo, e é assim que um dia ele vai
+     * poder ser automatizado.
+     */
+    boolean salvarOndeEstou(CommandSender quemPediu, String[] argumentos) {
+        if (argumentos.length == 1) {
+            if (!arenas.containsKey(argumentos[0])) {
+                quemPediu.sendMessage(ChatColor.RED + "Nao conheco a arena " + argumentos[0] + ".");
+                return true;
+            }
+            guardarModelo(argumentos[0], quemPediu);
+            return true;
+        }
         if (!(quemPediu instanceof Player jogador)) {
-            quemPediu.sendMessage("Esse comando precisa ser dado em jogo.");
+            quemPediu.sendMessage("Do console, use: /save <arena>");
             return true;
         }
         String mundo = jogador.getWorld().getName();
@@ -252,14 +286,18 @@ final class Arenas {
     }
 
     /** O /reset à mão. No fim da partida ele acontece sozinho. */
-    boolean resetarOndeEstou(CommandSender quemPediu) {
-        if (!(quemPediu instanceof Player jogador)) {
-            quemPediu.sendMessage("Esse comando precisa ser dado em jogo.");
+    boolean resetarOndeEstou(CommandSender quemPediu, String[] argumentos) {
+        String mundo;
+        if (argumentos.length == 1) {
+            mundo = argumentos[0];
+        } else if (quemPediu instanceof Player jogador) {
+            mundo = jogador.getWorld().getName();
+        } else {
+            quemPediu.sendMessage("Do console, use: /reset <arena>");
             return true;
         }
-        String mundo = jogador.getWorld().getName();
         if (!arenas.containsKey(mundo)) {
-            jogador.sendMessage(ChatColor.RED + "Voce nao esta numa arena — esta em " + mundo + ".");
+            quemPediu.sendMessage(ChatColor.RED + "Nao e uma arena: " + mundo + ".");
             return true;
         }
         World principal = Bukkit.getWorlds().get(0);

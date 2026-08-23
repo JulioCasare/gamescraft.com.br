@@ -339,6 +339,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             captura.pintarCastelos(quemMandou);
             return true;
         }
+        if (comando.getName().equals("saguao")) {
+            return partida != null && partida.irAoSaguao(quemMandou);
+        }
         if (comando.getName().equals("espera")) {
             return partida != null && partida.definirEspera(quemMandou);
         }
@@ -349,10 +352,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
             return arenas != null && arenas.setup(quemMandou, argumentos);
         }
         if (comando.getName().equals("save")) {
-            return arenas != null && arenas.salvarOndeEstou(quemMandou);
+            return arenas != null && arenas.salvarOndeEstou(quemMandou, argumentos);
         }
         if (comando.getName().equals("reset")) {
-            return arenas != null && arenas.resetarOndeEstou(quemMandou);
+            return arenas != null && arenas.resetarOndeEstou(quemMandou, argumentos);
         }
         if (comando.getName().equals("arenas")) {
             if (arenas == null) {
