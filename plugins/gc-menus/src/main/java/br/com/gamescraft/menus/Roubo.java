@@ -49,7 +49,8 @@ import org.bukkit.scoreboard.Team;
  *
  * <ul>
  *   <li>O time do bloco não quebra o próprio — não há como se sabotar.</li>
- *   <li>O inimigo quebra e o bloco cai sempre, com picareta ou com a mão.</li>
+ *   <li>O inimigo quebra e o bloco vai direto para a mão dele, com picareta ou
+ *       sem picareta nenhuma.</li>
  *   <li>Morreu carregando, o bloco fica onde o corpo caiu, e fica lá: não some
  *       com o tempo, não queima e não é levado pela lava.</li>
  *   <li>Encostou nele alguém do time dono, volta para a base na hora.</li>
@@ -220,9 +221,9 @@ final class Roubo implements Listener {
     // -------------------------------------------------------------- quebra
 
     /**
-     * Quebrar o bloco do inimigo tira ele da base e joga no chão.
+     * Quebrar o bloco do inimigo tira ele da base e o entrega ali mesmo.
      *
-     * Cai sempre, com o que for. A redstone e o lápis só caem com picareta de
+     * Sai sempre, com o que for. A redstone e o lápis só caem com picareta de
      * pedra para cima, e o kit começa com uma de madeira: quem atravessava o
      * mapa e quebrava o bloco via ele sumir no ar e voltava de mãos vazias.
      */
@@ -263,9 +264,23 @@ final class Roubo implements Listener {
         evento.setDropItems(false);
         evento.setExpToDrop(0);
         alvo.emCasa = false;
+        // Vai direto para a mochila de quem quebrou, e não para o chão.
+        //
+        // Caído, o bloco leva um tempo até poder ser pego — o item quica, e o
+        // jogo segura um segundo de carência antes de deixar alguém pegá-lo.
+        // Dentro do castelo inimigo, com gente em cima, esse segundo era a
+        // diferença entre levar o bloco e morrer olhando para ele no chão.
+        if (jogador.getInventory().addItem(itemDo(dono)).isEmpty()) {
+            alvo.noChao = null;
+            anunciar(cor(meu) + jogador.getName() + ChatColor.GRAY + " quebrou e pegou o bloco do time "
+                    + cor(dono) + dono + ChatColor.GRAY + ".");
+            tocar(Sound.BLOCK_NOTE_BLOCK_PLING);
+            return;
+        }
+        // Mochila cheia: cai no chão, e aí é corrida de quem chega primeiro.
         soltar(alvo, dono, bloco.getLocation().add(0.5, 0.5, 0.5));
         anunciar(cor(meu) + jogador.getName() + ChatColor.GRAY + " quebrou o bloco do time "
-                + cor(dono) + dono + ChatColor.GRAY + ". Ele caiu no chao.");
+                + cor(dono) + dono + ChatColor.GRAY + ", mas estava sem espaco: ele caiu no chao.");
     }
 
     /** Põe o bloco no chão marcado, brilhando, e sem prazo para sumir. */
@@ -275,6 +290,9 @@ final class Roubo implements Listener {
         }
         Item item = onde.getWorld().dropItem(onde, itemDo(dono));
         preparar(item);
+        // Sem carência: quem chegar primeiro leva. É o bloco caído de um morto,
+        // e é para ser disputado no lugar onde ele caiu, não um segundo depois.
+        item.setPickupDelay(0);
         alvo.noChao = item;
     }
 
@@ -285,7 +303,6 @@ final class Roubo implements Listener {
      * disputar. Ele fica onde caiu até alguém encostar nele.
      */
     private void preparar(Item item) {
-        item.setPickupDelay(20);
         item.setInvulnerable(true);
         item.setPersistent(true);
         item.setGlowing(true);
