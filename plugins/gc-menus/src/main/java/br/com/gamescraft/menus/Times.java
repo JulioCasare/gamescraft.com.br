@@ -39,8 +39,15 @@ final class Times implements Listener {
     /** Quem manda no ciclo da partida. Nulo ate o plugin terminar de subir. */
     private Partida partida;
 
+    /** Quem guarda o bloco de cada time enquanto ele está roubado. */
+    private Roubo roubo;
+
     void ligarPartida(Partida partida) {
         this.partida = partida;
+    }
+
+    void ligarRoubo(Roubo roubo) {
+        this.roubo = roubo;
     }
 
     private static final int SEGUNDOS_DO_PAGAMENTO = 30;
@@ -162,6 +169,21 @@ final class Times implements Listener {
      * mexer em codigo. Ha exatamente um de cada dentro do castelo do seu time.
      */
     Location casaDo(String time) {
+        // O bloco pode estar roubado neste instante, e aí não há o que procurar
+        // no mapa: quem sabe onde ele mora é o Roubo, que anotou a posição antes
+        // de a partida começar. Sem isto o time inteiro perdia o ponto de
+        // nascimento no minuto em que o inimigo levava o bloco.
+        Location doRoubo = roubo == null ? null : roubo.baseDo(time);
+        Location bloco = doRoubo != null ? doRoubo : blocoDo(time);
+        if (bloco == null || bloco.getWorld() == null) {
+            return null;
+        }
+        return emCimaDaPilha(bloco.getWorld(), bloco.getBlockX(), bloco.getBlockY(),
+                bloco.getBlockZ());
+    }
+
+    /** Onde está, no mapa, o bloco que marca a base daquele time. */
+    Location blocoDo(String time) {
         World mundo = plugin.getServer().getWorld(nomeMundo);
         if (mundo == null) {
             return null;
@@ -184,7 +206,7 @@ final class Times implements Listener {
                 for (int x = minx; x <= maxx; x++) {
                     for (int z = minz; z <= maxz; z++) {
                         if (mundo.getBlockAt(x, y, z).getType() == marca) {
-                            return emCimaDaPilha(mundo, x, y, z);
+                            return new Location(mundo, x, y, z);
                         }
                     }
                 }

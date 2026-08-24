@@ -192,9 +192,15 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         arenas = new Arenas(this);
         Times equipes = new Times(this, captura, armaduras, ferramentas);
         getServer().getPluginManager().registerEvents(equipes, this);
-        partida = new Partida(this, equipes, captura, armaduras, ferramentas, arenas);
+        // O bloco de cada time e alvo de partida, e nao mapa: a protecao das
+        // torres tem de abrir excecao para ele, senao ninguem consegue quebra-lo.
+        Roubo roubo = new Roubo(this, equipes, protecao);
+        getServer().getPluginManager().registerEvents(roubo, this);
+        protecao.naoProteger(roubo::eBlocoDeTime);
+        equipes.ligarRoubo(roubo);
+        partida = new Partida(this, equipes, captura, armaduras, ferramentas, arenas, roubo);
+        roubo.ligarPartida(partida);
         equipes.ligarPartida(partida);
-        getServer().getPluginManager().registerEvents(partida, this);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
         Loja loja = new Loja(this, protecao, areas, armaduras, ferramentas);
         getServer().getPluginManager().registerEvents(loja, this);

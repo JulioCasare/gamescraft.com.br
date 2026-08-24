@@ -10,17 +10,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
 
@@ -32,11 +26,14 @@ import org.bukkit.scoreboard.Team;
  * que se esvazia. Na largada os times são sorteados em partes iguais, e quem
  * chega no meio entra no lado que estiver perdendo em gente.
  *
- * A partida acaba quando alguém quebra o bloco do outro time — a redstone do
- * vermelho ou o lápis do azul. Aí todo mundo volta para o saguão e o mapa se
- * refaz sozinho: o /reset devolve os blocos e o /neutro devolve as torres.
+ * A partida acaba quando um time leva o bloco do outro até o próprio — quebrar
+ * só derruba o bloco no chão, e o caminho de volta é a metade difícil. Quem
+ * cuida dessa disputa inteira é o {@link Roubo}; aqui só chega o resultado.
+ *
+ * Aí todo mundo volta para o saguão e o mapa se refaz sozinho: o /reset devolve
+ * os blocos e o /neutro devolve as torres.
  */
-final class Partida implements Listener {
+final class Partida {
 
     private enum Fase {
         ESPERA, CONTAGEM, JOGO
@@ -62,6 +59,7 @@ final class Partida implements Listener {
     private final YamlConfiguration guardado;
 
     private final Arenas arenas;
+    private final Roubo roubo;
     private Fase fase = Fase.ESPERA;
     private int restante;
 
@@ -69,8 +67,9 @@ final class Partida implements Listener {
     private String arenaAtual = "ilha";
 
     Partida(JavaPlugin plugin, Times times, Captura captura, Armaduras armaduras,
-            Ferramentas ferramentas, Arenas arenas) {
+            Ferramentas ferramentas, Arenas arenas, Roubo roubo) {
         this.arenas = arenas;
+        this.roubo = roubo;
         this.plugin = plugin;
         this.times = times;
         this.captura = captura;
@@ -299,6 +298,12 @@ final class Partida implements Listener {
             arenas.marcarEmJogo(arenaAtual);
         }
         fase = Fase.JOGO;
+        // Antes de largar ninguem: e agora que os dois blocos sao achados e a
+        // posicao deles guardada. Depois que um for roubado o lugar vira ar, e
+        // nao haveria mais como devolver nem onde nascer.
+        if (roubo != null) {
+            roubo.novaPartida();
+        }
         List<Player> gente = online();
         Collections.shuffle(gente);
         times.limparTimes();
@@ -309,7 +314,8 @@ final class Partida implements Listener {
             largar(jogador, time);
         }
         anunciar(ChatColor.GREEN + "Comecou! " + ChatColor.GRAY
-                + "Quebre o bloco do outro time para vencer.");
+                + "Quebre o bloco do outro time, pegue ele do chao e suba no bloco "
+                + "do seu time para vencer.");
     }
 
     /** Poe no time, leva ao castelo e entrega o kit. */
@@ -357,43 +363,32 @@ final class Partida implements Listener {
 
     // ------------------------------------------------------------ vitoria
 
+    /** Se a partida esta rolando agora. */
+    boolean emJogo() {
+        return fase == Fase.JOGO;
+    }
+
     /**
-     * Quebrar o bloco do outro time acaba a partida.
+     * Alguem levou o bloco do inimigo ate o proprio e pontuou.
      *
-     * O bloco e o mesmo que marca o nascimento — redstone no vermelho, lapis no
-     * azul. Quebrar o proprio nao vale: seria perder de proposito, e alguem ia
-     * tentar so para ver o que acontece.
+     * Quem cuida do caminho todo — a quebra, a queda, o resgate — e o
+     * {@link Roubo}. Aqui so chega o fim dele: a partida acabou, e este e o
+     * time que ganhou.
      */
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
-    public void aoQuebrar(BlockBreakEvent evento) {
+    void capturou(String time, Player quem, String doTime) {
         if (fase != Fase.JOGO) {
             return;
         }
-        Block bloco = evento.getBlock();
-        Material tipo = bloco.getType();
-        if (tipo != Material.REDSTONE_BLOCK && tipo != Material.LAPIS_BLOCK) {
-            return;
-        }
-        String dono = tipo == Material.REDSTONE_BLOCK ? nomeVermelho : nomeAzul;
-        Team time = evento.getPlayer().getScoreboard().getEntryTeam(evento.getPlayer().getName());
-        String meu = time == null ? null : time.getName();
-        if (meu == null || meu.equals(dono)) {
-            evento.setCancelled(true);
-            evento.getPlayer().sendActionBar(ChatColor.RED + "Esse bloco e do seu time.");
-            return;
-        }
-        // Deixa quebrar: o bloco do inimigo e a unica coisa do mapa que os
-        // outros ouvintes nao devem barrar.
-        evento.setCancelled(false);
-        vitoria(meu, evento.getPlayer());
+        vitoria(time, quem, doTime);
     }
 
-    private void vitoria(String time, Player quem) {
+    private void vitoria(String time, Player quem, String doTime) {
         fase = Fase.ESPERA;
         ChatColor cor = time.equals(nomeVermelho) ? ChatColor.RED : ChatColor.BLUE;
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(cor + "O time " + time + " venceu!");
-        Bukkit.broadcastMessage(ChatColor.GRAY + quem.getName() + " quebrou o bloco inimigo.");
+        Bukkit.broadcastMessage(ChatColor.GRAY + quem.getName() + " levou o bloco do time "
+                + doTime + " ate a propria base.");
         Bukkit.broadcastMessage("");
 
         for (Player jogador : Bukkit.getOnlinePlayers()) {
@@ -414,6 +409,11 @@ final class Partida implements Listener {
         armaduras.limparTudo();
         ferramentas.limparTudo();
         captura.zerar(Bukkit.getConsoleSender());
+        // Antes de o mundo ser apagado: e aqui que o brilho de quem carregava
+        // sai, e que qualquer bloco solto no mapa deixa de existir.
+        if (roubo != null) {
+            roubo.zerar();
+        }
 
         // O mundo da partida e apagado, e nao consertado: o proximo nasce do
         // zip. Nao ha o que sobrar da partida anterior porque o mundo e outro.

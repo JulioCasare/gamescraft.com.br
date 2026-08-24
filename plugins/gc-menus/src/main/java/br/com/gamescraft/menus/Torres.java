@@ -187,6 +187,13 @@ final class Torres implements Listener {
     private static final int ABAIXO = 5;
     private static final int ACIMA = 15;
 
+    /** O que a proteção nunca cobre, por ser o alvo da partida. */
+    private java.util.function.Predicate<Block> alvoDaPartida = bloco -> false;
+
+    void naoProteger(java.util.function.Predicate<Block> alvo) {
+        this.alvoDaPartida = alvo;
+    }
+
     /** Altura do sinalizador de cada torre, achada uma vez e conferida ao usar. */
     private final java.util.Map<Torre, Integer> alturas = new java.util.HashMap<>();
 
@@ -199,6 +206,12 @@ final class Torres implements Listener {
      * quinze acima cobrem a torre inteira e devolvem o resto do mapa.
      */
     boolean protegido(Block bloco) {
+        // O bloco de cada time é o alvo da partida, e quatro dos cinco
+        // sinalizadores de cada castelo o cobrem com a sombra deles. Protegido,
+        // ele nunca cairia — e a partida não teria como acabar.
+        if (alvoDaPartida.test(bloco)) {
+            return false;
+        }
         int x = bloco.getX();
         int z = bloco.getZ();
         for (Torre torre : torres) {
