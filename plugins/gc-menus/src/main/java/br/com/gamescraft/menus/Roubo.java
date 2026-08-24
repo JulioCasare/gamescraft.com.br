@@ -51,8 +51,8 @@ import org.bukkit.scoreboard.Team;
  *   <li>O time do bloco não quebra o próprio — não há como se sabotar.</li>
  *   <li>O inimigo quebra e o bloco vai direto para a mão dele, com picareta ou
  *       sem picareta nenhuma.</li>
- *   <li>Morreu carregando, o bloco fica onde o corpo caiu, e fica lá: não some
- *       com o tempo, não queima e não é levado pela lava.</li>
+ *   <li>Morreu carregando, o bloco fica onde o corpo caiu — não queima e não é
+ *       levado pela lava — e volta sozinho para a base em quinze segundos.</li>
  *   <li>Encostou nele alguém do time dono, volta para a base na hora.</li>
  *   <li>Encostou nele o inimigo, a corrida continua de onde parou.</li>
  * </ul>
@@ -67,6 +67,16 @@ final class Roubo implements Listener {
      * pilha inteira valer, e é a mesma folga que o nascimento já usa.
      */
     private static final int ALCANCE = 5;
+
+    /**
+     * Quanto tempo o bloco espera no chão antes de voltar sozinho para a base.
+     *
+     * Sem prazo, um bloco caído num canto que ninguém viu parava a partida: o
+     * time roubado não tinha o que defender e o time que roubou não tinha o que
+     * levar. Quinze segundos dão tempo de a briga acabar e alguém pegar o bloco,
+     * e não tanto que a partida fique esperando.
+     */
+    private static final int SEGUNDOS_NO_CHAO = 15;
 
     /** Onde o bloco de um time mora, e onde ele está agora. */
     private static final class Estado {
@@ -297,16 +307,16 @@ final class Roubo implements Listener {
     }
 
     /**
-     * Um item caído some em cinco minutos, e some para valer na lava e no fogo.
+     * Um item caído some para valer na lava e no fogo, e some sem avisar.
      *
-     * Qualquer um desses fins deixaria a partida sem o bloco que ela existe para
-     * disputar. Ele fica onde caiu até alguém encostar nele.
+     * Perdido assim, a partida ficaria sem o bloco que ela existe para disputar.
+     * Ele fica onde caiu — brilhando, para ser achado — até alguém pegá-lo ou
+     * até os quinze segundos correrem e ele voltar para casa.
      */
     private void preparar(Item item) {
         item.setInvulnerable(true);
         item.setPersistent(true);
         item.setGlowing(true);
-        item.setTicksLived(1);
     }
 
     // -------------------------------------------------------------- pegada
@@ -385,7 +395,8 @@ final class Roubo implements Listener {
                 soltar(alvo, dono, morto.getLocation());
             }
             anunciar(ChatColor.GRAY + "O bloco do time " + cor(dono) + dono + ChatColor.GRAY
-                    + " caiu com " + morto.getName() + ".");
+                    + " caiu com " + morto.getName() + ". Volta para a base em "
+                    + SEGUNDOS_NO_CHAO + " segundos.");
         }
     }
 
@@ -403,7 +414,8 @@ final class Roubo implements Listener {
                 soltar(alvo, dono, jogador.getLocation());
             }
             anunciar(ChatColor.GRAY + "O bloco do time " + cor(dono) + dono + ChatColor.GRAY
-                    + " ficou onde " + jogador.getName() + " saiu.");
+                    + " ficou onde " + jogador.getName() + " saiu. Volta para a base em "
+                    + SEGUNDOS_NO_CHAO + " segundos.");
         }
     }
 
@@ -461,15 +473,16 @@ final class Roubo implements Listener {
                 continue;
             }
             if (alvo.noChao != null && alvo.noChao.isValid()) {
-                // Zerar a idade a cada volta é o que impede o item de sumir. O
-                // prazo do jogo é de cinco minutos, e uma partida dura mais.
-                alvo.noChao.setTicksLived(1);
                 if (alvo.noChao.getLocation().getY() < alvo.noChao.getWorld().getMinHeight() + 1) {
-                    alvo.noChao.remove();
-                    alvo.noChao = null;
-                    porNoLugar(alvo, dono);
-                    anunciar(ChatColor.GRAY + "O bloco do time " + cor(dono) + dono
-                            + ChatColor.GRAY + " caiu no vazio e voltou para a base.");
+                    // No vazio não há o que esperar: ninguém vai buscar.
+                    recolher(alvo, dono, "caiu no vazio e voltou para a base");
+                    continue;
+                }
+                // A idade do item é o próprio relógio: ele nasce no instante em
+                // que toca o chão, em qualquer dos caminhos que o soltam.
+                if (alvo.noChao.getTicksLived() >= SEGUNDOS_NO_CHAO * 20) {
+                    recolher(alvo, dono, "ficou " + SEGUNDOS_NO_CHAO
+                            + " segundos no chao e voltou para a base");
                 }
                 continue;
             }
@@ -550,6 +563,18 @@ final class Roubo implements Listener {
     }
 
     // -------------------------------------------------------------- apoios
+
+    /** Tira o bloco do chão e devolve para a base, dizendo por quê. */
+    private void recolher(Estado alvo, String dono, String motivo) {
+        if (alvo.noChao != null && alvo.noChao.isValid()) {
+            alvo.noChao.remove();
+        }
+        alvo.noChao = null;
+        porNoLugar(alvo, dono);
+        anunciar(ChatColor.GRAY + "O bloco do time " + cor(dono) + dono + ChatColor.GRAY
+                + " " + motivo + ".");
+        tocar(Sound.BLOCK_BEACON_DEACTIVATE);
+    }
 
     /** Repõe o bloco na base. */
     private void porNoLugar(Estado alvo, String dono) {
