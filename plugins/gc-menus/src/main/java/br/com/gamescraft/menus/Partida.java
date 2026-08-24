@@ -316,7 +316,14 @@ final class Partida implements Listener {
     private void largar(Player jogador, String time) {
         times.marcarTime(jogador, time);
         times.entrarNoTime(jogador, time);
-        jogador.setGameMode(GameMode.ADVENTURE);
+        // Sobrevivência, e não aventura: em aventura não se quebra bloco nenhum,
+        // e este é um jogo que se ganha quebrando — a picareta do kit não servia
+        // para nada, e nem o bloco do inimigo caía.
+        //
+        // O que não pode ser quebrado continua protegido pelo plugin: as colunas
+        // das torres, o concreto das fronteiras e o que é do mapa dentro dos
+        // castelos. Essas travas nunca dependeram do modo de jogo.
+        jogador.setGameMode(GameMode.SURVIVAL);
         Location casa = times.casaDo(time);
         if (casa != null) {
             jogador.teleport(casa);

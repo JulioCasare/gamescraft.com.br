@@ -194,6 +194,7 @@ final class Areas implements Listener {
             return;
         }
         evento.setCancelled(true);
+        Torres.explicar(evento.getPlayer(), "Bloco do mapa dentro do castelo.");
     }
 
     /**

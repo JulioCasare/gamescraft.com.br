@@ -183,17 +183,67 @@ final class Torres implements Listener {
         plugin.getLogger().info(recado);
     }
 
-    /** A coluna vale para qualquer altura, então só x e z entram na conta. */
+    /** Quanto a proteção desce abaixo do sinalizador, e quanto sobe acima dele. */
+    private static final int ABAIXO = 5;
+    private static final int ACIMA = 15;
+
+    /** Altura do sinalizador de cada torre, achada uma vez e conferida ao usar. */
+    private final java.util.Map<Torre, Integer> alturas = new java.util.HashMap<>();
+
+    /**
+     * A proteção é uma caixa em volta do sinalizador, e não uma coluna infinita.
+     *
+     * Ela ia do fundo do mundo até o teto, e isso não se via: quem cavava o chão
+     * a três blocos de uma torre, ou passava numa caverna sessenta blocos abaixo
+     * dela, batia num bloco que não quebrava sem nada explicar. Cinco abaixo e
+     * quinze acima cobrem a torre inteira e devolvem o resto do mapa.
+     */
     boolean protegido(Block bloco) {
         int x = bloco.getX();
         int z = bloco.getZ();
         for (Torre torre : torres) {
             int raio = raioDe(torre);
-            if (Math.abs(x - torre.x()) <= raio && Math.abs(z - torre.z()) <= raio) {
+            if (Math.abs(x - torre.x()) > raio || Math.abs(z - torre.z()) > raio) {
+                continue;
+            }
+            int base = alturaDoBeacon(bloco.getWorld(), torre);
+            if (base < 0) {
+                // Sem sinalizador ali — outro mundo, ou torre já derrubada.
+                continue;
+            }
+            if (bloco.getY() >= base - ABAIXO && bloco.getY() <= base + ACIMA) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Onde está o sinalizador daquela torre.
+     *
+     * Guardado, mas conferido antes de cada uso: uma cópia do mapa acima já fez
+     * a busca achar o sinalizador errado, e a altura errada sobreviveu na
+     * memória mesmo depois de a cópia sumir.
+     */
+    private int alturaDoBeacon(org.bukkit.World mundo, Torre torre) {
+        if (mundo == null) {
+            return -1;
+        }
+        Integer guardada = alturas.get(torre);
+        if (guardada != null && guardada >= 0
+                && mundo.getBlockAt(torre.x(), guardada, torre.z()).getType() == Material.BEACON) {
+            return guardada;
+        }
+        int teto = Math.min(plugin.getConfig().getInt("altura-maxima-da-torre", 150),
+                mundo.getMaxHeight() - 1);
+        for (int y = teto; y >= mundo.getMinHeight(); y--) {
+            if (mundo.getBlockAt(torre.x(), y, torre.z()).getType() == Material.BEACON) {
+                alturas.put(torre, y);
+                return y;
+            }
+        }
+        alturas.put(torre, -1);
+        return -1;
     }
 
     /**
@@ -253,18 +303,41 @@ final class Torres implements Listener {
     }
 
     /** Quem ligou o /obras passa; o resto, não. */
+    /**
+     * Quem passa por cima da proteção: só quem está em criativo.
+     *
+     * Antes era a marca do /obras, e ela vinha junto com ser operador — o que
+     * fazia a proteção valer para uns e não para outros dentro da mesma partida.
+     * Agora a regra é do modo de jogo, e vale igual para todos: em sobrevivência
+     * ninguém quebra o que é do mapa, operador ou não; em criativo todo mundo
+     * quebra, operador ou não.
+     *
+     * A vantagem é que dá para conferir a proteção sem tirar o próprio op: basta
+     * entrar em sobrevivência e bater no bloco.
+     */
     boolean podeMexer(Player jogador) {
-        return jogador.getScoreboardTags().contains("gc_obras");
+        return jogador.getGameMode() == org.bukkit.GameMode.CREATIVE;
     }
 
-    // Barrar em silêncio, sem aviso na tela. O bloco que não quebra já diz o
-    // que precisa ser dito, e o aviso repetido a cada clique só atrapalhava
-    // quem estava minerando ao lado de uma torre.
+    /**
+     * Silêncio para quem joga, explicação para quem administra.
+     *
+     * O aviso a cada clique atrapalhava quem minerava ao lado de uma torre, e
+     * por isso saiu. Mas sem ele não há como descobrir qual das três proteções
+     * barrou um bloco — e a coluna da torre é invisível: três blocos para cada
+     * lado do sinalizador, do fundo do mundo até o teto.
+     */
+    static void explicar(Player jogador, String motivo) {
+        if (jogador.hasPermission("gcmenus.npcskin")) {
+            jogador.sendActionBar(ChatColor.GRAY + motivo);
+        }
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void aoQuebrar(BlockBreakEvent evento) {
         if (protegido(evento.getBlock()) && !podeMexer(evento.getPlayer())) {
             evento.setCancelled(true);
+            explicar(evento.getPlayer(), "Coluna de torre protegida — 3 blocos para cada lado.");
         }
     }
 
