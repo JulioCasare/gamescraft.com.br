@@ -358,6 +358,12 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         if (comando.getName().equals("setup")) {
             return arenas != null && arenas.setup(quemMandou, argumentos);
         }
+        if (comando.getName().equals("abrir")) {
+            return arenas != null && arenas.abrirOndeEstou(quemMandou, argumentos);
+        }
+        if (comando.getName().equals("fechar")) {
+            return arenas != null && arenas.fecharOndeEstou(quemMandou, argumentos);
+        }
         if (comando.getName().equals("save")) {
             return arenas != null && arenas.salvarOndeEstou(quemMandou, argumentos);
         }

@@ -408,7 +408,11 @@ final class Partida {
         times.limparTimes();
         armaduras.limparTudo();
         ferramentas.limparTudo();
-        captura.zerar(Bukkit.getConsoleSender());
+        // Só a memória: o mapa vai ser apagado nas linhas abaixo, e a próxima
+        // partida nasce do zip já neutro. O /neutro completo varre a ilha
+        // inteira escrevendo bloco por vinte tiques, e fazer isso justo enquanto
+        // o mundo é fechado foi o que quebrou os arquivos de região da ilha.
+        captura.zerarMemoria();
         // Antes de o mundo ser apagado: e aqui que o brilho de quem carregava
         // sai, e que qualquer bloco solto no mapa deixa de existir.
         if (roubo != null) {

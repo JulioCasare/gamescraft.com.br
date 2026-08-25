@@ -289,6 +289,70 @@ final class Arenas {
     }
 
     /** O /save: a arena vira zip, e é desse zip que toda partida vai nascer. */
+    /**
+     * O /abrir: põe a arena no ar como ela está no disco, sem tocar no zip.
+     *
+     * O /setup também abre, mas antes apaga a pasta e descompacta o modelo — é o
+     * certo para começar a construir de um estado conhecido, e é errado quando o
+     * que está no disco vale mais que o zip. Foi o caso do conserto da ilha: o
+     * mapa bom estava na pasta e o zip carregava o arquivo de região quebrado.
+     *
+     * E não pede jogador. O /setup teleporta, então precisa de gente; este só
+     * carrega o mundo, e serve do console.
+     */
+    boolean abrirOndeEstou(CommandSender quemPediu, String[] argumentos) {
+        if (argumentos.length != 1) {
+            quemPediu.sendMessage("Use: /abrir <arena>");
+            return true;
+        }
+        String mundo = argumentos[0];
+        if (!arenas.containsKey(mundo)) {
+            quemPediu.sendMessage(ChatColor.RED + "Nao e uma arena: " + mundo + ".");
+            return true;
+        }
+        if (Bukkit.getWorld(mundo) != null) {
+            quemPediu.sendMessage(ChatColor.YELLOW + "A arena " + mundo + " ja esta aberta.");
+            return true;
+        }
+        World world = new WorldCreator(mundo).createWorld();
+        if (world == null) {
+            quemPediu.sendMessage(ChatColor.RED + "A arena " + mundo + " nao carregou.");
+            return true;
+        }
+        world.setTime(6000);
+        world.setStorm(false);
+        world.setDifficulty(Difficulty.NORMAL);
+        // Segura a arena no ar. O vigia fecha toda arena vazia em dez segundos,
+        // e quem abre pelo console abre justamente para mexer sem ninguém dentro
+        // — a arena sumia debaixo do trabalho antes de dar tempo de começar.
+        marcarEmJogo(mundo);
+        quemPediu.sendMessage(ChatColor.GREEN + "Arena " + mundo + " aberta como esta no disco. "
+                + ChatColor.GRAY + "O zip nao foi tocado.");
+        quemPediu.sendMessage(ChatColor.GRAY + "Ela fica no ar ate /fechar " + mundo
+                + " ou ate o servidor reiniciar.");
+        return true;
+    }
+
+    /** O /fechar: tira a arena do ar guardando o que está nela, e solta o vigia. */
+    boolean fecharOndeEstou(CommandSender quemPediu, String[] argumentos) {
+        if (argumentos.length != 1) {
+            quemPediu.sendMessage("Use: /fechar <arena>");
+            return true;
+        }
+        String mundo = argumentos[0];
+        if (!arenas.containsKey(mundo)) {
+            quemPediu.sendMessage(ChatColor.RED + "Nao e uma arena: " + mundo + ".");
+            return true;
+        }
+        if (mundo.equals(emJogo)) {
+            marcarEmJogo(null);
+        }
+        fechar(mundo, false, null);
+        quemPediu.sendMessage(ChatColor.GREEN + "Arena " + mundo + " fechada. "
+                + ChatColor.GRAY + "O que estava nela foi gravado.");
+        return true;
+    }
+
     boolean salvarOndeEstou(CommandSender quemPediu, String[] argumentos) {
         String mundo;
         if (argumentos.length == 1) {

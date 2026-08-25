@@ -44,6 +44,14 @@ commands:
     description: Leva voce a uma arena em criativo para construir o mapa
     usage: /setup <arena>
     permission: gcmenus.npcskin
+  abrir:
+    description: Poe a arena no ar como ela esta no disco, sem tocar no zip
+    usage: /abrir <arena>
+    permission: gcmenus.npcskin
+  fechar:
+    description: Tira a arena do ar guardando o que esta nela
+    usage: /fechar <arena>
+    permission: gcmenus.npcskin
   save:
     description: Guarda a arena onde voce esta como o mapa oficial dela
     usage: /save

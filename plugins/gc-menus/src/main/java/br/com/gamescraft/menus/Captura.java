@@ -229,6 +229,30 @@ final class Captura {
             contagem++;
         }
         int limpos = contagem;
+        varrerOChao(quemPediu, mundo, limpos);
+    }
+
+    /**
+     * Esquece de quem era cada torre, sem encostar no mundo.
+     *
+     * É o que o fim de partida precisa. O /neutro completo varre o mapa inteiro
+     * para despintar o chão, e no fim da partida esse mapa está sendo apagado no
+     * mesmo instante — a varredura escrevia blocos num mundo que já estava
+     * saindo do ar, e o trabalho era jogado fora de qualquer jeito, porque a
+     * próxima partida nasce do zip.
+     */
+    void zerarMemoria() {
+        for (int[] pos : torres.posicoes()) {
+            if (emCastelo(pos[0], pos[1])) {
+                continue;
+            }
+            Torre torre = new Torre(pos[0], pos[1]);
+            donos.put(torre, Dono.NEUTRO);
+            progresso.put(torre, 0);
+        }
+    }
+
+    private void varrerOChao(org.bukkit.command.CommandSender quemPediu, World mundo, int limpos) {
         int alcance = plugin.getConfig().getInt("alcance-da-varredura", 288);
         quemPediu.sendMessage(ChatColor.GRAY + "Devolvendo o chao ao cinza...");
         new org.bukkit.scheduler.BukkitRunnable() {
@@ -236,6 +260,19 @@ final class Captura {
 
             @Override
             public void run() {
+                // O mundo ainda é o mesmo de quando isto começou?
+                //
+                // Esta varredura dura uns vinte tiques e escreve blocos o tempo
+                // todo. Se a arena for fechada ou trocada no meio — fim de
+                // partida, /setup, servidor desligando — o que sobra é uma
+                // referência para um mundo morto: cada chamada estoura, e o que
+                // estava em voo pega a gravação dos arquivos de região no meio.
+                // Foi assim que o r.0.0.mca da ilha quebrou e voltou a quebrar
+                // a cada partida, levando chunks junto de cada vez.
+                if (plugin.getServer().getWorld(nomeMundo) != mundo) {
+                    cancel();
+                    return;
+                }
                 // Trinta fileiras por tique: a ilha inteira de uma vez segura o
                 // servidor por segundos.
                 for (int feitas = 0; feitas < 30; feitas++) {

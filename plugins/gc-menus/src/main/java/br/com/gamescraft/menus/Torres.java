@@ -133,6 +133,18 @@ final class Torres implements Listener {
 
             @Override
             public void run() {
+                // Mesma trava da varredura do chão: carregar mil e duzentos
+                // chunks leva tempo, e o mundo pode sair do ar no meio. Pedir
+                // chunk a um mundo já descarregado estoura, e o que estava em
+                // voo pega a gravação dos arquivos de região no meio.
+                if (plugin.getServer().getWorld(nomeMundo) != mundo) {
+                    quemPediu.sendMessage(ChatColor.YELLOW
+                            + "O mundo saiu do ar no meio da varredura. A lista de torres "
+                            + "ficou como estava.");
+                    varrendo = false;
+                    cancel();
+                    return;
+                }
                 for (int feitos = 0; feitos < CHUNKS_POR_TIQUE; feitos++) {
                     if (cx > ateChunk) {
                         terminar(quemPediu, achadas);
