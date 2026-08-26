@@ -1,0 +1,12 @@
+# Quem passou pela rede durante o beta
+# Capturado em 2026-08-26 a partir do usercache de todos os servidores.
+#
+# E desta lista que sai o cargo Beta no lancamento. Depois de a rede abrir,
+# nao ha mais como saber quem esteve aqui antes: o usercache tem prazo de
+# validade e se limpa sozinho. Rodar de novo antes de lancar, para pegar
+# quem entrar daqui para la.
+
+00000000-0000-0000-0009-01f33497e0ee  .RotaryNest67424
+7e3ae378-30bb-4684-a392-eebec441ab35  HelenaCasare
+1e57838f-7cce-4504-9449-a4d74c6feba8  JulioCasare
+99f861af-6fd1-4562-8598-21058cce4027  Victor_Casare
