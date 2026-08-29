@@ -169,11 +169,17 @@ final class Cargos implements Listener {
      * conseguiria, porque o Rei continuaria lá por baixo.
      */
     boolean comando(CommandSender quemPediu, String[] argumentos) {
-        if (argumentos.length != 2) {
+        if (argumentos.length < 2 || argumentos.length > 3) {
             ajuda(quemPediu);
             return true;
         }
         String alvo = argumentos[1];
+        String prazo = argumentos.length == 3 ? argumentos[2] : null;
+        if (prazo != null && !prazoValido(prazo)) {
+            quemPediu.sendMessage(ChatColor.RED + "Prazo estranho: " + prazo);
+            ajuda(quemPediu);
+            return true;
+        }
         if (!nomeValido(alvo)) {
             quemPediu.sendMessage(ChatColor.RED + "Isso nao parece um nome de jogador.");
             return true;
@@ -184,6 +190,10 @@ final class Cargos implements Listener {
         if (!tirando && cargo == null) {
             quemPediu.sendMessage(ChatColor.RED + "Cargo desconhecido: " + argumentos[0]);
             ajuda(quemPediu);
+            return true;
+        }
+        if (tirando && prazo != null) {
+            quemPediu.sendMessage(ChatColor.RED + "Remover nao leva prazo: tirar e agora.");
             return true;
         }
 
@@ -210,23 +220,30 @@ final class Cargos implements Listener {
             return true;
         }
 
-        // Tira os quatro antes de dar o novo. O LuckPerms nao reclama de tirar
-        // grupo que a pessoa nao tem, entao nao ha o que conferir primeiro.
+        // Tira os quatro antes de dar o novo, nas duas formas: o LuckPerms
+        // guarda cargo com prazo e cargo sem prazo em lugares diferentes, e
+        // `parent remove` não encosta no que tem prazo. Sem o removetemp, quem
+        // ganhou 30 dias e depois comprou o vitalício ficaria com os dois, e o
+        // vitalício sumiria junto com o prêmio no fim do mês.
         for (Cargo outro : Cargo.values()) {
             console("lp user " + quem + " parent remove " + outro.chave());
+            console("lp user " + quem + " parent removetemp " + outro.chave());
         }
-        if (cargo != null) {
+        if (cargo != null && prazo == null) {
             console("lp user " + quem + " parent add " + cargo.chave());
+        } else if (cargo != null) {
+            console("lp user " + quem + " parent addtemp " + cargo.chave() + " " + prazo);
         }
 
         if (cargo == null) {
             quemPediu.sendMessage(ChatColor.GREEN + "Cargo de " + alvo + " removido.");
         } else {
+            String ate = prazo == null ? " (sem prazo)" : " por " + prazo;
             quemPediu.sendMessage(ChatColor.GREEN + alvo + " agora e "
-                    + ChatColor.RESET + cargo.rotulo() + ChatColor.GREEN + ".");
+                    + ChatColor.RESET + cargo.rotulo() + ChatColor.GREEN + ate + ".");
             if (online != null) {
                 online.sendMessage(ChatColor.GREEN + "Voce recebeu o cargo "
-                        + cargo.rotulo() + "!");
+                        + cargo.rotulo() + (prazo == null ? "!" : " por " + prazo + "!"));
             }
         }
         if (online != null) {
@@ -259,16 +276,46 @@ final class Cargos implements Listener {
         return true;
     }
 
+    /**
+     * Prazo no formato do LuckPerms: número e letra, podendo emendar.
+     *
+     * Confere antes de mandar porque isto vira comando de console: um espaço no
+     * meio viraria um argumento a mais, e argumento a mais em `lp user` muda o
+     * que o comando faz.
+     */
+    private boolean prazoValido(String prazo) {
+        if (prazo.isEmpty() || prazo.length() > 20 || !Character.isDigit(prazo.charAt(0))) {
+            return false;
+        }
+        boolean temLetra = false;
+        for (char c : prazo.toCharArray()) {
+            if (Character.isDigit(c)) {
+                continue;
+            }
+            if (c >= 'a' && c <= 'z') {
+                temLetra = true;
+                continue;
+            }
+            return false;
+        }
+        return temLetra;
+    }
+
     private void console(String comando) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), comando);
     }
 
     private void ajuda(CommandSender quemPediu) {
-        quemPediu.sendMessage(ChatColor.GRAY + "Use: /vip <cargo> <jogador>");
+        quemPediu.sendMessage(ChatColor.GRAY + "Use: /vip <cargo> <jogador> [prazo]");
         StringBuilder lista = new StringBuilder();
         for (Cargo cargo : Cargo.values()) {
             lista.append(cargo.chave()).append(", ");
         }
         quemPediu.sendMessage(ChatColor.GRAY + "Cargos: " + lista + "remover");
+        quemPediu.sendMessage(ChatColor.GRAY + "Sem prazo o cargo e para sempre.");
+        // O 'm' e minuto e o 'mo' e mes — essa e a letra que engana, e cargo
+        // dado por engano com um minuto de prazo some antes de alguem notar.
+        quemPediu.sendMessage(ChatColor.GRAY + "Prazo: 30d dias, 12h horas, 30m minutos, "
+                + "3mo meses, 2w semanas, 1y ano. Da para emendar: 1mo15d.");
     }
 }

@@ -46,7 +46,7 @@ commands:
     permission: gcmenus.npcskin
   vip:
     description: Da ou tira um cargo — gerente, rei, cavaleiro ou escudeiro
-    usage: /vip <cargo> <jogador>
+    usage: /vip <cargo> <jogador> [prazo]
     permission: gcmenus.vip
   abrir:
     description: Poe a arena no ar como ela esta no disco, sem tocar no zip
@@ -72,6 +72,18 @@ permissions:
   gcmenus.vip:
     description: Pode dar e tirar cargos
     default: op
+  gcmenus.cargo.gerente:
+    description: Tag de Gerente
+    default: false
+  gcmenus.cargo.rei:
+    description: Tag de Rei
+    default: false
+  gcmenus.cargo.cavaleiro:
+    description: Tag de Cavaleiro
+    default: false
+  gcmenus.cargo.escudeiro:
+    description: Tag de Escudeiro
+    default: false
   gcmenus.npcskin:
     description: Permite mexer nos bonecos
     default: op
