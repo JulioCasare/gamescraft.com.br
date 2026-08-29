@@ -44,6 +44,10 @@ commands:
     description: Leva voce a uma arena em criativo para construir o mapa
     usage: /setup <arena>
     permission: gcmenus.npcskin
+  vip:
+    description: Da ou tira um cargo — gerente, rei, cavaleiro ou escudeiro
+    usage: /vip <cargo> <jogador>
+    permission: gcmenus.vip
   abrir:
     description: Poe a arena no ar como ela esta no disco, sem tocar no zip
     usage: /abrir <arena>
@@ -65,6 +69,9 @@ commands:
     usage: /arenas
     permission: gcmenus.npcskin
 permissions:
+  gcmenus.vip:
+    description: Pode dar e tirar cargos
+    default: op
   gcmenus.npcskin:
     description: Permite mexer nos bonecos
     default: op

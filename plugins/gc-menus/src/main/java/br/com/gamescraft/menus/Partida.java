@@ -60,6 +60,10 @@ final class Partida {
 
     private final Arenas arenas;
     private final Roubo roubo;
+
+    /** Quem desenha as tags, para elas sumirem na largada e voltarem no fim. */
+    private Cargos cargos;
+
     private Fase fase = Fase.ESPERA;
     private int restante;
 
@@ -81,6 +85,10 @@ final class Partida {
         this.guardado = YamlConfiguration.loadConfiguration(arquivo);
 
         plugin.getServer().getScheduler().runTaskTimer(plugin, this::segundo, 20L, 20L);
+    }
+
+    void ligarCargos(Cargos cargos) {
+        this.cargos = cargos;
     }
 
     // ------------------------------------------------------------- saguão
@@ -313,6 +321,10 @@ final class Partida {
             String time = (i++ % 2 == 0) ? nomeAzul : nomeVermelho;
             largar(jogador, time);
         }
+        // As tags saem de cena agora: daqui para a frente o nome diz time.
+        if (cargos != null) {
+            cargos.pintarTodos();
+        }
         anunciar(ChatColor.GREEN + "Comecou! " + ChatColor.GRAY
                 + "Quebre o bloco do outro time, pegue ele do chao e suba no bloco "
                 + "do seu time para vencer.");
@@ -424,6 +436,9 @@ final class Partida {
         if (arenas != null) {
             arenas.marcarEmJogo(null);
             arenas.fechar(arenaAtual, true, saguao());
+        }
+        if (cargos != null) {
+            cargos.pintarTodos();
         }
         anunciar(ChatColor.GRAY + "Arena fechada. A proxima partida comeca "
                 + "quando houver " + MINIMO + " pessoas.");

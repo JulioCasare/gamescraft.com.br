@@ -109,6 +109,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
     /** Qual parte do plugin este servidor usa. */
     private String modo = "menus";
 
+    /** As tags de cargo: Gerente, Rei, Cavaleiro e Escudeiro. */
+    private Cargos cargos;
+
     /** No Bed Wars: quem chegou escolhendo uma arena la no lobby. */
     private EntradaBedwars entrada;
 
@@ -161,6 +164,11 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         // um quer uma parte diferente. Sem esta chave o lobby dava kit e time de
         // MegaGames a quem entrasse — os bonecos são a única peça comum a todos.
         modo = getConfig().getString("modo", "menus");
+        // Fora da chave de modo, de proposito: o cargo de uma pessoa e o mesmo
+        // no lobby, no PvP e no Bed Wars, e uma tag que aparece so num lugar nao
+        // e um cargo — e um enfeite local.
+        cargos = new Cargos(this);
+        getServer().getPluginManager().registerEvents(cargos, this);
         if (modo.equals("megagames")) {
             ligarMegaGames();
         } else if (modo.equals("bedwars")) {
@@ -200,6 +208,10 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         equipes.ligarRoubo(roubo);
         partida = new Partida(this, equipes, captura, armaduras, ferramentas, arenas, roubo);
         roubo.ligarPartida(partida);
+        // A tag some quando a partida comeca: dentro do jogo o nome serve para
+        // dizer de que time a pessoa e, e quem colore nome ali e o time.
+        cargos.ligarPartida(partida);
+        partida.ligarCargos(cargos);
         equipes.ligarPartida(partida);
         getServer().getPluginManager().registerEvents(new Concreto(protecao, areas), this);
         Loja loja = new Loja(this, protecao, areas, armaduras, ferramentas);
@@ -357,6 +369,9 @@ public final class GcMenus extends JavaPlugin implements Listener, PluginMessage
         }
         if (comando.getName().equals("setup")) {
             return arenas != null && arenas.setup(quemMandou, argumentos);
+        }
+        if (comando.getName().equals("vip")) {
+            return cargos != null && cargos.comando(quemMandou, argumentos);
         }
         if (comando.getName().equals("abrir")) {
             return arenas != null && arenas.abrirOndeEstou(quemMandou, argumentos);
