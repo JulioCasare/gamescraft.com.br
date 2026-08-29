@@ -1,6 +1,9 @@
 package br.com.gamescraft.menus;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,7 +17,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 
@@ -27,9 +33,10 @@ import io.papermc.paper.event.player.AsyncChatEvent;
  * graça por esse caminho. E quando o VIP passar a durar 30 ou 90 dias, o prazo
  * também já existe lá, sem código novo.
  *
- * Aqui fica só o que o LuckPerms não faz: desenhar a tag no chat e na lista de
- * jogadores. Cada cargo dá uma permissão própria, e é por ela que este plugin
- * descobre quem é quem — sem depender da API do LuckPerms para nada.
+ * Aqui fica só o que o LuckPerms não faz: desenhar a tag nos três lugares onde
+ * um nome aparece — o chat, a lista de tab e o rótulo que flutua sobre a
+ * cabeça. Cada cargo dá uma permissão própria, e é por ela que este plugin
+ * descobre quem é quem, sem depender da API do LuckPerms para nada.
  */
 final class Cargos implements Listener {
 
@@ -84,11 +91,18 @@ final class Cargos implements Listener {
 
     private final JavaPlugin plugin;
 
+    /** O último cargo visto em cada um, para saber quando ele venceu. */
+    private final Map<UUID, Cargo> ultimoReal = new HashMap<>();
+
+    /** Se a última ronda pegou partida rolando. */
+    private boolean ultimaFase;
+
     /** Só existe no MegaGames. Nos outros servidores fica nulo, e a tag sempre aparece. */
     private Partida partida;
 
     Cargos(JavaPlugin plugin) {
         this.plugin = plugin;
+        plugin.getServer().getScheduler().runTaskTimer(plugin, this::vigiar, 100L, 100L);
     }
 
     void ligarPartida(Partida partida) {
@@ -130,7 +144,40 @@ final class Cargos implements Listener {
         });
     }
 
-    // -------------------------------------------------------- lista de tab
+    // ------------------------------------------- etiqueta em cima da cabeça
+
+    /**
+     * A etiqueta acima do nome só existe por time de placar.
+     *
+     * Não há outro caminho no Minecraft: o nome que flutua sobre a cabeça não
+     * aceita texto solto, só o prefixo do time em que a pessoa está. A lista de
+     * tab vem junto de graça — é o mesmo prefixo, desenhado nos dois lugares —
+     * e por isso o nome na tab não é mais escrito à mão, senão a etiqueta
+     * apareceria duas vezes lá.
+     *
+     * Os times são numerados na ordem dos cargos porque a tab ordena por nome de
+     * time: gc0gerente vem antes de gc1rei, e a lista sai em ordem de cargo sem
+     * ninguém pedir.
+     */
+    private String nomeDoTime(Cargo cargo) {
+        return cargo == null ? "gc9sem" : "gc" + cargo.ordinal() + cargo.chave();
+    }
+
+    private boolean nossa(String nomeDoTime) {
+        return nomeDoTime.startsWith("gc") && nomeDoTime.length() > 2
+                && Character.isDigit(nomeDoTime.charAt(2));
+    }
+
+    private Team time(Cargo cargo) {
+        Scoreboard placar = Bukkit.getScoreboardManager().getMainScoreboard();
+        String nome = nomeDoTime(cargo);
+        Team time = placar.getTeam(nome);
+        if (time == null) {
+            time = placar.registerNewTeam(nome);
+        }
+        time.prefix(cargo == null ? Component.empty() : cargo.etiqueta());
+        return time;
+    }
 
     @EventHandler
     public void aoEntrar(PlayerJoinEvent evento) {
@@ -139,7 +186,25 @@ final class Cargos implements Listener {
         plugin.getServer().getScheduler().runTask(plugin, () -> pintar(evento.getPlayer()));
     }
 
-    /** Redesenha a lista de jogadores de todo mundo. */
+    /**
+     * Quem sai também sai do time.
+     *
+     * A entrada num time é só o nome escrito, e ela fica no scoreboard.dat mesmo
+     * com a pessoa offline. Se o cargo dela vencer enquanto está fora, ninguém
+     * limpa: a ronda só olha quem está online. Tirar na saída fecha esse buraco,
+     * e não custa nada — quem volta é repintado na entrada de qualquer jeito.
+     */
+    @EventHandler
+    public void aoSair(PlayerQuitEvent evento) {
+        ultimoReal.remove(evento.getPlayer().getUniqueId());
+        Scoreboard placar = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team atual = placar.getEntryTeam(evento.getPlayer().getName());
+        if (atual != null && nossa(atual.getName())) {
+            atual.removeEntry(evento.getPlayer().getName());
+        }
+    }
+
+    /** Redesenha todo mundo. */
     void pintarTodos() {
         for (Player jogador : Bukkit.getOnlinePlayers()) {
             pintar(jogador);
@@ -150,12 +215,60 @@ final class Cargos implements Listener {
         if (!jogador.isOnline()) {
             return;
         }
+        // A tab volta a ser só o nome: quem desenha a etiqueta ali agora é o
+        // prefixo do time.
+        jogador.playerListName(Component.text(jogador.getName()));
+
+        Scoreboard placar = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team atual = placar.getEntryTeam(jogador.getName());
         Cargo cargo = emPartida() ? null : doJogador(jogador);
         if (cargo == null) {
-            jogador.playerListName(Component.text(jogador.getName()));
+            // Sai só dos times que são nossos. Em partida quem manda no nome é
+            // o time do jogo — tirar a pessoa de lá apagaria a cor do time dela
+            // justo quando ela mais precisa ser reconhecida.
+            if (atual != null && nossa(atual.getName())) {
+                atual.removeEntry(jogador.getName());
+            }
             return;
         }
-        jogador.playerListName(cargo.etiqueta().append(Component.text(jogador.getName())));
+        if (atual != null && !nossa(atual.getName())) {
+            return;
+        }
+        time(cargo).addEntry(jogador.getName());
+    }
+
+    // --------------------------------------------------------- vencimento
+
+    /**
+     * Olha de cinco em cinco segundos se o cargo de alguém mudou.
+     *
+     * O cargo com prazo vence sozinho lá no LuckPerms, e ninguém avisa este
+     * plugin. Sem esta ronda a etiqueta ficava na tela até a pessoa sair e
+     * entrar — o cargo tinha acabado e continuava aparecendo, que é o pior dos
+     * dois mundos: não vale mais nada e ninguém sabe disso.
+     *
+     * Só redesenha quem mudou. Perguntar a permissão de cada um é barato;
+     * reescrever placar de todo mundo a cada cinco segundos não é.
+     */
+    private void vigiar() {
+        boolean emJogo = emPartida();
+        boolean virouFase = emJogo != ultimaFase;
+        ultimaFase = emJogo;
+        for (Player jogador : Bukkit.getOnlinePlayers()) {
+            Cargo real = doJogador(jogador);
+            Cargo antes = ultimoReal.get(jogador.getUniqueId());
+            boolean mudou = real != antes;
+            if (mudou) {
+                ultimoReal.put(jogador.getUniqueId(), real);
+            }
+            if (mudou || virouFase) {
+                pintar(jogador);
+            }
+            if (mudou && antes != null && real == null) {
+                jogador.sendMessage(ChatColor.YELLOW + "Seu cargo " + antes.rotulo()
+                        + " venceu.");
+            }
+        }
     }
 
     // ------------------------------------------------------------- comando
