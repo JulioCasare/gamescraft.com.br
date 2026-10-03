@@ -209,6 +209,10 @@
   td.rei { color: var(--rei); }
   .nao { color: var(--tinta-fraca); opacity: .5; }
   .qtd { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-variant-numeric: tabular-nums; }
+  /* Valor comprido — as animacoes, que sao acumuladas — quebra em linhas em vez
+     de esticar a tabela. Esticando, as colunas do Cavaleiro e do Rei saem da
+     tela no celular, e e justamente nelas que esta o que se quer comprar. */
+  .qtd.lista { white-space: normal; display: inline-block; max-width: 16ch; line-height: 1.45; }
   /* Cabecalho de grupo dentro da tabela: a lista cresceu, e sem estas faixas o
      leitor nao sabe se "efeitos" e do lobby ou da partida. Nao e decoracao —
      cada faixa diz ONDE o beneficio vale. */
@@ -427,8 +431,8 @@
               <td class="rei"><span class="qtd">3</span></td>
             </tr>
             <tr>
-              <th scope="row">Mapas que você pode escolher na votação
-                <span class="nota">entrar na partida é aberto a todo mundo</span></th>
+              <th scope="row">Escolher o mapa da partida
+                <span class="nota">para os outros ele entra como mapa sorteado; hoje no BedWars e no Pillars of Fortune</span></th>
               <td class="esc"><span class="qtd">5</span></td>
               <td class="cav"><span class="qtd">10</span></td>
               <td class="rei"><span class="qtd">todos</span></td>
@@ -440,10 +444,11 @@
               <td class="rei"><span class="sim">✓</span></td>
             </tr>
             <tr>
-              <th scope="row">Animações</th>
-              <td class="esc"><span class="qtd">quebrar cama</span></td>
-              <td class="cav"><span class="qtd">vitória</span></td>
-              <td class="rei"><span class="qtd">eliminação</span></td>
+              <th scope="row">Animações
+                <span class="nota">cada cargo mantém as do anterior</span></th>
+              <td class="esc"><span class="qtd lista">quebrar cama</span></td>
+              <td class="cav"><span class="qtd lista">quebrar cama / vitória</span></td>
+              <td class="rei"><span class="qtd lista">quebrar cama / vitória / eliminação</span></td>
             </tr>
             <tr>
               <th scope="row">Criar clã, sem limite de membros</th>
@@ -460,7 +465,7 @@
               <td class="rei"><span class="qtd">20</span></td>
             </tr>
             <tr>
-              <th scope="row">Entradas</th>
+              <th scope="row">Mensagem de entrada no lobby</th>
               <td class="esc"><span class="qtd">3</span></td>
               <td class="cav"><span class="qtd">9</span></td>
               <td class="rei"><span class="qtd">12</span></td>
@@ -471,56 +476,19 @@
               <td class="cav"><span class="sim">✓</span></td>
               <td class="rei"><span class="sim">✓</span></td>
             </tr>
-
-            <tr class="grupo"><th scope="rowgroup" colspan="4">Eventos</th></tr>
-            <tr>
-              <th scope="row">Criar um evento seu
-                <span class="nota">quem cria dá a recompensa ao vencedor; entrar é aberto a todo mundo</span></th>
-              <td><span class="nao">—</span></td>
-              <td><span class="nao">—</span></td>
-              <td class="rei"><span class="sim">✓</span></td>
-            </tr>
-
-            <tr class="grupo"><th scope="rowgroup" colspan="4">Em breve</th></tr>
-            <tr>
-              <th scope="row">Pilar personalizado <span class="breve">em breve</span></th>
-              <td><span class="nao">—</span></td>
-              <td class="cav"><span class="qtd">2</span></td>
-              <td class="rei"><span class="qtd">5</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Criar um tema de Build Battle <span class="breve">em breve</span></th>
-              <td><span class="nao">—</span></td>
-              <td><span class="nao">—</span></td>
-              <td class="rei"><span class="qtd">1</span></td>
-            </tr>
-
-            <tr class="grupo"><th scope="rowgroup" colspan="4">Fora do jogo</th></tr>
-            <tr>
-              <th scope="row">Dar ideias para a rede</th>
-              <td><span class="nao">—</span></td>
-              <td class="cav"><span class="sim">✓</span></td>
-              <td class="rei"><span class="sim">✓</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Vantagem dentro da partida</th>
-              <td><span class="nao">—</span></td>
-              <td><span class="nao">—</span></td>
-              <td><span class="nao">—</span></td>
-            </tr>
           </tbody>
         </table>
       </div>
 
-      <p class="aviso-loja"><b>Lote de fundador.</b> O vitalício existe só enquanto a beta
-        durar — quem compra agora está apostando num servidor que ainda está provando que
-        funciona. Depois da beta fica só o plano de 30 dias. O que estiver marcado
-        <b>em breve</b> ainda está sendo feito, e não é cobrado como pronto.</p>
+      <p class="aviso-loja"><b>Nenhum cargo dá vantagem dentro do jogo.</b> Nada aqui muda
+        dano, alcance, velocidade, item inicial ou qualquer coisa que decida uma partida.
+        O que você compra aparece: placa, animação, efeito, entrada — e a escolha do mapa,
+        que entra sorteada para todo mundo.</p>
 
       <ul class="letra-miuda">
         <li><b>Vitalício</b> vale enquanto o servidor existir.</li>
         <li>Você mantém o cargo que comprou. <b>Cargo novo é compra nova.</b></li>
-        <li>Os benefícios podem mudar, com <b>aviso de 30 dias</b> no Discord.</li>
+        <li>Os benefícios e os preços podem mudar, com <b>aviso de 30 dias</b> no Discord.</li>
         <li><b>Banimento por trapaça não devolve o valor.</b></li>
       </ul>
     </div>
@@ -571,6 +539,11 @@
           <span class="pena">Silenciamento</span>
         </div>
       </div>
+
+      <p class="aviso-loja"><b>Dá para tirar um banimento pagando.</b> O pedido é no Discord,
+        com nick e horário, e o valor sobe a cada vez: <b>R$ 50</b> no primeiro,
+        <b>R$ 100</b> no segundo, <b>R$ 150</b> no terceiro e <b>R$ 200</b> do quarto em
+        diante.</p>
     </div>
   </section>
 </main>
@@ -639,6 +612,7 @@
       <li><div><b>Anunciado no Discord com antecedência</b><span>Data e hora marcadas. O servidor de eventos fica desligado fora disso.</span></div></li>
       <li><div><b>A brincadeira muda a cada vez</b><span>Quem conduz é a administração, ao vivo, e as regras do dia são ditas na hora.</span></div></li>
       <li><div><b>O prêmio não se compra</b><span>Cosmético de evento nunca entra na loja, nem depois. Quem estava lá tem; quem não estava, não terá.</span></div></li>
+      <li><div><b>Quem pede o evento paga a recompensa</b><span>Dá para pedir um evento seu, com a brincadeira que você quiser. Quem pede entra com o prêmio do vencedor — a gente conduz e marca a data no Discord. Entrar é aberto a todo mundo.</span></div></li>
     </ol>
   </div>
 </main>
