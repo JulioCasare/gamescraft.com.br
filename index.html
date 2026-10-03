@@ -209,6 +209,22 @@
   td.rei { color: var(--rei); }
   .nao { color: var(--tinta-fraca); opacity: .5; }
   .qtd { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-variant-numeric: tabular-nums; }
+  /* Cabecalho de grupo dentro da tabela: a lista cresceu, e sem estas faixas o
+     leitor nao sabe se "efeitos" e do lobby ou da partida. Nao e decoracao —
+     cada faixa diz ONDE o beneficio vale. */
+  .grupo th {
+    text-align: left; font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
+    background: var(--superficie); padding-top: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--linha); width: auto;
+  }
+  /* As condicoes da compra. Nao sao aviso de rodape: sao o que evita
+     desentendimento depois que o dinheiro entrou. */
+  .letra-miuda {
+    margin: 14px 0 0; padding-left: 20px; font-size: 13.5px;
+    color: var(--tinta-fraca); line-height: 1.75;
+  }
+  .letra-miuda b { color: var(--tinta); font-weight: 600; }
   .breve {
     font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--tinta-fraca); border: 1px solid var(--linha);
@@ -361,13 +377,13 @@
     <div class="env">
       <div class="rotulo">Apoie a rede</div>
       <h2>Cargos</h2>
-      <p class="sub">Escudeiro, Cavaleiro e Rei. Todos são <strong>só cosméticos</strong>.
-        Numa rede que ainda junta os oito primeiros jogadores, pay-to-win custa exatamente
-        os jogadores que o VIP precisa ter do outro lado do mapa.</p>
+      <p class="sub">Escudeiro, Cavaleiro e Rei. <strong>Nada aqui dá vantagem dentro da
+        partida.</strong> Numa rede que ainda junta os oito primeiros jogadores, pay-to-win
+        custa exatamente os jogadores que o VIP precisa ter do outro lado do mapa.</p>
 
       <div class="rolagem">
         <table>
-          <caption>Preços de fundador, com o preço cheio riscado ao lado.</caption>
+          <caption>O vitalício é de fundador: existe só enquanto a beta durar.</caption>
           <thead>
             <tr>
               <th></th>
@@ -378,17 +394,20 @@
           </thead>
           <tbody>
             <tr class="preco-linha vital">
-              <th scope="row">Vitalício</th>
-              <td><span class="val">R$ 24,90</span><s>R$ 44,90</s></td>
-              <td><span class="val">R$ 49,90</span><s>R$ 89,90</s></td>
-              <td><span class="val">R$ 99,90</span><s>R$ 179,90</s></td>
+              <th scope="row">Vitalício de fundador
+                <span class="nota">só durante a beta; depois fica só o plano de 30 dias</span></th>
+              <td><span class="val">R$ 44,90</span></td>
+              <td><span class="val">R$ 89,90</span></td>
+              <td><span class="val">R$ 149,99</span></td>
             </tr>
             <tr class="preco-linha">
               <th scope="row">30 dias</th>
-              <td><span class="val">R$ 4,90</span></td>
-              <td><span class="val">R$ 9,90</span></td>
-              <td><span class="val">R$ 19,90</span></td>
+              <td><span class="val">R$ 4,99</span></td>
+              <td><span class="val">R$ 9,99</span></td>
+              <td><span class="val">R$ 19,99</span></td>
             </tr>
+
+            <tr class="grupo"><th scope="rowgroup" colspan="4">Em toda a rede</th></tr>
             <tr>
               <th scope="row">Placa de cargo no chat, na lista e sobre a cabeça</th>
               <td class="esc"><span class="sim">✓</span></td>
@@ -396,64 +415,91 @@
               <td class="rei"><span class="sim">✓</span></td>
             </tr>
             <tr>
-              <th scope="row">Nuvem pessoal que te segue</th>
-              <td><span class="nao">—</span></td>
-              <td class="cav"><span class="qtd">2</span></td>
-              <td class="rei"><span class="qtd">todas</span></td>
-            </tr>
-            <tr>
               <th scope="row">Emotes</th>
-              <td class="esc"><span class="qtd">3</span></td>
-              <td class="cav"><span class="qtd">8</span></td>
-              <td class="rei"><span class="qtd">20</span></td>
+              <td class="esc"><span class="qtd">5</span></td>
+              <td class="cav"><span class="qtd">10</span></td>
+              <td class="rei"><span class="qtd">25</span></td>
             </tr>
             <tr>
-              <th scope="row">Chapéu cosmético <span class="breve">em breve</span></th>
+              <th scope="row">Peso do seu voto para escolher a partida no MegaGames</th>
               <td class="esc"><span class="qtd">1</span></td>
-              <td class="cav"><span class="qtd">3</span></td>
-              <td class="rei"><span class="qtd">todos</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Rastro de partícula ao andar <span class="breve">em breve</span></th>
-              <td class="esc"><span class="qtd">1</span></td>
-              <td class="cav"><span class="qtd">3</span></td>
-              <td class="rei"><span class="qtd">todos</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Aura girando em volta <span class="breve">em breve</span></th>
-              <td><span class="nao">—</span></td>
               <td class="cav"><span class="qtd">2</span></td>
-              <td class="rei"><span class="qtd">todas</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Efeito ao eliminar alguém <span class="breve">em breve</span></th>
-              <td><span class="nao">—</span></td>
-              <td class="cav"><span class="qtd">1</span></td>
-              <td class="rei"><span class="qtd">todos</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Animação de vitória <span class="breve">em breve</span></th>
-              <td><span class="nao">—</span></td>
-              <td><span class="nao">—</span></td>
-              <td class="rei"><span class="sim">✓</span></td>
-            </tr>
-            <tr>
-              <th scope="row">Guarda-roupa de conjuntos salvos <span class="breve">em breve</span></th>
-              <td><span class="nao">—</span></td>
-              <td class="cav"><span class="qtd">1</span></td>
               <td class="rei"><span class="qtd">3</span></td>
             </tr>
             <tr>
-              <th scope="row">Todo cosmético VIP novo, sem pagar de novo</th>
+              <th scope="row">Mapas que você pode escolher na votação
+                <span class="nota">entrar na partida é aberto a todo mundo</span></th>
+              <td class="esc"><span class="qtd">5</span></td>
+              <td class="cav"><span class="qtd">10</span></td>
+              <td class="rei"><span class="qtd">todos</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Escolher a cor do time no BedWars e no Build Battle</th>
+              <td class="esc"><span class="sim">✓</span></td>
+              <td class="cav"><span class="sim">✓</span></td>
+              <td class="rei"><span class="sim">✓</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Animações</th>
+              <td class="esc"><span class="qtd">quebrar cama</span></td>
+              <td class="cav"><span class="qtd">vitória</span></td>
+              <td class="rei"><span class="qtd">eliminação</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Criar clã, sem limite de membros</th>
+              <td><span class="nao">—</span></td>
+              <td class="cav"><span class="sim">✓</span></td>
+              <td class="rei"><span class="sim">✓</span></td>
+            </tr>
+
+            <tr class="grupo"><th scope="rowgroup" colspan="4">No lobby</th></tr>
+            <tr>
+              <th scope="row">Efeitos</th>
+              <td class="esc"><span class="qtd">10</span></td>
+              <td class="cav"><span class="qtd">15</span></td>
+              <td class="rei"><span class="qtd">20</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Entradas</th>
+              <td class="esc"><span class="qtd">3</span></td>
+              <td class="cav"><span class="qtd">9</span></td>
+              <td class="rei"><span class="qtd">12</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Voar no lobby</th>
+              <td><span class="nao">—</span></td>
+              <td class="cav"><span class="sim">✓</span></td>
+              <td class="rei"><span class="sim">✓</span></td>
+            </tr>
+
+            <tr class="grupo"><th scope="rowgroup" colspan="4">Eventos</th></tr>
+            <tr>
+              <th scope="row">Criar um evento seu
+                <span class="nota">quem cria dá a recompensa ao vencedor; entrar é aberto a todo mundo</span></th>
               <td><span class="nao">—</span></td>
               <td><span class="nao">—</span></td>
               <td class="rei"><span class="sim">✓</span></td>
             </tr>
+
+            <tr class="grupo"><th scope="rowgroup" colspan="4">Em breve</th></tr>
             <tr>
-              <th scope="row">Evento seu no servidor
-                <span class="nota">até 1 por mês, marcado com a gente no Discord</span></th>
+              <th scope="row">Pilar personalizado <span class="breve">em breve</span></th>
+              <td><span class="nao">—</span></td>
+              <td class="cav"><span class="qtd">2</span></td>
+              <td class="rei"><span class="qtd">5</span></td>
+            </tr>
+            <tr>
+              <th scope="row">Criar um tema de Build Battle <span class="breve">em breve</span></th>
               <td><span class="nao">—</span></td>
               <td><span class="nao">—</span></td>
+              <td class="rei"><span class="qtd">1</span></td>
+            </tr>
+
+            <tr class="grupo"><th scope="rowgroup" colspan="4">Fora do jogo</th></tr>
+            <tr>
+              <th scope="row">Dar ideias para a rede</th>
+              <td><span class="nao">—</span></td>
+              <td class="cav"><span class="sim">✓</span></td>
               <td class="rei"><span class="sim">✓</span></td>
             </tr>
             <tr>
@@ -466,10 +512,17 @@
         </table>
       </div>
 
-      <p class="aviso-loja"><b>Lote de fundador.</b> Os preços riscados são os que vão valer
-        quando a rede encher. Quem compra agora está apostando num servidor que ainda está
-        provando que funciona — e por isso paga menos, para sempre. O que estiver marcado
+      <p class="aviso-loja"><b>Lote de fundador.</b> O vitalício existe só enquanto a beta
+        durar — quem compra agora está apostando num servidor que ainda está provando que
+        funciona. Depois da beta fica só o plano de 30 dias. O que estiver marcado
         <b>em breve</b> ainda está sendo feito, e não é cobrado como pronto.</p>
+
+      <ul class="letra-miuda">
+        <li><b>Vitalício</b> vale enquanto o servidor existir.</li>
+        <li>Você mantém o cargo que comprou. <b>Cargo novo é compra nova.</b></li>
+        <li>Os benefícios podem mudar, com <b>aviso de 30 dias</b> no Discord.</li>
+        <li><b>Banimento por trapaça não devolve o valor.</b></li>
+      </ul>
     </div>
   </section>
 
