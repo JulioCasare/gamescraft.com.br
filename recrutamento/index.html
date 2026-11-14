@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recrutamento — Game Craft</title>
+<!--
+  Mesma história da pasta /regras: o site é uma página só, com roteamento por
+  âncora, e as vagas vivem em /#/recrutamento. Ninguém digita o "#" — quem
+  manda o endereço num chat escreve gamescraft.com.br/recrutamento, e isso
+  dava 404.
+
+  O GitHub Pages serve esta pasta como /recrutamento e como /recrutamento/,
+  então as duas formas caem no lugar certo. A troca é feita pelo script; o
+  http-equiv fica como reserva para quem estiver com script desligado, e o
+  link abaixo para quem não tiver nem isso.
+-->
+<meta http-equiv="refresh" content="0; url=/#/recrutamento">
+<link rel="canonical" href="https://gamescraft.com.br/#/recrutamento">
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #11100f;
+    color: #efe9e1;
+    text-align: center;
+    padding: 24px;
+  }
+  a { color: #e3a94a; }
+</style>
+</head>
+<body>
+  <p>Levando você ao recrutamento…<br>
+    <a href="/#/recrutamento">Clique aqui se não for sozinho.</a></p>
+  <script>location.replace("/#/recrutamento");</script>
+</body>
+</html>
