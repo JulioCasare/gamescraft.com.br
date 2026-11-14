@@ -910,7 +910,7 @@
       </div>
     </section>
 
-    <p class="aviso-loja" style="margin-top:34px"><b>Como a resposta chega.</b> O botão
+    <p class="aviso-loja" style="margin-top:34px" data-como-chega><b>Como a resposta chega.</b> O botão
       monta a sua inscrição em texto e copia. Abra um ticket no Discord e cole lá — é
       por onde tudo passa aqui, inclusive recurso de punição, e é o que me deixa
       responder você sem pedir seu e-mail. Se o botão não funcionar no seu aparelho,
@@ -928,6 +928,24 @@
   (function () {
     var pagina = document.querySelector('[data-pagina="recrutamento"]');
     if (!pagina) { return; }
+
+    // ------------------------------------------------------------------
+    // Para a inscricao chegar por e-mail, ponha aqui o endereco que o
+    // servico de formulario der -- algo como:
+    //
+    //     var FORMULARIO = 'https://formspree.io/f/abcdwxyz';
+    //
+    // Como se consegue esse endereco esta em docs/RECRUTAMENTO.md, no
+    // repositorio principal. Leva uns dez minutos, uma vez so.
+    //
+    // Deixado VAZIO, nada quebra: o botao de enviar nem nasce, e a pagina
+    // segue como esta, montando o texto para colar no ticket do Discord.
+    //
+    // O e-mail de destino fica cadastrado no servico, NAO aqui: esta pagina
+    // e publica e o repositorio tambem, e endereco escrito em HTML vira
+    // spam permanente.
+    var FORMULARIO = '';
+    // ------------------------------------------------------------------
 
     var abas = [].slice.call(pagina.querySelectorAll('[role="tab"]'));
 
@@ -1007,6 +1025,66 @@
         texto.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     });
+
+    // A segunda porta: enviar de verdade, quando houver para onde.
+    if (FORMULARIO) {
+      pagina.querySelectorAll('[data-saida]').forEach(function (saida) {
+        var vaga = saida.closest('.vaga');
+        var linha = saida.querySelector('.botoes');
+        var enviar = document.createElement('button');
+        enviar.type = 'button';
+        enviar.className = 'btn';
+        enviar.textContent = 'Enviar para o Julio';
+        linha.insertBefore(enviar, linha.firstChild);
+
+        // O copiar vira o plano B assim que existe o plano A.
+        var copiar = saida.querySelector('[data-copiar]');
+        if (copiar) { copiar.className = 'btn fraco'; }
+
+        enviar.addEventListener('click', function () {
+          var texto = saida.querySelector('[data-texto]').value;
+          var recado = vaga.querySelector('[data-recado]');
+          if (!texto.trim()) { return; }
+
+          enviar.disabled = true;
+          enviar.textContent = 'Enviando…';
+          recado.textContent = '';
+          recado.className = 'recado';
+
+          var corpo = {
+            inscricao: texto,
+            _subject: 'Inscricao — ' + vaga.getAttribute('data-vaga')
+          };
+          var nick = vaga.querySelector('[data-p="Nick"]');
+          if (nick && nick.value.trim()) { corpo._subject += ' — ' + nick.value.trim(); }
+
+          fetch(FORMULARIO, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(corpo)
+          }).then(function (r) {
+            if (!r.ok) { throw new Error(r.status); }
+            enviar.textContent = 'Enviado';
+            recado.textContent = 'Chegou. Pode fechar a pagina — e se quiser conversar antes da resposta, abra um ticket.';
+            recado.className = 'recado bom';
+          }).catch(function () {
+            // Falha de rede nao pode virar inscricao perdida em silencio.
+            enviar.disabled = false;
+            enviar.textContent = 'Tentar enviar de novo';
+            recado.textContent = 'Nao consegui enviar. Copie o texto e cole num ticket do Discord — vale igual.';
+            recado.className = 'recado ruim';
+          });
+        });
+      });
+
+      var aviso = pagina.querySelector('[data-como-chega]');
+      if (aviso) {
+        aviso.innerHTML = '<b>Como a resposta chega.</b> O botao envia a sua inscricao '
+          + 'direto para quem le, e o outro copia o texto para voce colar num ticket do '
+          + 'Discord. Tanto faz qual dos dois: so nao faca os dois, que vira inscricao '
+          + 'repetida. Se o envio falhar, o copiar continua ali.';
+      }
+    }
 
     pagina.querySelectorAll('[data-copiar]').forEach(function (botao) {
       botao.addEventListener('click', function () {
