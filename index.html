@@ -284,6 +284,7 @@
     <nav class="menu">
       <a href="#entrar">Como entrar</a>
       <a href="#modos">Modos</a>
+      <a href="#creditos">Créditos</a>
       <a href="#cargos">Cargos</a>
       <a href="#regras">Regras</a>
       <a href="/recrutamento/">Recrutamento</a>
@@ -388,6 +389,237 @@
     </div>
   </section>
 
+  <section id="creditos">
+    <style>
+      /* ------------------------------------------------------------ créditos */
+      #creditos .cartoes {
+        display: grid; gap: 12px; margin-top: 26px;
+        grid-template-columns: repeat(auto-fit, minmax(188px, 1fr));
+      }
+      #creditos .pct {
+        position: relative; background: var(--superficie); border: 1px solid var(--linha);
+        border-radius: var(--r); padding: 22px 16px 18px; text-align: center;
+        display: flex; flex-direction: column;
+      }
+      #creditos .pct.melhor { border-color: var(--ouro); }
+      #creditos .selo {
+        position: absolute; top: -1px; left: -1px; right: -1px;
+        background: var(--ouro); color: #16130B; font-family: "IBM Plex Mono", monospace;
+        font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+        padding: 4px 0; border-radius: var(--r) var(--r) 0 0;
+      }
+      #creditos .pct.melhor { padding-top: 40px; }
+      #creditos .moeda {
+        width: 56px; height: 56px; margin: 0 auto 14px; display: block;
+      }
+      #creditos .nome {
+        font-family: Cinzel, Georgia, serif; font-weight: 700; font-size: 17px;
+        letter-spacing: .02em; color: var(--ouro-cl);
+      }
+      #creditos .risco {
+        font-size: 13px; color: var(--tinta-fraca);
+        margin-top: 12px; min-height: 1.3em;
+      }
+      /* vazio no pacote base: risco sobre nada vira um tracinho solto. */
+      #creditos .risco:not(:empty) { text-decoration: line-through; }
+      #creditos .valor {
+        font-size: 15px; color: var(--tinta-fraca); margin-top: 2px;
+      }
+      #creditos .valor b {
+        font-size: 30px; color: var(--tinta); font-weight: 600; letter-spacing: -.01em;
+      }
+      #creditos .vale { font-size: 13px; color: var(--tinta-fraca); margin: 10px 0 16px; }
+      .comprar {
+        margin-top: auto; display: block; background: var(--ouro); color: #16130B;
+        border: 0; border-radius: var(--r); font: inherit; font-weight: 600; font-size: 14.5px;
+        padding: 10px 0; text-decoration: none; cursor: pointer;
+      }
+      .comprar:hover { background: var(--ouro-cl); }
+      .comprar[aria-disabled="true"] {
+        background: none; border: 1px dashed var(--linha); color: var(--tinta-fraca);
+        font-weight: 400; cursor: not-allowed;
+      }
+      .comprar[aria-disabled="true"]:hover { background: none; }
+      #cargos .compra-linha td { padding-top: 16px; padding-bottom: 18px; }
+      #cargos .compra-linha .comprar { display: inline-block; padding: 9px 22px; }
+      #creditos .presente {
+        margin-top: 26px; border-left: 2px solid var(--ouro); padding: 10px 0 10px 14px;
+        color: var(--tinta-fraca); font-size: 15px; max-width: 68ch;
+      }
+      #creditos .presente b { color: var(--tinta); }
+      #creditos .miuda { color: var(--tinta-fraca); font-size: 13px; margin-top: 18px; max-width: 72ch; }
+    </style>
+
+    <div class="env">
+      <div class="rotulo">Apoie a rede</div>
+      <h2>Créditos</h2>
+      <p class="sub">A moeda da rede. Compra cosmético — animação de quebrar cama, efeito
+        de vitória, efeito de eliminação. <strong>Nada aqui dá vantagem dentro da
+        partida.</strong> Dá para jogar a rede inteira sem gastar um centavo: votando
+        nas listas de servidor você ganha <strong>10 créditos por dia</strong>.</p>
+
+      <div class="cartoes">
+
+        <div class="pct">
+          <svg class="moeda" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="14" y="24" width="20" height="14" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="14" y="24" width="20" height="4" fill="#E8C468"/>
+          </svg>
+          <div class="nome">100 CRÉDITOS</div>
+          <div class="risco"></div>
+          <div class="valor">R$ <b>4</b>,90</div>
+          <p class="vale">2 cosméticos</p>
+          <a class="comprar" data-produto="credito-100" href="#">Comprar</a>
+        </div>
+
+        <div class="pct">
+          <svg class="moeda" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="10" y="26" width="18" height="12" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="22" y="18" width="18" height="12" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="10" y="26" width="18" height="4" fill="#E8C468"/>
+            <rect x="22" y="18" width="18" height="4" fill="#E8C468"/>
+          </svg>
+          <div class="nome">300 CRÉDITOS</div>
+          <div class="risco">R$ 14,70</div>
+          <div class="valor">R$ <b>12</b>,90</div>
+          <p class="vale">6 cosméticos</p>
+          <a class="comprar" data-produto="credito-300" href="#">Comprar</a>
+        </div>
+
+        <div class="pct melhor">
+          <div class="selo">Melhor conta</div>
+          <svg class="moeda" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="6" y="28" width="16" height="11" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="26" y="28" width="16" height="11" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="16" y="17" width="16" height="11" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="6" y="28" width="16" height="4" fill="#E8C468"/>
+            <rect x="26" y="28" width="16" height="4" fill="#E8C468"/>
+            <rect x="16" y="17" width="16" height="4" fill="#E8C468"/>
+          </svg>
+          <div class="nome">700 CRÉDITOS</div>
+          <div class="risco">R$ 34,30</div>
+          <div class="valor">R$ <b>24</b>,90</div>
+          <p class="vale">14 cosméticos</p>
+          <a class="comprar" data-produto="credito-700" href="#">Comprar</a>
+        </div>
+
+        <div class="pct">
+          <svg class="moeda" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="5" y="30" width="14" height="10" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="21" y="30" width="14" height="10" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="13" y="20" width="14" height="10" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="29" y="20" width="14" height="10" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="21" y="10" width="14" height="10" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="5" y="30" width="14" height="3" fill="#E8C468"/>
+            <rect x="21" y="30" width="14" height="3" fill="#E8C468"/>
+            <rect x="13" y="20" width="14" height="3" fill="#E8C468"/>
+            <rect x="29" y="20" width="14" height="3" fill="#E8C468"/>
+            <rect x="21" y="10" width="14" height="3" fill="#E8C468"/>
+          </svg>
+          <div class="nome">1.500 CRÉDITOS</div>
+          <div class="risco">R$ 73,50</div>
+          <div class="valor">R$ <b>44</b>,90</div>
+          <p class="vale">30 cosméticos</p>
+          <a class="comprar" data-produto="credito-1500" href="#">Comprar</a>
+        </div>
+
+        <div class="pct">
+          <svg class="moeda" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="8" y="22" width="32" height="18" rx="1" fill="#6B4A22" stroke="#3E2A12" stroke-width="2"/>
+            <rect x="8" y="22" width="32" height="5" fill="#8A6434"/>
+            <rect x="12" y="13" width="9" height="9" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="22" y="9" width="9" height="9" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+            <rect x="29" y="14" width="9" height="8" fill="#D4A537" stroke="#8A6A17" stroke-width="2"/>
+          </svg>
+          <div class="nome">3.500 CRÉDITOS</div>
+          <div class="risco">R$ 171,50</div>
+          <div class="valor">R$ <b>89</b>,90</div>
+          <p class="vale">70 cosméticos</p>
+          <a class="comprar" data-produto="credito-3500" href="#">Comprar</a>
+        </div>
+
+      </div>
+
+      <p class="presente"><b>Dá para comprar para outra pessoa.</b> Crédito e cargo vão
+        para o nick que for escrito no pagamento — não precisa ser o seu, e quem recebe
+        não precisa estar online. O aviso aparece no próximo login, em qualquer servidor.</p>
+
+      <p class="miuda" id="creditos-aviso"><b>A loja ainda não abriu.</b> Os botões ligam
+        quando a plataforma de pagamento estiver de pé. Até lá, quem quiser apoiar fala
+        no ticket do Discord e a entrega é feita à mão.</p>
+
+      <p class="miuda">O preço cortado é quanto esses créditos custariam comprados no
+        pacote de 100 — é a economia por crédito, não um preço que a gente já cobrou.
+        Pagamento processado pela plataforma de loja: a Game Craft não recebe nem guarda
+        dado de cartão.</p>
+    </div>
+
+    <script>
+      // ---------------------------------------------------------------------
+      // O ENDEREÇO DA LOJA MORA AQUI, E SÓ AQUI.
+      //
+      // O site é estático no GitHub Pages: não existe servidor nosso para cobrar
+      // nem para entregar. Quem faz as duas coisas é a plataforma de loja
+      // (PixelCart, Loja Square e parecidas), que recebe por Pix e roda o comando
+      // de entrega no servidor sozinha.
+      //
+      // Enquanto `base` estiver vazio, TODO botão nasce desligado e diz "Em
+      // breve". Isso é de propósito: botão de comprar que não cobra nada é pior
+      // que botão nenhum — a pessoa clica, não acontece nada, e conclui que o
+      // servidor está quebrado.
+      //
+      // Para ligar: ponha o endereço da loja em `base` e o caminho de cada
+      // produto em `produtos`. Nada mais precisa mudar.
+      // ---------------------------------------------------------------------
+      window.GC_LOJA = {
+        base: "",
+        produtos: {
+          "credito-100":  "",
+          "credito-300":  "",
+          "credito-700":  "",
+          "credito-1500": "",
+          "credito-3500": "",
+          "escudeiro":    "",
+          "cavaleiro":    "",
+          "rei":          ""
+        }
+      };
+
+      function ligarLoja() {
+        const L = window.GC_LOJA;
+        const aberta = !!L.base;
+
+        for (const a of document.querySelectorAll("[data-produto]")) {
+          const caminho = L.produtos[a.dataset.produto];
+          if (aberta && caminho) {
+            a.href = L.base.replace(/\/+$/, "") + "/" + caminho.replace(/^\/+/, "");
+            a.rel = "noopener";
+            continue;
+          }
+          a.href = "#";
+          a.setAttribute("aria-disabled", "true");
+          a.textContent = "Em breve";
+          a.addEventListener("click", e => e.preventDefault());
+        }
+
+        if (aberta) {
+          const aviso = document.getElementById("creditos-aviso");
+          if (aviso) aviso.hidden = true;
+        }
+      }
+
+      // Os botoes dos CARGOS ficam depois desta secao no documento, entao na hora
+      // em que este script roda eles ainda nao existem. Sem esperar o fim da
+      // analise do HTML, so os botoes de credito seriam ligados — e os de cargo
+      // ficariam com href="#", que rola a pagina para o topo em vez de comprar.
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", ligarLoja);
+      } else {
+        ligarLoja();
+      }
+    </script>
+  </section>
+
   <section id="cargos">
     <div class="env">
       <div class="rotulo">Apoie a rede</div>
@@ -420,6 +652,12 @@
               <td><span class="val">R$ 4,99</span></td>
               <td><span class="val">R$ 9,99</span></td>
               <td><span class="val">R$ 19,99</span></td>
+            </tr>
+            <tr class="compra-linha">
+              <th scope="row"></th>
+              <td><a class="comprar" data-produto="escudeiro" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="cavaleiro" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="rei" href="#">Comprar</a></td>
             </tr>
 
             <tr class="grupo"><th scope="rowgroup" colspan="4">Em toda a rede</th></tr>
