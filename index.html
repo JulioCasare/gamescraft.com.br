@@ -208,6 +208,9 @@
   .preco-linha td { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
   .preco-linha .val { font-size: 19px; font-weight: 600; color: var(--tinta); display: block; }
   .preco-linha s { font-size: 12.5px; color: var(--tinta-fraca); }
+  /* Traco de "nao existe", e nao de "faltou preencher": cinza fraco e
+     grande o bastante para ler como resposta. O Rei nao tem vitalicio. */
+  .preco-linha .sem { font-size: 19px; color: var(--linha); }
   .preco-linha.vital { background: color-mix(in srgb, var(--ouro) 7%, transparent); }
   .sim { font-size: 17px; font-weight: 700; }
   td.esc { color: var(--escudeiro); }
@@ -579,9 +582,8 @@
           "credito-700":  "",
           "credito-1500": "",
           "credito-3500": "",
-          "escudeiro":    "",
-          "cavaleiro":    "",
-          "rei":          ""
+          "escudeiro-sempre": "", "cavaleiro-sempre": "",
+          "escudeiro-30":     "", "cavaleiro-30":     "", "rei-30": ""
         }
       };
 
@@ -630,7 +632,7 @@
 
       <div class="rolagem">
         <table>
-          <caption>O vitalício é de fundador: existe só enquanto a beta durar.</caption>
+          <caption>O vitalício é de fundador: paga uma vez e é seu. O Rei não tem vitalício — só o plano de 30 dias.</caption>
           <thead>
             <tr>
               <th></th>
@@ -642,10 +644,16 @@
           <tbody>
             <tr class="preco-linha vital">
               <th scope="row">Vitalício de fundador
-                <span class="nota">só durante a beta; depois fica só o plano de 30 dias</span></th>
+                <span class="nota">paga uma vez e é seu; o Rei não tem vitalício</span></th>
               <td><span class="val">R$ 44,90</span></td>
               <td><span class="val">R$ 89,90</span></td>
-              <td><span class="val">R$ 149,99</span></td>
+              <td><span class="sem">&ndash;</span></td>
+            </tr>
+            <tr class="compra-linha">
+              <th scope="row"></th>
+              <td><a class="comprar" data-produto="escudeiro-sempre" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="cavaleiro-sempre" href="#">Comprar</a></td>
+              <td></td>
             </tr>
             <tr class="preco-linha">
               <th scope="row">30 dias</th>
@@ -655,9 +663,9 @@
             </tr>
             <tr class="compra-linha">
               <th scope="row"></th>
-              <td><a class="comprar" data-produto="escudeiro" href="#">Comprar</a></td>
-              <td><a class="comprar" data-produto="cavaleiro" href="#">Comprar</a></td>
-              <td><a class="comprar" data-produto="rei" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="escudeiro-30" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="cavaleiro-30" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="rei-30" href="#">Comprar</a></td>
             </tr>
 
             <tr class="grupo"><th scope="rowgroup" colspan="4">Em toda a rede</th></tr>
