@@ -715,7 +715,9 @@
           ?.querySelector("thead tr th:nth-child(" + (i + 1) + ")");
         const cargo = cabeca?.textContent.trim() || id;
         const preco = gcNum(linha?.previousElementSibling?.children[i]?.textContent);
-        return { id, nome: cargo + (id.endsWith("sempre") ? " vitalício" : " — 30 dias"), preco };
+        const prazo = id.slice(id.lastIndexOf("-") + 1);
+        const comoDizer = prazo === "sempre" ? " vitalício" : " — " + prazo + " dias";
+        return { id, nome: cargo + comoDizer, preco };
       }
 
       let gcDesconto = 0, gcCupom = null;
@@ -922,8 +924,8 @@
             <tr class="preco-linha vital">
               <th scope="row">Vitalício de fundador
                 <span class="nota">paga uma vez e é seu; o Rei não tem vitalício</span></th>
-              <td><span class="val">R$ 44,90</span></td>
-              <td><span class="val">R$ 89,90</span></td>
+              <td><span class="val">R$ 74,90</span></td>
+              <td><span class="val">R$ 149,90</span></td>
               <td><span class="sem">&ndash;</span></td>
             </tr>
             <tr class="compra-linha">
@@ -942,7 +944,18 @@
               <th scope="row"></th>
               <td><a class="comprar" data-produto="escudeiro-30" href="#">Comprar</a></td>
               <td><a class="comprar" data-produto="cavaleiro-30" href="#">Comprar</a></td>
-              <td><a class="comprar" data-produto="rei-30" href="#">Comprar</a></td>
+              $1            <tr class="preco-linha">
+              <th scope="row">90 dias
+                <span class="nota">20% mais barato que três meses avulsos</span></th>
+              <td><span class="val">R$ 11,90</span></td>
+              <td><span class="val">R$ 23,90</span></td>
+              <td><span class="val">R$ 47,90</span></td>
+            </tr>
+            <tr class="compra-linha">
+              <th scope="row"></th>
+              <td><a class="comprar" data-produto="escudeiro-90" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="cavaleiro-90" href="#">Comprar</a></td>
+              <td><a class="comprar" data-produto="rei-90" href="#">Comprar</a></td>
             </tr>
 
             <tr class="grupo"><th scope="rowgroup" colspan="4">Em toda a rede</th></tr>
