@@ -443,6 +443,16 @@
         font-weight: 400; cursor: not-allowed;
       }
       .comprar[aria-disabled="true"]:hover { background: none; }
+      /* O botao de "compra no jogo" nao e um botao desligado: ele tem algo
+         a dizer e algo a fazer. Entao nao usa o tracejado apagado do
+         aria-disabled, e sim a borda de ouro de quem esta disponivel. */
+      #creditos .comprar.no-jogo, .compra-linha .comprar.no-jogo {
+        background: none; border: 1px solid var(--ouro); color: var(--ouro-cl);
+        font-family: "IBM Plex Mono", monospace; font-size: 13px; cursor: copy;
+      }
+      #creditos .comprar.no-jogo:hover, .compra-linha .comprar.no-jogo:hover {
+        background: color-mix(in srgb, var(--ouro) 14%, transparent);
+      }
       #cargos .compra-linha td { padding-top: 16px; padding-bottom: 18px; }
       #cargos .compra-linha .comprar { display: inline-block; padding: 9px 22px; }
       #creditos .presente {
@@ -547,9 +557,10 @@
         para o nick que for escrito no pagamento — não precisa ser o seu, e quem recebe
         não precisa estar online. O aviso aparece no próximo login, em qualquer servidor.</p>
 
-      <p class="miuda" id="creditos-aviso"><b>A loja ainda não abriu.</b> Os botões ligam
-        quando a plataforma de pagamento estiver de pé. Até lá, quem quiser apoiar fala
-        no ticket do Discord e a entrega é feita à mão.</p>
+      <p class="miuda" id="creditos-aviso"><b>A compra é dentro do jogo.</b> Entre no
+        servidor e use <code>/comprar</code>: você escolhe, o servidor devolve um Pix no
+        chat, você paga pelo celular e em segundos chega sozinho — sem sair do jogo e sem
+        cadastro em lugar nenhum.</p>
 
       <p class="miuda">O preço cortado é quanto esses créditos custariam comprados no
         pacote de 100 — é a economia por crédito, não um preço que a gente já cobrou.
@@ -575,13 +586,19 @@
       // produto em `produtos`. Nada mais precisa mudar.
       // ---------------------------------------------------------------------
       window.GC_LOJA = {
-        base: "",
+        // Três estados possíveis:
+        //   "fechada"  — nada à venda ainda; botão diz "Em breve"
+        //   "jogo"     — a compra acontece DENTRO do jogo, com /comprar
+        //   uma URL    — existe loja na web, e o botão leva até ela
+        //
+        // Hoje é "jogo". A loja fala com o Mercado Pago de dentro para fora:
+        // ela pergunta se o Pix caiu em vez de esperar um aviso. Isso dispensa
+        // endereço público, HTTPS e túnel — e, em troca, não existe página de
+        // compra para o botão apontar. O que existe é o comando no servidor.
+        onde: "jogo",
         produtos: {
-          "credito-100":  "",
-          "credito-300":  "",
-          "credito-700":  "",
-          "credito-1500": "",
-          "credito-3500": "",
+          "credito-100":  "", "credito-300":  "", "credito-700":  "",
+          "credito-1500": "", "credito-3500": "",
           "escudeiro-sempre": "", "cavaleiro-sempre": "",
           "escudeiro-30":     "", "cavaleiro-30":     "", "rei-30": ""
         }
@@ -589,25 +606,44 @@
 
       function ligarLoja() {
         const L = window.GC_LOJA;
-        const aberta = !!L.base;
+        const naWeb = L.onde && L.onde !== "jogo" && L.onde !== "fechada";
 
         for (const a of document.querySelectorAll("[data-produto]")) {
           const caminho = L.produtos[a.dataset.produto];
-          if (aberta && caminho) {
-            a.href = L.base.replace(/\/+$/, "") + "/" + caminho.replace(/^\/+/, "");
+
+          if (naWeb && caminho) {
+            a.href = L.onde.replace(/\/+$/, "") + "/" + caminho.replace(/^\/+/, "");
             a.rel = "noopener";
             continue;
           }
+
+          if (L.onde === "jogo") {
+            // O botão vira instrução, e clicar nele copia o comando. Botão que
+            // não faz nada ensina a pessoa a não clicar em botão; este pelo
+            // menos deixa o comando pronto para colar no chat do jogo.
+            a.href = "#";
+            a.classList.add("no-jogo");
+            a.textContent = "/comprar no jogo";
+            a.title = "Entre no servidor e use /comprar";
+            a.addEventListener("click", (e) => {
+              e.preventDefault();
+              const antes = a.textContent;
+              navigator.clipboard?.writeText("/comprar").then(
+                () => { a.textContent = "copiado!"; },
+                () => { a.textContent = "use /comprar"; }
+              ).finally(() => setTimeout(() => { a.textContent = antes; }, 1600));
+            });
+            continue;
+          }
+
           a.href = "#";
           a.setAttribute("aria-disabled", "true");
           a.textContent = "Em breve";
           a.addEventListener("click", e => e.preventDefault());
         }
 
-        if (aberta) {
-          const aviso = document.getElementById("creditos-aviso");
-          if (aviso) aviso.hidden = true;
-        }
+        const aviso = document.getElementById("creditos-aviso");
+        if (aviso && naWeb) aviso.hidden = true;
       }
 
       // Os botoes dos CARGOS ficam depois desta secao no documento, entao na hora
