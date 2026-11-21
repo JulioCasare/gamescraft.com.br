@@ -759,8 +759,6 @@
             '<input id="gc-nick" class="gc-mono" maxlength="17" autocomplete="off" ' +
               'spellcheck="false" placeholder="SeuNickNoJogo">' +
             '<div class="gc-dica" id="gc-d-nick">Exatamente como aparece no jogo.</div>' +
-            '<label for="gc-email">E-mail <i>— opcional, para o recibo</i></label>' +
-            '<input id="gc-email" type="email" maxlength="120" placeholder="voce@exemplo.com">' +
             '<label for="gc-nome">Seu nome <i>— opcional</i></label>' +
             '<input id="gc-nome" maxlength="120" placeholder="Como te chamar">' +
             '<label for="gc-cupom">Cupom <i>— se tiver</i></label>' +
@@ -844,7 +842,6 @@
               body: JSON.stringify({
                 produto: p.id,
                 nick: nick.value.trim(),
-                email: document.getElementById("gc-email").value.trim(),
                 nome: document.getElementById("gc-nome").value.trim(),
                 cupom: gcCupom || "",
               }),
