@@ -210,6 +210,87 @@
   .preco-linha s { font-size: 12.5px; color: var(--tinta-fraca); }
   /* Traco de "nao existe", e nao de "faltou preencher": cinza fraco e
      grande o bastante para ler como resposta. O Rei nao tem vitalicio. */
+  /* ------------------------------------------------------------- checkout */
+  /* A janela de compra. Mesma paleta do resto: quem clica em comprar não
+     deve sentir que saiu do site. */
+  .gc-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.8);
+    display: grid; place-items: center; padding: 16px; z-index: 90;
+    overflow: auto;
+  }
+  .gc-janela {
+    background: var(--superficie); border: 1px solid var(--linha);
+    border-radius: 12px; padding: 26px; width: min(460px, 100%);
+  }
+  .gc-janela h3 {
+    font-family: Cinzel, Georgia, serif; color: var(--ouro);
+    font-size: 21px; margin: 0 0 3px;
+  }
+  .gc-oque { color: var(--tinta-fraca); margin: 0 0 16px; font-size: 14px; }
+  .gc-janela label {
+    display: block; font-size: 13px; color: var(--tinta-fraca); margin: 14px 0 5px;
+  }
+  .gc-janela label i { color: var(--linha); font-style: normal; }
+  .gc-janela input, .gc-copia {
+    width: 100%; background: var(--fundo); border: 1px solid var(--linha);
+    color: var(--tinta); font: inherit; padding: 10px 12px; border-radius: var(--r);
+  }
+  .gc-janela input:focus, .gc-copia:focus { outline: none; border-color: var(--ouro); }
+  .gc-mono { font-family: "IBM Plex Mono", monospace; }
+  #gc-cupom { text-transform: uppercase; }
+  .gc-dica { font-size: 12.5px; color: var(--tinta-fraca); margin-top: 5px; }
+  .gc-dica.ruim { color: #E88B88; }
+  .gc-dica.bom { color: #5BBF5B; }
+  .gc-cupom { display: flex; gap: 8px; }
+  .gc-cupom input { flex: 1; }
+  .gc-cupom button {
+    background: none; border: 1px solid var(--linha); color: var(--tinta-fraca);
+    font: inherit; font-size: 13px; padding: 0 14px; border-radius: var(--r);
+    cursor: pointer;
+  }
+  .gc-cupom button:hover { border-color: var(--ouro); color: var(--ouro-cl); }
+  .gc-total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 1px solid var(--linha); margin-top: 18px; padding-top: 13px;
+    color: var(--tinta-fraca); font-size: 13px;
+  }
+  .gc-val {
+    font-family: "IBM Plex Mono", monospace; font-size: 25px; font-weight: 600;
+    color: var(--tinta); font-variant-numeric: tabular-nums;
+  }
+  .gc-val s { color: var(--tinta-fraca); font-size: 14px; margin-right: 8px; font-weight: 400; }
+  .gc-acoes { display: flex; gap: 9px; margin-top: 16px; }
+  .gc-acoes button {
+    flex: 1; font: inherit; font-weight: 600; padding: 12px 0;
+    border-radius: var(--r); cursor: pointer; border: 0;
+  }
+  .gc-ok { background: var(--ouro); color: #16130B; }
+  .gc-ok:hover { background: var(--ouro-cl); }
+  .gc-ok:disabled { background: var(--linha); color: var(--tinta-fraca); cursor: wait; }
+  .gc-nao {
+    background: none; border: 1px solid var(--linha);
+    color: var(--tinta-fraca); flex: 0 0 96px;
+  }
+  /* Fundo branco de propósito: leitor de QR erra em fundo escuro. */
+  .gc-qr {
+    background: #fff; padding: 10px; border-radius: var(--r);
+    width: min(240px, 100%); margin: 6px auto 14px; display: block;
+  }
+  .gc-copia {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; height: 80px;
+    resize: none; color: var(--tinta-fraca); word-break: break-all;
+  }
+  .gc-estado {
+    margin-top: 14px; border-top: 1px solid var(--linha); padding-top: 12px;
+    font-size: 13.5px; color: var(--tinta-fraca);
+  }
+  .gc-estado.pago { color: #5BBF5B; }
+  .gc-err {
+    background: rgba(217,83,79,.1); border: 1px solid rgba(217,83,79,.45);
+    color: #E88B88; padding: 10px 13px; border-radius: var(--r);
+    margin: 12px 0 0; font-size: 13.5px;
+  }
+
   .preco-linha .sem { font-size: 19px; color: var(--linha); }
   .preco-linha.vital { background: color-mix(in srgb, var(--ouro) 7%, transparent); }
   .sim { font-size: 17px; font-weight: 700; }
@@ -586,64 +667,251 @@
       // produto em `produtos`. Nada mais precisa mudar.
       // ---------------------------------------------------------------------
       window.GC_LOJA = {
-        // Três estados possíveis:
-        //   "fechada"  — nada à venda ainda; botão diz "Em breve"
-        //   "jogo"     — a compra acontece DENTRO do jogo, com /comprar
-        //   uma URL    — existe loja na web, e o botão leva até ela
+        // O endereço da loja. Ela NÃO mora aqui: este site é estático no
+        // GitHub Pages, e quem fala com o Mercado Pago é um serviço nosso,
+        // que roda junto da rede e PERGUNTA a ele se o Pix caiu, em vez de
+        // esperar um aviso. Por isso não há webhook, nem assinatura, nem
+        // endereço de entrada — só este, para o navegador alcançar.
         //
-        // Hoje é "jogo". A loja fala com o Mercado Pago de dentro para fora:
-        // ela pergunta se o Pix caiu em vez de esperar um aviso. Isso dispensa
-        // endereço público, HTTPS e túnel — e, em troca, não existe página de
-        // compra para o botão apontar. O que existe é o comando no servidor.
-        onde: "jogo",
-        produtos: {
-          "credito-100":  "", "credito-300":  "", "credito-700":  "",
-          "credito-1500": "", "credito-3500": "",
-          "escudeiro-sempre": "", "cavaleiro-sempre": "",
-          "escudeiro-30":     "", "cavaleiro-30":     "", "rei-30": ""
-        }
+        // Vazio desliga o checkout: os botões viram "/comprar no jogo", que é
+        // o que vale enquanto o túnel não estiver de pé.
+        api: "https://loja.gamescraft.com.br",
       };
 
       function ligarLoja() {
-        const L = window.GC_LOJA;
-        const naWeb = L.onde && L.onde !== "jogo" && L.onde !== "fechada";
-
         for (const a of document.querySelectorAll("[data-produto]")) {
-          const caminho = L.produtos[a.dataset.produto];
-
-          if (naWeb && caminho) {
-            a.href = L.onde.replace(/\/+$/, "") + "/" + caminho.replace(/^\/+/, "");
-            a.rel = "noopener";
-            continue;
-          }
-
-          if (L.onde === "jogo") {
-            // O botão vira instrução, e clicar nele copia o comando. Botão que
-            // não faz nada ensina a pessoa a não clicar em botão; este pelo
-            // menos deixa o comando pronto para colar no chat do jogo.
+          if (window.GC_LOJA.api) {
             a.href = "#";
-            a.classList.add("no-jogo");
-            a.textContent = "/comprar no jogo";
-            a.title = "Entre no servidor e use /comprar";
-            a.addEventListener("click", (e) => {
-              e.preventDefault();
-              const antes = a.textContent;
-              navigator.clipboard?.writeText("/comprar").then(
-                () => { a.textContent = "copiado!"; },
-                () => { a.textContent = "use /comprar"; }
-              ).finally(() => setTimeout(() => { a.textContent = antes; }, 1600));
-            });
+            a.textContent = "Comprar";
+            a.addEventListener("click", (e) => { e.preventDefault(); abrirCheckout(a); });
             continue;
           }
-
+          // Sem loja de pé, o botão vira instrução e clicar copia o comando.
+          // Botão que não faz nada ensina a pessoa a não clicar em botão.
           a.href = "#";
-          a.setAttribute("aria-disabled", "true");
-          a.textContent = "Em breve";
-          a.addEventListener("click", e => e.preventDefault());
+          a.classList.add("no-jogo");
+          a.textContent = "/comprar no jogo";
+          a.title = "Entre no servidor e use /comprar";
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            const antes = a.textContent;
+            navigator.clipboard?.writeText("/comprar").then(
+              () => { a.textContent = "copiado!"; },
+              () => { a.textContent = "use /comprar"; }
+            ).finally(() => setTimeout(() => { a.textContent = antes; }, 1600));
+          });
         }
-
         const aviso = document.getElementById("creditos-aviso");
-        if (aviso && naWeb) aviso.hidden = true;
+        if (aviso && window.GC_LOJA.api) aviso.hidden = true;
+      }
+
+      // ---------------------------------------------------------------------
+      // O CHECKOUT
+      //
+      // O nome e o preço saem do próprio HTML da página, e não de uma lista
+      // repetida aqui: preço em dois lugares é preço que um dia discorda de si
+      // mesmo. O servidor confere tudo de novo de qualquer jeito — é dele o
+      // preço que vale, e o daqui serve só para a pessoa ver antes de clicar.
+      // ---------------------------------------------------------------------
+      const gcNick = /^[A-Za-z0-9_.]{3,17}$/;
+      const gcEsc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const gcReais = (v) => "R$ " + Number(v).toFixed(2).replace(".", ",");
+      const gcNum = (t) => Number(String(t || "").replace(/[^\d,]/g, "").replace(",", ".")) || null;
+
+      /** Descobre o que este botão vende, lendo a página em volta dele. */
+      function gcOQueVende(botao) {
+        const id = botao.dataset.produto;
+        const cartao = botao.closest(".pct");
+        if (cartao) {
+          return {
+            id,
+            nome: cartao.querySelector(".nome")?.textContent.trim() || id,
+            preco: gcNum(cartao.querySelector(".valor")?.textContent),
+          };
+        }
+        // Cargo: o nome está no cabeçalho da coluna, e o preço na linha logo
+        // acima da linha dos botões.
+        const celula = botao.closest("td");
+        const linha = celula?.parentElement;
+        const i = linha ? [...linha.children].indexOf(celula) : -1;
+        const cabeca = botao.closest("table")
+          ?.querySelector("thead tr th:nth-child(" + (i + 1) + ")");
+        const cargo = cabeca?.textContent.trim() || id;
+        const preco = gcNum(linha?.previousElementSibling?.children[i]?.textContent);
+        return { id, nome: cargo + (id.endsWith("sempre") ? " vitalício" : " — 30 dias"), preco };
+      }
+
+      let gcDesconto = 0, gcCupom = null;
+
+      function abrirCheckout(botao) {
+        const p = gcOQueVende(botao);
+        gcDesconto = 0; gcCupom = null;
+
+        const caixa = document.createElement("div");
+        caixa.className = "gc-modal";
+        caixa.innerHTML =
+          '<div class="gc-janela">' +
+            '<h3>' + gcEsc(p.nome) + '</h3>' +
+            '<p class="gc-oque">Confira o nick antes de pagar: é para ele que a compra vai, ' +
+              'e depois de paga não dá para trocar.</p>' +
+            '<label for="gc-nick">Seu nick no Minecraft</label>' +
+            '<input id="gc-nick" class="gc-mono" maxlength="17" autocomplete="off" ' +
+              'spellcheck="false" placeholder="SeuNickNoJogo">' +
+            '<div class="gc-dica" id="gc-d-nick">Exatamente como aparece no jogo.</div>' +
+            '<label for="gc-email">E-mail <i>— opcional, para o recibo</i></label>' +
+            '<input id="gc-email" type="email" maxlength="120" placeholder="voce@exemplo.com">' +
+            '<label for="gc-nome">Seu nome <i>— opcional</i></label>' +
+            '<input id="gc-nome" maxlength="120" placeholder="Como te chamar">' +
+            '<label for="gc-cupom">Cupom <i>— se tiver</i></label>' +
+            '<div class="gc-cupom">' +
+              '<input id="gc-cupom" class="gc-mono" maxlength="32" placeholder="CUPOM">' +
+              '<button type="button" id="gc-aplicar">Aplicar</button>' +
+            '</div>' +
+            '<div class="gc-dica" id="gc-d-cupom"></div>' +
+            '<div class="gc-total"><span>Total</span>' +
+              '<span class="gc-val" id="gc-total">' +
+                (p.preco ? gcReais(p.preco) : "—") + '</span></div>' +
+            '<div id="gc-erro"></div>' +
+            '<div class="gc-acoes">' +
+              '<button type="button" class="gc-nao" id="gc-voltar">Voltar</button>' +
+              '<button type="button" class="gc-ok" id="gc-pagar">Gerar Pix</button>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(caixa);
+        document.body.style.overflow = "hidden";
+
+        const fechar = () => { caixa.remove(); document.body.style.overflow = ""; };
+        const porTecla = (e) => {
+          if (e.key === "Escape") { fechar(); removeEventListener("keydown", porTecla); }
+        };
+        addEventListener("keydown", porTecla);
+        document.getElementById("gc-voltar").onclick = fechar;
+        caixa.onclick = (e) => { if (e.target === caixa) fechar(); };
+
+        const nick = document.getElementById("gc-nick");
+        nick.focus();
+        const conferirNick = () => {
+          const v = nick.value.trim();
+          const ok = gcNick.test(v);
+          const d = document.getElementById("gc-d-nick");
+          d.textContent = v === "" ? "Exatamente como aparece no jogo."
+            : ok ? "Certo." : "Só letras, números, _ e ponto. De 3 a 17.";
+          d.className = "gc-dica" + (v === "" ? "" : ok ? " bom" : " ruim");
+          return ok;
+        };
+        nick.oninput = conferirNick;
+
+        const mostrarTotal = () => {
+          if (!p.preco) return;
+          const novo = gcDesconto
+            ? Math.max(1, Math.round(p.preco * (100 - gcDesconto)) / 100) : p.preco;
+          document.getElementById("gc-total").innerHTML = gcDesconto
+            ? "<s>" + gcReais(p.preco) + "</s>" + gcReais(novo) : gcReais(novo);
+        };
+
+        document.getElementById("gc-aplicar").onclick = async () => {
+          const c = document.getElementById("gc-cupom").value.trim().toUpperCase();
+          const d = document.getElementById("gc-d-cupom");
+          if (!c) { gcDesconto = 0; gcCupom = null; d.textContent = ""; mostrarTotal(); return; }
+          d.className = "gc-dica"; d.textContent = "conferindo…";
+          try {
+            const r = await (await fetch(GC_LOJA.api + "/api/cupom?codigo="
+              + encodeURIComponent(c))).json();
+            if (r.erro || !r.desconto) {
+              gcDesconto = 0; gcCupom = null;
+              d.className = "gc-dica ruim"; d.textContent = r.erro || "cupom não existe";
+            } else {
+              gcDesconto = r.desconto; gcCupom = r.codigo;
+              d.className = "gc-dica bom";
+              d.textContent = r.desconto + "% de desconto" + (r.motivo ? " — " + r.motivo : "");
+            }
+          } catch (e) {
+            d.className = "gc-dica ruim"; d.textContent = "não consegui conferir agora";
+          }
+          mostrarTotal();
+        };
+
+        document.getElementById("gc-pagar").onclick = async () => {
+          if (!conferirNick()) { nick.focus(); return; }
+          const b = document.getElementById("gc-pagar");
+          b.disabled = true; b.textContent = "Gerando…";
+          document.getElementById("gc-erro").innerHTML = "";
+          try {
+            const r = await fetch(GC_LOJA.api + "/api/pix", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                produto: p.id,
+                nick: nick.value.trim(),
+                email: document.getElementById("gc-email").value.trim(),
+                nome: document.getElementById("gc-nome").value.trim(),
+                cupom: gcCupom || "",
+              }),
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.erro || "não consegui gerar o Pix");
+            gcMostrarPix(caixa, d, fechar);
+          } catch (e) {
+            const recado = e.message === "Failed to fetch"
+              ? "A loja está fora do ar agora. Tente daqui a pouco, ou entre no servidor e use /comprar."
+              : e.message;
+            document.getElementById("gc-erro").innerHTML =
+              '<div class="gc-err">' + gcEsc(recado) + '</div>';
+            b.disabled = false; b.textContent = "Gerar Pix";
+          }
+        };
+      }
+
+      function gcMostrarPix(caixa, d, fechar) {
+        caixa.querySelector(".gc-janela").innerHTML =
+          '<h3>Pague para receber</h3>' +
+          '<p class="gc-oque">' + gcEsc(d.produto) + ' para <b>' + gcEsc(d.nick) + '</b>' +
+            (d.desconto ? " — " + d.desconto + "% off com " + gcEsc(d.cupom) : "") + '</p>' +
+          (d.qrBase64 ? '<img class="gc-qr" alt="QR Code do Pix" ' +
+            'src="data:image/png;base64,' + d.qrBase64 + '">' : "") +
+          '<label for="gc-copia">Ou copie o código</label>' +
+          '<textarea class="gc-copia" id="gc-copia" readonly>' +
+            gcEsc(d.copiaecola || "") + '</textarea>' +
+          '<div class="gc-acoes">' +
+            '<button type="button" class="gc-nao" id="gc-fechar2">Fechar</button>' +
+            '<button type="button" class="gc-ok" id="gc-copiar">Copiar código</button>' +
+          '</div>' +
+          '<div class="gc-estado" id="gc-estado">Esperando o pagamento. ' +
+            'O Pix vale por ' + d.validadeMin + ' minutos.</div>' +
+          '<div class="gc-estado" style="border:0;padding-top:4px">Pode fechar depois de ' +
+            'pagar — a entrega acontece sozinha, mesmo com você fora do jogo.</div>';
+
+        document.getElementById("gc-fechar2").onclick = fechar;
+        document.getElementById("gc-copiar").onclick = () => {
+          const t = document.getElementById("gc-copia");
+          const b = document.getElementById("gc-copiar");
+          t.select();
+          navigator.clipboard?.writeText(t.value).then(() => {
+            b.textContent = "copiado!";
+            setTimeout(() => { b.textContent = "Copiar código"; }, 1600);
+          }, () => { document.execCommand("copy"); });
+        };
+
+        // A página só PERGUNTA. Quem entrega é a ronda do servidor — esta tela
+        // nunca decide que alguém pagou, só repete o que o servidor já sabe.
+        const olhar = setInterval(async () => {
+          if (!document.body.contains(caixa)) { clearInterval(olhar); return; }
+          try {
+            const e = await (await fetch(GC_LOJA.api + "/api/pedido/estado?r="
+              + encodeURIComponent(d.referencia))).json();
+            const el = document.getElementById("gc-estado");
+            if (!el) { clearInterval(olhar); return; }
+            if (e.estado === "pago" || e.estado === "entregue") {
+              clearInterval(olhar);
+              el.className = "gc-estado pago";
+              el.innerHTML = "<b>Pagamento confirmado!</b> Entre no jogo para receber.";
+            } else if (["vencido", "cancelado", "recusado"].indexOf(e.estado) >= 0) {
+              clearInterval(olhar);
+              el.textContent = "Este Pix não foi pago a tempo. Pode fechar e gerar outro.";
+            }
+          } catch (erro) { /* tenta de novo na próxima volta */ }
+        }, 4000);
       }
 
       // Os botoes dos CARGOS ficam depois desta secao no documento, entao na hora
