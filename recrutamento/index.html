@@ -78,6 +78,10 @@
     padding: 11px 0; border-bottom: 1px solid var(--linha); align-items: start;
   }
   .exige li:first-child { border-top: 1px solid var(--linha); }
+  /* Lista sem caixa de marcar: o criterio do Parceiro e informativo, nao e
+     checklist que alimenta a inscricao. Sem isto o texto caía na coluna de
+     22px reservada para a caixinha e saía espremido numa tira. */
+  .exige.sem-caixa li { grid-template-columns: 1fr; }
   .exige input[type="checkbox"] { width: 16px; height: 16px; margin-top: 3px; accent-color: var(--ouro); }
   .exige b { display: block; font-weight: 600; font-size: 15.5px; }
   .exige span { color: var(--tinta-fraca); font-size: 14.5px; }
@@ -165,6 +169,24 @@
         <li><input type="checkbox" data-exige="sem punição ativa"><div><b>Sem punição ativa, e nunca banido por ódio ou trapaça</b><span>Quem representa a rede lá fora responde pela regra aqui dentro.</span></div></li>
       </ul>
 
+
+      <h3>Parceiro — o degrau de cima</h3>
+      <p class="sub">O que está acima é a <b>entrada</b>, e ela não olha tamanho de
+        canal. Parceiro é outra conversa: é para quem já traz gente de verdade, e
+        entra pela administração, não por critério automático. Basta <b>um</b> dos
+        números abaixo.</p>
+      <ul class="exige sem-caixa">
+        <li><div><b>3.000 visualizações em um vídeo da Game Craft</b><span>Um vídeo, não a soma do canal. E da rede — vídeo de outro assunto não conta, porque o que se mede aqui é quanta gente você traz para cá.</span></div></li>
+        <li><div><b>30 espectadores simultâneos, em média, na live</b><span>Vale YouTube, Twitch ou TikTok. Média da live, não o pico de um momento.</span></div></li>
+        <li><div><b>Ou ser Arauto há mais de dois meses, trazendo gente</b><span>Este é o caminho que não depende de audiência nenhuma: o <code>/vim</code> conta quantos chegaram pelo seu código e quantos continuaram jogando. Número que a gente olha, não conversa.</span></div></li>
+      </ul>
+      <p class="sub">O que o Parceiro ganha é <b>combinado caso a caso</b>, porque
+        depende do que você faz — evento com a sua comunidade, recompensa maior no
+        seu código, divulgação dos dois lados. O cargo continua sendo o
+        <b>Arauto</b>: aqui ninguém ganha vantagem dentro da partida, e isso não
+        muda para quem tem canal grande.</p>
+      <p class="sub">Para pedir, use a mesma inscrição abaixo e diga o número que
+        você atende.</p>
       <h3>A inscrição</h3>
       <div class="campos duplo">
         <div class="campo"><label for="c-nick">Seu nick no jogo</label><input id="c-nick" data-p="Nick" required></div>
